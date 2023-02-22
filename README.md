@@ -1,4 +1,4 @@
-# night_solver
+# LEPL1509-Groupe25-NightSolver
 
 A new Flutter project.
 
