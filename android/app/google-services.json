@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "371837141633",
+    "project_id": "nightsolver-6c99c",
+    "storage_bucket": "nightsolver-6c99c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:371837141633:android:fd62ce435fc9605c174380",
+        "android_client_info": {
+          "package_name": "be.uclouvain.night_solver"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "371837141633-mtbaj1tqetpf5q6n9m1fdfs2cn5riji5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDdtBFVhwazbsYPpY_L17b1wy8pdk9Mfgs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "371837141633-mtbaj1tqetpf5q6n9m1fdfs2cn5riji5.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
