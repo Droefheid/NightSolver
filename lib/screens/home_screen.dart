@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:night_solver/screens/NavBar.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -49,10 +50,11 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      //backgroundColor: Colors.black,
+        drawer: NavBar(),
         appBar: AppBar(
-          backgroundColor: Colors.black,
-          foregroundColor: Colors.white,
+          backgroundColor: Colors.white,
+          foregroundColor: Colors.black,
           title: Center(
             child: customSearchBar,
           ),
@@ -65,15 +67,15 @@ class _HomeScreenState extends State<HomeScreen> {
                     customSearchBar = ListTile(
                       leading: Icon(
                         Icons.search,
-                        color: Colors.white,
+                        color: Colors.black,
                         size: 28,
                       ),
                       title: TextField(
-                        style: TextStyle(color: Colors.white),
+                        style: TextStyle(color: Colors.black),
                         decoration: InputDecoration(
                           hintText: 'Type in movie name...',
                           hintStyle: TextStyle(
-                            color: Colors.white,
+                            color: Colors.black,
                             fontSize: 18,
                             fontStyle: FontStyle.italic,
                           ),
