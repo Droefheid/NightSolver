@@ -2,6 +2,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:night_solver/screens/NavBar.dart';
 
+import 'movie_list.dart';
+
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
 
@@ -13,7 +15,6 @@ class _HomeScreenState extends State<HomeScreen> {
   final user = FirebaseAuth.instance.currentUser!;
   Icon customIcon = const Icon(Icons.search);
   String searchValue = "";
-  Widget customSearchBar = const Text("search");
   List movies = [Image.asset('poster/avenger.jpg'),
                   Image.asset('poster/blackpanter.jpg'),
                   Image.asset('poster/riddle.jpg'),
@@ -34,6 +35,10 @@ class _HomeScreenState extends State<HomeScreen> {
         fetch();
       }
     });
+  }
+
+  void navigateToMovieList() {
+    Navigator.of(context).push(MaterialPageRoute(builder: (_) => MovieList()));
   }
 
   @override
