@@ -14,6 +14,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final user = FirebaseAuth.instance.currentUser!;
   Icon customIcon = const Icon(Icons.search);
+  Widget customSearchBar = const Text("search");
   String searchValue = "";
   List movies = [Image.asset('poster/avenger.jpg'),
                   Image.asset('poster/blackpanter.jpg'),
