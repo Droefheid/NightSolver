@@ -96,23 +96,23 @@ class _HomeScreenState extends State<HomeScreen> {
             IconButton(onPressed: signOut, icon: Icon(Icons.logout)),
           ],
         ),
-        body: ListView.builder(
-        controller: controller,
-        //padding: const EdgeInsets.all(8),
-        itemCount: movies.length + 1,
-        itemBuilder: (context, index) {
-          if (index < movies.length) {
-            final movie = movies[index];
+        body: GridView.builder(
+            itemCount: movies.length + 1,
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 3,
+                mainAxisSpacing: 20),
+            itemBuilder: (context, index) {
+              if (index < movies.length) {
+                final movie = movies[index];
 
-            return movie;
-          } else {
-            return const Padding(
-              padding: EdgeInsets.symmetric(vertical: 32),
-              child: Center(child: CircularProgressIndicator())
-            );
-          }
-        },
-      )
+                return movie;
+              } else {
+                return const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 32),
+                    child: Center(child: CircularProgressIndicator())
+                );
+              }
+            })
     );
   }
 }
