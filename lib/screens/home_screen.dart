@@ -99,7 +99,6 @@ class _HomeScreenState extends State<HomeScreen> {
               },
               icon: customIcon,
             ),
-            IconButton(onPressed: signOut, icon: Icon(Icons.logout)),
           ],
         ),
         body: ListView.builder(
