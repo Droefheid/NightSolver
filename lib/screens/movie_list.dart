@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'movie_details.dart';
@@ -10,45 +12,54 @@ class MovieList extends StatefulWidget {
 }
 
 class _MovieListState extends State<MovieList> {
+  final apiKey = '9478d83ca04bd6ee25b942dd7a0ad777';
   List<dynamic> movies = [];
-  List<dynamic> filteredMovies = [];
   Color mainColor = const Color(0xff3C3261);
   final TextEditingController _controller = TextEditingController();
 
-  Future<void> getData(String value) async {
-    try {
-      final url =
-          'https://api.themoviedb.org/3/search/movie?api_key=9478d83ca04bd6ee25b942dd7a0ad777&query=$value';
+  Future<void> getData() async {
+    final user = FirebaseAuth.instance.currentUser!;
+    final snapshot = await FirebaseFirestore.instance.collection('movies').doc(user.uid).get();
+    List<dynamic>? moviesId = snapshot.data()!['movies_id'];
 
-      final response = await http.get(Uri.parse(url));
-      final responseData = json.decode(response.body);
-      if (responseData['results'] != null) {
-        setState(() {
-          movies = responseData['results'];
-          filteredMovies = movies;
-        });
-      } else {
-        print('Response data is null');
+    List<dynamic> moviesData = [];
+
+
+    if(moviesId != null){
+      for (String movieId in moviesId) {
+        final response = await http.get(Uri.parse('https://api.themoviedb.org/3/movie/$movieId?api_key=$apiKey'));
+
+        if (response.statusCode == 200) {
+          final Map<String, dynamic> responseData = json.decode(response.body);
+          moviesData.add(responseData);
+        }
       }
-    } catch (error) {
-      print('Error occurred: $error');
     }
+
+    setState(() {
+      movies = moviesData;
+    });
   }
 
   void _onSearchChanged(String value) async {
     try {
       final url =
-          'https://api.themoviedb.org/3/search/movie?api_key=9478d83ca04bd6ee25b942dd7a0ad777&query=$value';
+          'https://api.themoviedb.org/3/search/movie?api_key=$apiKey&query=$value';
       final response = await http.get(Uri.parse(url));
       final responseData = json.decode(response.body);
       if (responseData['results'] != null) {
         setState(() {
           movies = responseData['results'];
-          filteredMovies = movies;
         });
       } else {
         print('Response data is null');
       }
+      /*if(responseData['results'].isEmpty()){
+        print("RESPONSE DATA SEARCH");
+        print(responseData['results']);
+        getData();
+      }*/
+
     } catch (error) {
       print('Error occurred: $error');
     }
@@ -57,8 +68,7 @@ class _MovieListState extends State<MovieList> {
   @override
   void initState() {
     super.initState();
-    String searchTerm = 'Avengers'; // example search term
-    getData(searchTerm);
+    getData();
   }
 
   @override
@@ -95,19 +105,18 @@ class _MovieListState extends State<MovieList> {
               controller: _controller,
               onChanged: _onSearchChanged,
             ),
-            MovieTitle(mainColor),
             Expanded(
               child: ListView.builder(
-                itemCount: filteredMovies == null ? 0 : filteredMovies.length,
+                itemCount: movies == null ? 0 : movies.length,
                 itemBuilder: (context, i) {
                   return MaterialButton(
-                    child: MovieCell(filteredMovies[i]),
+                    child: MovieCell(movies[i]),
                     padding: const EdgeInsets.all(0.0),
                     onPressed: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => MovieDetail(filteredMovies[i]),
+                          builder: (context) => MovieDetail(movies[i]),
                         ),
                       );
                     },
@@ -123,28 +132,7 @@ class _MovieListState extends State<MovieList> {
   }
 }
 
-class MovieTitle extends StatelessWidget {
-  final Color mainColor;
 
-  const MovieTitle(this.mainColor);
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 16.0),
-      child: Text(
-        'Historique',
-        style: TextStyle(
-          fontSize: 40.0,
-          color: mainColor,
-          fontWeight: FontWeight.bold,
-          fontFamily: 'Arvo',
-        ),
-        textAlign: TextAlign.left,
-      ),
-    );
-  }
-}
 
 class MovieCell extends StatelessWidget {
   final dynamic movie;
@@ -172,9 +160,9 @@ class MovieCell extends StatelessWidget {
                   color: Colors.grey,
                   image: movie['poster_path'] != null
                       ? new DecorationImage(
-                          image: new NetworkImage(
-                              image_url + movie['poster_path']),
-                          fit: BoxFit.cover)
+                      image: new NetworkImage(
+                          image_url + movie['poster_path']),
+                      fit: BoxFit.cover)
                       : null,
                   boxShadow: [
                     new BoxShadow(
@@ -187,28 +175,28 @@ class MovieCell extends StatelessWidget {
             ),
             new Expanded(
                 child: new Container(
-              margin: const EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 0.0),
-              child: new Column(
-                children: [
-                  new Text(
-                    movie['title'] ?? 'Title Not Found',
-                    style: new TextStyle(
-                        fontSize: 20.0,
-                        fontFamily: 'Arvo',
-                        fontWeight: FontWeight.bold,
-                        color: mainColor),
+                  margin: const EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 0.0),
+                  child: new Column(
+                    children: [
+                      new Text(
+                        movie['title'] ?? 'Title Not Found',
+                        style: new TextStyle(
+                            fontSize: 20.0,
+                            fontFamily: 'Arvo',
+                            fontWeight: FontWeight.bold,
+                            color: mainColor),
+                      ),
+                      new Padding(padding: const EdgeInsets.all(2.0)),
+                      new Text(
+                        movie['overview'] ?? 'Overview Not Found',
+                        maxLines: 3,
+                        style: new TextStyle(
+                            color: const Color(0xff8785A4), fontFamily: 'Arvo'),
+                      )
+                    ],
+                    crossAxisAlignment: CrossAxisAlignment.start,
                   ),
-                  new Padding(padding: const EdgeInsets.all(2.0)),
-                  new Text(
-                    movie['overview'] ?? 'Overview Not Found',
-                    maxLines: 3,
-                    style: new TextStyle(
-                        color: const Color(0xff8785A4), fontFamily: 'Arvo'),
-                  )
-                ],
-                crossAxisAlignment: CrossAxisAlignment.start,
-              ),
-            )),
+                )),
           ],
         ),
         new Container(
@@ -239,12 +227,10 @@ class _SearchBarState extends State<SearchBar> {
   TextEditingController searchController = TextEditingController();
   String searchText = '';
 
-  List<dynamic> filteredMovies = [];
 
   @override
   void initState() {
     super.initState();
-    filteredMovies = movieList;
     searchController.addListener(() {
       setState(() {
         searchText = searchController.text;
