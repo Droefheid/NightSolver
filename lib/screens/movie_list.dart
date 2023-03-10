@@ -1,25 +1,46 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'movie_details.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 
 class MovieList extends StatefulWidget {
   @override
   _MovieListState createState() => _MovieListState();
 }
 
+
+
 class _MovieListState extends State<MovieList> {
   List<dynamic> movies = [];
   Color mainColor = const Color(0xff3C3261);
 
+
+
   Future<void> getData() async {
-    final url =
-        'https://api.themoviedb.org/3/movie/top_rated?api_key=9478d83ca04bd6ee25b942dd7a0ad777';
-    final response = await http.get(Uri.parse(url));
-    final Map<String, dynamic> responseData = json.decode(response.body);
+    final user = FirebaseAuth.instance.currentUser!;
+    final snapshot = await FirebaseFirestore.instance.collection('movies').doc(user.uid).get();
+    List<dynamic>? moviesId = snapshot.data()!['movies_id'];
+
+    List<dynamic> moviesData = [];
+    final apiKey = '9478d83ca04bd6ee25b942dd7a0ad777';
+
+    if(moviesId != null){
+      for (String movieId in moviesId) {
+        final response = await http.get(Uri.parse('https://api.themoviedb.org/3/movie/$movieId?api_key=$apiKey'));
+
+        if (response.statusCode == 200) {
+          final Map<String, dynamic> responseData = json.decode(response.body);
+          moviesData.add(responseData);
+        }
+      }
+    }
+
     setState(() {
-      movies = responseData['results'];
+      movies = moviesData;
     });
   }
 
