@@ -33,12 +33,12 @@ class NavBar extends StatelessWidget{
           ),
           ListTile(
             leading: Icon(Icons.movie),
-            title: Text('Mylist'),
+            title: Text('Historique'),
             onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => MovieList())),
           ),
           ListTile(
             leading: Icon(Icons.movie),
-            title: Text('Recommendation'),
+            title: Text('Recommendations'),
             onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => RecommendationMovieList())),
           ),
 
