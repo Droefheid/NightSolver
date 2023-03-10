@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'dart:ui' as ui;
 
@@ -8,6 +10,16 @@ class MovieDetail extends StatelessWidget {
   MovieDetail(this.movie);
 
   Color mainColor = const Color(0xff3C3261);
+
+  Future addMovie() async {
+    final user = FirebaseAuth.instance.currentUser!;
+    final DocumentReference docRef =  FirebaseFirestore.instance.collection('movies').doc(user.uid);
+    docRef.update({
+      'movies_id': FieldValue.arrayUnion([movie['id'].toString()]),
+    });
+  }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -80,16 +92,19 @@ class MovieDetail extends StatelessWidget {
                   children: <Widget>[
                     new Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child: new Container(
-                        padding: const EdgeInsets.all(16.0),
-                        alignment: Alignment.center,
-                        child: new Icon(
-                          Icons.add,
-                          color: Colors.white,
+                      child: new GestureDetector(
+                        onTap: addMovie,
+                        child: new Container(
+                          padding: const EdgeInsets.all(16.0),
+                          alignment: Alignment.center,
+                          child: new Icon(
+                            Icons.add,
+                            color: Colors.white,
+                          ),
+                          decoration: new BoxDecoration(
+                              borderRadius: new BorderRadius.circular(10.0),
+                              color: const Color(0xaa3C3261)),
                         ),
-                        decoration: new BoxDecoration(
-                            borderRadius: new BorderRadius.circular(10.0),
-                            color: const Color(0xaa3C3261)),
                       ),
                     ),
                   ],
