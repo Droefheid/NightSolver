@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/material.dart';
 import 'movie_list.dart';
+import 'recommendation_movie_list.dart';
 
 class NavBar extends StatelessWidget{
   void signOut(){
@@ -36,6 +36,12 @@ class NavBar extends StatelessWidget{
             title: Text('Mylist'),
             onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => MovieList())),
           ),
+          ListTile(
+            leading: Icon(Icons.movie),
+            title: Text('Recommendation'),
+            onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => RecommendationMovieList())),
+          ),
+
           ListTile(
             leading: Icon(Icons.logout),
             title: Text('Logout'),
