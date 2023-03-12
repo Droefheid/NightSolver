@@ -7,11 +7,15 @@ class MovieDetail extends StatelessWidget {
 
   MovieDetail(this.movie);
 
-  Color mainColor = const Color(0xff3C3261);
+  Color mainColor = const Color(0xffffffff);
 
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
+      appBar: new AppBar(
+        backgroundColor: mainColor,
+        title: new Text(movie['title']),
+      ),
       body: new Stack(fit: StackFit.expand, children: [
         new Image.network(
           image_url + movie['poster_path'],
@@ -73,7 +77,7 @@ class MovieDetail extends StatelessWidget {
                 ),
                 new Text(movie['overview'],
                     style:
-                        new TextStyle(color: Colors.white, fontFamily: 'Arvo')),
+                    new TextStyle(color: Colors.white, fontFamily: 'Arvo')),
                 new Padding(padding: const EdgeInsets.all(10.0)),
                 new Row(
                   mainAxisAlignment: MainAxisAlignment.center,
