@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:night_solver/screens/result_screen.dart';
 
 class Preferences extends StatefulWidget {
-  const Preferences({Key? key }): super(key: key);
+  const Preferences({Key? key}) : super(key: key);
 
   @override
   State<Preferences> createState() => _PreferencesState();
 }
 
-class _PreferencesState extends State<Preferences>{
+class _PreferencesState extends State<Preferences> {
   double aventureValue = 50;
   double actionValue = 50;
   double comedieValue = 50;
@@ -39,36 +39,48 @@ class _PreferencesState extends State<Preferences>{
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          Text('Aventure',textAlign: TextAlign.left, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-          buildSideLabel(this.aventureValue),
-          Text('Action', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-          buildSideLabel(this.actionValue),
-          Text('Comédie', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-          buildSideLabel(this.comedieValue),
+          Text('Aventure',
+              textAlign: TextAlign.left,
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+          buildSideLabel("aventureValue", aventureValue),
+          Text('Action',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+          buildSideLabel("actionValue", actionValue),
+          Text('Comédie',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+          buildSideLabel("comedieValue", comedieValue),
           buildSubmit(),
         ],
       ),
     );
   }
 
-  Widget buildSideLabel(double Value){
+  Widget buildSideLabel(String field, double value) {
     return Row(
       children: [
-        Text('Not at all', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+        Text('Not at all',
+            style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
         Expanded(
           child: Slider(
-            value: Value,
+            value: value,
             min: 0,
             max: 100,
             divisions: 4,
-            onChanged: (NewValue) {
+            onChanged: (newValue) {
               setState(() {
-                Value = NewValue;
+                if (field == "aventureValue") {
+                  aventureValue = newValue;
+                } else if (field == "actionValue") {
+                  actionValue = newValue;
+                } else if (field == "comedieValue") {
+                  comedieValue = newValue;
+                }
               });
             },
           ),
         ),
-        Text('A lot', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+        Text('A lot',
+            style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
       ],
     );
   }
@@ -81,17 +93,16 @@ class _PreferencesState extends State<Preferences>{
           //width: MediaQuery.of(context).size.width- 80,
           height: 50,
           child: ElevatedButton(
-            onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (context) => ResultScreen(aventure : aventureValue, action : actionValue, comedie : comedieValue))),
-            child: Text('Submit', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            onPressed: () => Navigator.of(context).push(MaterialPageRoute(
+                builder: (context) => ResultScreen(
+                    aventure: aventureValue,
+                    action: actionValue,
+                    comedie: comedieValue))),
+            child: Text('Submit',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
           ),
         ),
       ],
     );
   }
-
-
 }
-
-
-
-
