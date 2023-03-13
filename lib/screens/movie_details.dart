@@ -11,15 +11,18 @@ class MovieDetail extends StatelessWidget {
 
   Color mainColor = const Color(0xffffffff);
 
-  Future addMovie() async {
+  Future addMovie(BuildContext context) async {
     final user = FirebaseAuth.instance.currentUser!;
-    final DocumentReference docRef =  FirebaseFirestore.instance.collection('movies').doc(user.uid);
-    docRef.update({
+    final DocumentReference docRef =
+    FirebaseFirestore.instance.collection('movies').doc(user.uid);
+    docRef.set({
       'movies_id': FieldValue.arrayUnion([movie['id'].toString()]),
-    });
+    }, SetOptions(merge: true));
+
+    // Navigate back to the previous screen
+    FocusScope.of(context).unfocus();
+    Navigator.pop(context, true);
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -97,7 +100,9 @@ class MovieDetail extends StatelessWidget {
                     new Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: new GestureDetector(
-                        onTap: addMovie,
+                        onTap: () {
+                          addMovie(context);
+                        },
                         child: new Container(
                           padding: const EdgeInsets.all(16.0),
                           alignment: Alignment.center,
