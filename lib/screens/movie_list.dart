@@ -16,18 +16,22 @@ class _MovieListState extends State<MovieList> {
   List<dynamic> movies = [];
   Color mainColor = const Color(0xff3C3261);
   final TextEditingController _controller = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
 
   Future<void> getData() async {
     final user = FirebaseAuth.instance.currentUser!;
-    final snapshot = await FirebaseFirestore.instance.collection('movies').doc(user.uid).get();
+    final snapshot = await FirebaseFirestore.instance
+        .collection('movies')
+        .doc(user.uid)
+        .get();
     List<dynamic>? moviesId = snapshot.data()!['movies_id'];
 
     List<dynamic> moviesData = [];
 
-
-    if(moviesId != null){
+    if (moviesId != null) {
       for (String movieId in moviesId) {
-        final response = await http.get(Uri.parse('https://api.themoviedb.org/3/movie/$movieId?api_key=$apiKey'));
+        final response = await http.get(Uri.parse(
+            'https://api.themoviedb.org/3/movie/$movieId?api_key=$apiKey'));
 
         if (response.statusCode == 200) {
           final Map<String, dynamic> responseData = json.decode(response.body);
@@ -43,23 +47,22 @@ class _MovieListState extends State<MovieList> {
 
   void _onSearchChanged(String value) async {
     try {
-      final url =
-          'https://api.themoviedb.org/3/search/movie?api_key=$apiKey&query=$value';
-      final response = await http.get(Uri.parse(url));
-      final responseData = json.decode(response.body);
-      if (responseData['results'] != null) {
-        setState(() {
-          movies = responseData['results'];
-        });
+      if (value != '') {
+        final url =
+            'https://api.themoviedb.org/3/search/movie?api_key=$apiKey&query=$value';
+        final response = await http.get(Uri.parse(url));
+        final responseData = json.decode(response.body);
+        resetScrollPosition();
+        if (responseData['results'] != null) {
+          setState(() {
+            movies = responseData['results'];
+          });
+        } else {
+          print('Response data is null');
+        }
       } else {
-        print('Response data is null');
+        await getData();
       }
-      /*if(responseData['results'].isEmpty()){
-        print("RESPONSE DATA SEARCH");
-        print(responseData['results']);
-        getData();
-      }*/
-
     } catch (error) {
       print('Error occurred: $error');
     }
@@ -69,6 +72,10 @@ class _MovieListState extends State<MovieList> {
   void initState() {
     super.initState();
     getData();
+  }
+
+  void resetScrollPosition() {
+    _scrollController.jumpTo(0.0);
   }
 
   @override
@@ -107,18 +114,23 @@ class _MovieListState extends State<MovieList> {
             ),
             Expanded(
               child: ListView.builder(
-                itemCount: movies == null ? 0 : movies.length,
+                controller: _scrollController,
+                itemCount: movies.isEmpty ? 0 : movies.length,
                 itemBuilder: (context, i) {
                   return MaterialButton(
                     child: MovieCell(movies[i]),
                     padding: const EdgeInsets.all(0.0),
-                    onPressed: () {
-                      Navigator.push(
+                    onPressed: () async {
+                      final addedMovie = await Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (context) => MovieDetail(movies[i]),
                         ),
                       );
+                      if (addedMovie != null && addedMovie) {
+                        _controller.clear();
+                        await getData();
+                      }
                     },
                     color: Colors.white,
                   );
@@ -131,8 +143,6 @@ class _MovieListState extends State<MovieList> {
     );
   }
 }
-
-
 
 class MovieCell extends StatelessWidget {
   final dynamic movie;
@@ -226,7 +236,6 @@ class _SearchBarState extends State<SearchBar> {
 
   TextEditingController searchController = TextEditingController();
   String searchText = '';
-
 
   @override
   void initState() {
