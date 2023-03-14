@@ -37,12 +37,13 @@ class ResultScreenSate extends State<ResultScreen> {
 
     if(moviesId != null){
       for (String movieId in moviesId) {
-        final result = await http.get(Uri.parse('https://api.themoviedb.org/3/movie/$movieId/recommendations?api_key=$apiKey'));
-
-        if (result.statusCode == 200) {
-          final Map<String, dynamic> resultData = json.decode(result.body);
-          if(Genres.contains(resultData['results']['genre_ids'][0])){
-            moviesData.add(resultData);
+        for(int i=1;i<5;i++){
+          final result = await http.get(Uri.parse('https://api.themoviedb.org/3/movie/$movieId/recommendations?api_key=$apiKey&language=en-US&page=$i'));
+          if (result.statusCode == 200) {
+            final Map<String, dynamic> resultData = json.decode(result.body);
+            if(Genres.contains(resultData['results']['genre_ids'][0])){
+              moviesData.add(resultData);
+            }
           }
         }
       }
