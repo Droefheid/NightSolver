@@ -37,16 +37,21 @@ class ResultScreenSate extends State<ResultScreen> {
 
     if(moviesId != null){
       for (String movieId in moviesId) {
-        for(int i=1;i<5;i++){
-          final result = await http.get(Uri.parse('https://api.themoviedb.org/3/movie/$movieId/recommendations?api_key=$apiKey&language=en-US&page=$i'));
+          final result = await http.get(Uri.parse('https://api.themoviedb.org/3/movie/$movieId/recommendations?api_key=$apiKey&language=en-US&page=1'));
           if (result.statusCode == 200) {
             final Map<String, dynamic> resultData = json.decode(result.body);
-            if(Genres.contains(resultData['results']['genre_ids'][0])){
-              moviesData.add(resultData);
+            for(int i=0;i<resultData['results'].length;i++){
+              if(resultData['results'][i]['genre_ids'].length != 0 && Genres.contains(resultData['results'][i]['genre_ids'][0] as int)){
+
+                if(!moviesId.contains(resultData["results"][i]["id"] as int)) {
+
+                  moviesData.add(resultData["results"][i]);
+                }
+              }
             }
           }
-        }
       }
+      print(moviesData.first["id"]);
     }
 
     setState(() {
@@ -92,7 +97,7 @@ class ResultScreenSate extends State<ResultScreen> {
                 itemBuilder: (context, i) {
                   return MaterialButton(
                     child:
-                    MovieCell(movies[i]['results']),
+                    MovieCell(movies[i]),
                     padding: const EdgeInsets.all(0.0),
                     onPressed: () {},
                     color: Colors.white,

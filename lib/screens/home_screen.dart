@@ -1,6 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:night_solver/screens/NavBar.dart';
+import 'package:night_solver/screens/new_salon_screen.dart';
+import 'package:night_solver/screens/preference_page.dart';
 
 import 'movie_list.dart';
 
@@ -126,7 +128,7 @@ class _HomeScreenState extends State<HomeScreen> {
         width: double.infinity,
         child: ElevatedButton(
           child: Text("Create new room"),
-          onPressed: () {},
+          onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => NewSalon())),
         ),
       ),
     );
