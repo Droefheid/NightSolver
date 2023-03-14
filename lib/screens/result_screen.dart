@@ -107,28 +107,6 @@ class ResultScreenSate extends State<ResultScreen> {
 
   }
 }
-class MovieTitle extends StatelessWidget {
-  final Color mainColor;
-
-  const MovieTitle(this.mainColor);
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 16.0),
-      child: Text(
-        'My Top Rated',
-        style: TextStyle(
-          fontSize: 40.0,
-          color: mainColor,
-          fontWeight: FontWeight.bold,
-          fontFamily: 'Arvo',
-        ),
-        textAlign: TextAlign.left,
-      ),
-    );
-  }
-}
 
 class MovieCell extends StatelessWidget {
   final dynamic movie;
