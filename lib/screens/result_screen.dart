@@ -42,9 +42,7 @@ class ResultScreenSate extends State<ResultScreen> {
             final Map<String, dynamic> resultData = json.decode(result.body);
             for(int i=0;i<resultData['results'].length;i++){
               if(resultData['results'][i]['genre_ids'].length != 0 && Genres.contains(resultData['results'][i]['genre_ids'][0] as int)){
-
-                if(!moviesId.contains(resultData["results"][i]["id"] as int)) {
-
+                if(!moviesId.contains(resultData["results"][i]["id"].toString())) {
                   moviesData.add(resultData["results"][i]);
                 }
               }
