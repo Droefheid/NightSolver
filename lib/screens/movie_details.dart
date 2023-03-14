@@ -5,9 +5,13 @@ import 'dart:ui' as ui;
 
 class MovieDetail extends StatelessWidget {
   final movie;
+  final bool canDelete;
+
   var image_url = 'https://image.tmdb.org/t/p/w500/';
 
-  MovieDetail(this.movie);
+
+  MovieDetail(this.movie)
+      : canDelete = movie['can_delete'] == true;
 
   Color mainColor = const Color(0xffffffff);
 
@@ -18,6 +22,19 @@ class MovieDetail extends StatelessWidget {
     docRef.set({
       'movies_id': FieldValue.arrayUnion([movie['id'].toString()]),
     }, SetOptions(merge: true));
+
+    // Navigate back to the previous screen
+    FocusScope.of(context).unfocus();
+    Navigator.pop(context, true);
+  }
+
+  Future deleteMovie(BuildContext context, String movieId) async {
+    final user = FirebaseAuth.instance.currentUser!;
+    final DocumentReference docRef =
+    FirebaseFirestore.instance.collection('movies').doc(user.uid);
+    docRef.update({
+      'movies_id': FieldValue.arrayRemove([movieId]),
+    });
 
     // Navigate back to the previous screen
     FocusScope.of(context).unfocus();
@@ -97,6 +114,27 @@ class MovieDetail extends StatelessWidget {
                 new Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
+                    canDelete ? // Render delete button only if user has permission
+                    new Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: new GestureDetector(
+                        onTap: () {
+                          deleteMovie(context, movie['id'].toString());
+                        },
+                        child: new Container(
+                          padding: const EdgeInsets.all(16.0),
+                          alignment: Alignment.center,
+                          child: new Icon(
+                            Icons.delete,
+                            color: Colors.white,
+                          ),
+                          decoration: new BoxDecoration(
+                            borderRadius: new BorderRadius.circular(10.0),
+                            color: Colors.red,
+                          ),
+                        ),
+                      ),
+                    ) :
                     new Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: new GestureDetector(
@@ -111,8 +149,9 @@ class MovieDetail extends StatelessWidget {
                             color: Colors.white,
                           ),
                           decoration: new BoxDecoration(
-                              borderRadius: new BorderRadius.circular(10.0),
-                              color: const Color(0xaa3C3261)),
+                            borderRadius: new BorderRadius.circular(10.0),
+                            color: Colors.green,
+                          ),
                         ),
                       ),
                     ),

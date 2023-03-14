@@ -35,6 +35,7 @@ class _MovieListState extends State<MovieList> {
 
         if (response.statusCode == 200) {
           final Map<String, dynamic> responseData = json.decode(response.body);
+          responseData['can_delete'] = true;
           moviesData.add(responseData);
         }
       }
