@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'dart:ui' as ui;
 
-class MovieDetail extends StatelessWidget {
+class RecommendationMovieDetail extends StatelessWidget {
   final movie;
   var image_url = 'https://image.tmdb.org/t/p/w500/';
-
-  MovieDetail(this.movie);
-
+  RecommendationMovieDetail(this.movie);
   Color mainColor = const Color(0xff3C3261);
 
   @override
@@ -53,47 +51,25 @@ class MovieDetail extends StatelessWidget {
                   child: new Row(
                     children: <Widget>[
                       new Expanded(
-                        child: new Text(
-                          movie['title'],
-                          style: new TextStyle(
-                              color: Colors.white,
-                              fontSize: 30.0,
-                              fontFamily: 'Arvo'),
-                        ),
-                      ),
+                          child: new Text(
+                            movie['title'],
+                            style: new TextStyle(
+                                color: Colors.white,
+                                fontSize: 30.0,
+                                fontFamily: 'Arvo'),
+                          )),
                       new Text(
                         '${movie['vote_average']}/10',
                         style: new TextStyle(
                             color: Colors.white,
                             fontSize: 20.0,
                             fontFamily: 'Arvo'),
-                      ),
+                      )
                     ],
                   ),
                 ),
-                new Text(movie['overview'],
-                    style:
-                        new TextStyle(color: Colors.white, fontFamily: 'Arvo')),
+                new Text(movie['overview'],style: new TextStyle(color: Colors.white, fontFamily: 'Arvo')),
                 new Padding(padding: const EdgeInsets.all(10.0)),
-                new Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    new Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: new Container(
-                        padding: const EdgeInsets.all(16.0),
-                        alignment: Alignment.center,
-                        child: new Icon(
-                          Icons.add,
-                          color: Colors.white,
-                        ),
-                        decoration: new BoxDecoration(
-                            borderRadius: new BorderRadius.circular(10.0),
-                            color: const Color(0xaa3C3261)),
-                      ),
-                    ),
-                  ],
-                ),
               ],
             ),
           ),

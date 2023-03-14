@@ -1,68 +1,26 @@
 import 'dart:async';
 import 'dart:convert';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
-import 'movie_details.dart';
+import 'recommendation_movie_details.dart';
 
-class MovieList extends StatefulWidget {
+class RecommendationMovieList extends StatefulWidget {
   @override
-  _MovieListState createState() => _MovieListState();
+  _RecommendationMovieListState createState() => _RecommendationMovieListState();
 }
 
-class _MovieListState extends State<MovieList> {
-  final apiKey = '9478d83ca04bd6ee25b942dd7a0ad777';
+class _RecommendationMovieListState extends State<RecommendationMovieList> {
   List<dynamic> movies = [];
   Color mainColor = const Color(0xff3C3261);
-  final TextEditingController _controller = TextEditingController();
 
   Future<void> getData() async {
-    final user = FirebaseAuth.instance.currentUser!;
-    final snapshot = await FirebaseFirestore.instance.collection('movies').doc(user.uid).get();
-    List<dynamic>? moviesId = snapshot.data()!['movies_id'];
-
-    List<dynamic> moviesData = [];
-
-
-    if(moviesId != null){
-      for (String movieId in moviesId) {
-        final response = await http.get(Uri.parse('https://api.themoviedb.org/3/movie/$movieId?api_key=$apiKey'));
-
-        if (response.statusCode == 200) {
-          final Map<String, dynamic> responseData = json.decode(response.body);
-          moviesData.add(responseData);
-        }
-      }
-    }
-
+    final url =
+        'https://api.themoviedb.org/3/movie/top_rated?api_key=9478d83ca04bd6ee25b942dd7a0ad777';
+    final response = await http.get(Uri.parse(url));
+    final Map<String, dynamic> responseData = json.decode(response.body);
     setState(() {
-      movies = moviesData;
+      movies = responseData['results'];
     });
-  }
-
-  void _onSearchChanged(String value) async {
-    try {
-      final url =
-          'https://api.themoviedb.org/3/search/movie?api_key=$apiKey&query=$value';
-      final response = await http.get(Uri.parse(url));
-      final responseData = json.decode(response.body);
-      if (responseData['results'] != null) {
-        setState(() {
-          movies = responseData['results'];
-        });
-      } else {
-        print('Response data is null');
-      }
-      /*if(responseData['results'].isEmpty()){
-        print("RESPONSE DATA SEARCH");
-        print(responseData['results']);
-        getData();
-      }*/
-
-    } catch (error) {
-      print('Error occurred: $error');
-    }
   }
 
   @override
@@ -98,13 +56,7 @@ class _MovieListState extends State<MovieList> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            TextField(
-              decoration: InputDecoration(
-                hintText: 'Add movies',
-              ),
-              controller: _controller,
-              onChanged: _onSearchChanged,
-            ),
+            MovieTitle(mainColor),
             Expanded(
               child: ListView.builder(
                 itemCount: movies == null ? 0 : movies.length,
@@ -116,7 +68,7 @@ class _MovieListState extends State<MovieList> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => MovieDetail(movies[i]),
+                          builder: (context) => RecommendationMovieDetail(movies[i]),
                         ),
                       );
                     },
@@ -132,7 +84,28 @@ class _MovieListState extends State<MovieList> {
   }
 }
 
+class MovieTitle extends StatelessWidget {
+  final Color mainColor;
 
+  const MovieTitle(this.mainColor);
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 16.0),
+      child: Text(
+        'My Top Rated',
+        style: TextStyle(
+          fontSize: 40.0,
+          color: mainColor,
+          fontWeight: FontWeight.bold,
+          fontFamily: 'Arvo',
+        ),
+        textAlign: TextAlign.left,
+      ),
+    );
+  }
+}
 
 class MovieCell extends StatelessWidget {
   final dynamic movie;
@@ -210,51 +183,3 @@ class MovieCell extends StatelessWidget {
   }
 }
 
-class SearchBar extends StatefulWidget {
-  final List<dynamic> movieList;
-
-  SearchBar(this.movieList);
-
-  @override
-  _SearchBarState createState() => _SearchBarState(movieList);
-}
-
-class _SearchBarState extends State<SearchBar> {
-  List<dynamic> movieList;
-
-  _SearchBarState(this.movieList);
-
-  TextEditingController searchController = TextEditingController();
-  String searchText = '';
-
-
-  @override
-  void initState() {
-    super.initState();
-    searchController.addListener(() {
-      setState(() {
-        searchText = searchController.text;
-      });
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: TextField(
-        controller: searchController,
-        decoration: InputDecoration(
-          hintText: "Search movies...",
-          suffixIcon: Icon(Icons.search),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.all(Radius.circular(25.0)),
-            borderSide: BorderSide.none,
-          ),
-          filled: true,
-          fillColor: Colors.grey[200],
-        ),
-      ),
-    );
-  }
-}
