@@ -122,6 +122,13 @@ class _HomeScreenState extends State<HomeScreen> {
             }
           }
         ),
+      bottomSheet: Container(
+        width: double.infinity,
+        child: ElevatedButton(
+          child: Text("Create new room"),
+          onPressed: () {},
+        ),
+      ),
     );
   }
 }
