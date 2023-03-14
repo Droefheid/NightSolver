@@ -57,10 +57,9 @@ class _SalonsState extends State<Salons> {
     return Scaffold(
       backgroundColor: Colors.white,
       floatingActionButton: FloatingActionButton.extended(
-          onPressed: () {
-            Navigator.push(context,PageRouteBuilder(pageBuilder: (_,__,___) => const NewSalon()
-              )
-            );
+          onPressed: () async {
+            final result = await Navigator.push(context,PageRouteBuilder(pageBuilder: (_,__,___) => const NewSalon()));
+            if(result != null && result) await getData();
           },
         label: const Text(
           "New salon"

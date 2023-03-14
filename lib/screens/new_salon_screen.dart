@@ -36,9 +36,12 @@ class _NewSalonState extends State<NewSalon> {
             .doc(user.uid)
             .get();
         List<dynamic> searchPersons = [];
-        for (String friend in snapshot.data()!['friends']) {
-          if (friend.substring(0, letterCount).toLowerCase() == value.toLowerCase()) {
-            searchPersons.add(friend);
+        if(snapshot.data()!['friends'] != null) {
+          for (String friend in snapshot.data()!['friends']) {
+            if (friend.substring(0, letterCount).toLowerCase() ==
+                value.toLowerCase()) {
+              searchPersons.add(friend);
+            }
           }
         }
         setState(() {
@@ -69,18 +72,14 @@ class _NewSalonState extends State<NewSalon> {
   }
 
 
-  void _createSalon() async {
+  void _createSalon(BuildContext context) async {
     final snapshot1 = await FirebaseFirestore.instance.collection("movies").doc(user.uid).get();
-    if(snapshot1.data()!['salons'][salonName] == null){
-      FirebaseFirestore.instance.collection('movies').doc(user.uid).set({'salons' : {'$salonName' : {'salon_members' : salonMembers}}}, SetOptions(merge : true));
-    }
-    else{
-      // TODO : afficher que le nom de salon est déjà pris
-    }
+    FirebaseFirestore.instance.collection('movies').doc(user.uid).set({'salons' : {'$salonName' : {'salon_members' : salonMembers}}}, SetOptions(merge : true));
+
     //for (String member in salonMembers){
     //  salons["salons"][salonName].set({'salon_members': FieldValue.arrayUnion([member])});
     //}
-    Navigator.of(context).pop();
+    Navigator.pop(context, true);
   }
 
 
@@ -90,7 +89,7 @@ class _NewSalonState extends State<NewSalon> {
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: Scaffold(
         floatingActionButton: FloatingActionButton.extended(
-            onPressed: _createSalon,
+            onPressed:() {_createSalon(context);},
             label: Text("Create")
         ),
         appBar: AppBar(
