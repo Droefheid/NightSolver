@@ -24,15 +24,26 @@ class ResultScreenSate extends State<ResultScreen> {
     final snapshot = await FirebaseFirestore.instance.collection('movies').doc(user.uid).get();
     List<dynamic>? moviesId = snapshot.data()!['movies_id'];
     List<dynamic> moviesData = [];
-
+    List<dynamic> Genres = [];
+    if(widget.aventure>=50){
+      Genres.add(12);
+    }
+    if(widget.action>=50){
+      Genres.add(28);
+    }
+    if(widget.comedie>=50){
+      Genres.add(35);
+    }
 
     if(moviesId != null){
       for (String movieId in moviesId) {
-        final result = await http.get(Uri.parse('https://api.themoviedb.org/3/movie/$movieId/recommendation/?api_key=$apiKey'));
+        final result = await http.get(Uri.parse('https://api.themoviedb.org/3/movie/$movieId/recommendations?api_key=$apiKey'));
 
         if (result.statusCode == 200) {
           final Map<String, dynamic> resultData = json.decode(result.body);
-          moviesData.add(resultData);
+          if(Genres.contains(resultData['results']['genre_ids'][0])){
+            moviesData.add(resultData);
+          }
         }
       }
     }
@@ -74,13 +85,13 @@ class ResultScreenSate extends State<ResultScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            MovieTitle(mainColor),
             Expanded(
               child: ListView.builder(
                 itemCount: movies == null ? 0 : movies.length,
                 itemBuilder: (context, i) {
                   return MaterialButton(
-                    child: MovieCell(movies[i]),
+                    child:
+                    MovieCell(movies[i]['results']),
                     padding: const EdgeInsets.all(0.0),
                     onPressed: () {},
                     color: Colors.white,
