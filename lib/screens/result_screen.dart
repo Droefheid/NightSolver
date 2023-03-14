@@ -1,12 +1,53 @@
+import 'dart:convert';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 
-class ResultScreen extends StatelessWidget{
+class ResultScreen extends StatefulWidget {
+  const ResultScreen({Key? key,required this.aventure, required this.action, required this.comedie}) : super(key: key);
+  final double aventure;
+  final double action;
+  final double comedie;
+  @override
+  State<ResultScreen> createState() => ResultScreenSate();
+
+}
+
+class ResultScreenSate extends State<ResultScreen> {
+  final apiKey = '9478d83ca04bd6ee25b942dd7a0ad777';
   Color mainColor = const Color(0xff3C3261);
-  double aventure;
-  double action;
-  double comedie;
-  ResultScreen({required this.aventure, required this.action, required this.comedie});
-  
+  List<dynamic> movies = [];
+
+  Future<void> getData() async {
+    final user = FirebaseAuth.instance.currentUser!;
+    final snapshot = await FirebaseFirestore.instance.collection('movies').doc(user.uid).get();
+    List<dynamic>? moviesId = snapshot.data()!['movies_id'];
+    List<dynamic> moviesData = [];
+
+
+    if(moviesId != null){
+      for (String movieId in moviesId) {
+        final result = await http.get(Uri.parse('https://api.themoviedb.org/3/movie/$movieId/recommendation/?api_key=$apiKey'));
+
+        if (result.statusCode == 200) {
+          final Map<String, dynamic> resultData = json.decode(result.body);
+          moviesData.add(resultData);
+        }
+      }
+    }
+
+    setState(() {
+      movies = moviesData;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getData();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -28,10 +69,130 @@ class ResultScreen extends StatelessWidget{
           ),
         ),
       ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            MovieTitle(mainColor),
+            Expanded(
+              child: ListView.builder(
+                itemCount: movies == null ? 0 : movies.length,
+                itemBuilder: (context, i) {
+                  return MaterialButton(
+                    child: MovieCell(movies[i]),
+                    padding: const EdgeInsets.all(0.0),
+                    onPressed: () {},
+                    color: Colors.white,
+                  );
+                },
+              ),
+            )
+          ],
+        ),
+      ),
     );
 
   }
-
 }
+class MovieTitle extends StatelessWidget {
+  final Color mainColor;
+
+  const MovieTitle(this.mainColor);
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 16.0),
+      child: Text(
+        'My Top Rated',
+        style: TextStyle(
+          fontSize: 40.0,
+          color: mainColor,
+          fontWeight: FontWeight.bold,
+          fontFamily: 'Arvo',
+        ),
+        textAlign: TextAlign.left,
+      ),
+    );
+  }
+}
+
+class MovieCell extends StatelessWidget {
+  final dynamic movie;
+  Color mainColor = const Color(0xff3C3261);
+  var image_url = 'https://image.tmdb.org/t/p/w500/';
+
+  MovieCell(this.movie);
+
+  @override
+  Widget build(BuildContext context) {
+    return new Column(
+      children: <Widget>[
+        new Row(
+          children: <Widget>[
+            new Padding(
+              padding: const EdgeInsets.all(0.0),
+              child: new Container(
+                margin: const EdgeInsets.all(16.0),
+                child: new Container(
+                  width: 70.0,
+                  height: 70.0,
+                ),
+                decoration: new BoxDecoration(
+                  borderRadius: new BorderRadius.circular(10.0),
+                  color: Colors.grey,
+                  image: movie['poster_path'] != null
+                      ? new DecorationImage(
+                      image: new NetworkImage(
+                          image_url + movie['poster_path']),
+                      fit: BoxFit.cover)
+                      : null,
+                  boxShadow: [
+                    new BoxShadow(
+                        color: mainColor,
+                        blurRadius: 5.0,
+                        offset: new Offset(2.0, 5.0))
+                  ],
+                ),
+              ),
+            ),
+            new Expanded(
+                child: new Container(
+                  margin: const EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 0.0),
+                  child: new Column(
+                    children: [
+                      new Text(
+                        movie['title'] ?? 'Title Not Found',
+                        style: new TextStyle(
+                            fontSize: 20.0,
+                            fontFamily: 'Arvo',
+                            fontWeight: FontWeight.bold,
+                            color: mainColor),
+                      ),
+                      new Padding(padding: const EdgeInsets.all(2.0)),
+                      new Text(
+                        movie['overview'] ?? 'Overview Not Found',
+                        maxLines: 3,
+                        style: new TextStyle(
+                            color: const Color(0xff8785A4), fontFamily: 'Arvo'),
+                      )
+                    ],
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                  ),
+                )),
+          ],
+        ),
+        new Container(
+          width: 300.0,
+          height: 0.5,
+          color: const Color(0xD2D2E1ff),
+          margin: const EdgeInsets.all(16.0),
+        )
+      ],
+    );
+  }
+}
+
 
 
