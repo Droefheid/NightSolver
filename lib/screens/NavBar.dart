@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:night_solver/screens/preference_page.dart';
 import 'movie_list.dart';
 import 'recommendation_movie_list.dart';
 import 'salons.dart';
