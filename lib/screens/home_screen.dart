@@ -55,6 +55,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final orientation = MediaQuery.of(context).orientation;
     return Scaffold(
       //backgroundColor: Colors.black,
         drawer: NavBar(),
@@ -101,23 +102,33 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ],
         ),
-        body: ListView.builder(
-        controller: controller,
-        //padding: const EdgeInsets.all(8),
-        itemCount: movies.length + 1,
-        itemBuilder: (context, index) {
-          if (index < movies.length) {
-            final movie = movies[index];
-
-            return movie;
-          } else {
-            return const Padding(
-              padding: EdgeInsets.symmetric(vertical: 32),
-              child: Center(child: CircularProgressIndicator())
-            );
+        body: GridView.builder(
+          controller: controller,
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: (orientation == Orientation.portrait) ? 2 : 3,
+              mainAxisSpacing: 3,
+            childAspectRatio: 0.7
+          ),
+          itemCount: movies.length + 1,
+          itemBuilder: (context, index) {
+            if (index < movies.length) {
+              final movie = movies[index];
+              return movie;
+            } else {
+              return const Padding(
+                  padding: EdgeInsets.symmetric(),
+                  child: Center(child: CircularProgressIndicator())
+              );
+            }
           }
-        },
-      )
+        ),
+      bottomSheet: Container(
+        width: double.infinity,
+        child: ElevatedButton(
+          child: Text("Create new room"),
+          onPressed: () {},
+        ),
+      ),
     );
   }
 }
