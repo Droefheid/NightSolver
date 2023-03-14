@@ -1,8 +1,12 @@
+import 'dart:convert';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:night_solver/screens/NavBar.dart';
+import 'package:night_solver/screens/movie_details.dart';
 import 'package:night_solver/screens/new_salon_screen.dart';
 import 'package:night_solver/screens/preference_page.dart';
+import 'package:http/http.dart' as http;
 
 import 'movie_list.dart';
 
@@ -18,30 +22,26 @@ class _HomeScreenState extends State<HomeScreen> {
   Icon customIcon = const Icon(Icons.search);
   Widget customSearchBar = const Text("search");
   String searchValue = "";
-  List movies = [Image.asset('poster/avenger.jpg'),
-                  Image.asset('poster/blackpanter.jpg'),
-                  Image.asset('poster/riddle.jpg'),
-                  Image.asset('poster/spiderman.jpg'),
-                  Image.asset('poster/Titanic.jpg'),
-                  Image.asset('poster/wood.jpg')
-  ];
+  List<dynamic> movies = [];
   final controller = ScrollController();
   void signOut(){
     FirebaseAuth.instance.signOut();
   }
-  
-  @override
-  void initState() {
-    super.initState();
-    controller.addListener(() {
-      if(controller.position.maxScrollExtent == controller.offset) {
-        fetch();
-      }
+
+  Future<void> getData() async {
+    final url =
+        'https://api.themoviedb.org/3/movie/top_rated?api_key=9478d83ca04bd6ee25b942dd7a0ad777';
+    final response = await http.get(Uri.parse(url));
+    final Map<String, dynamic> responseData = json.decode(response.body);
+    setState(() {
+      movies = responseData['results'];
     });
   }
 
-  void navigateToMovieList() {
-    Navigator.of(context).push(MaterialPageRoute(builder: (_) => MovieList()));
+  @override
+  void initState() {
+    super.initState();
+    getData();
   }
 
   @override
@@ -49,15 +49,11 @@ class _HomeScreenState extends State<HomeScreen> {
     controller.dispose();
   }
 
-  Future fetch() async {
-    setState(() {
-      movies.addAll([Image.asset('poster/shrek.jpg'), Image.asset('poster/shrek2.jpg'), Image.asset('poster/shrek3.jpg'), Image.asset('poster/shrek4.jpg')]);
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
     final orientation = MediaQuery.of(context).orientation;
+    final String movies_url = "https://image.tmdb.org/t/p/w500/";
     return Scaffold(
       //backgroundColor: Colors.black,
         drawer: NavBar(),
@@ -111,17 +107,13 @@ class _HomeScreenState extends State<HomeScreen> {
               mainAxisSpacing: 3,
             childAspectRatio: 0.7
           ),
-          itemCount: movies.length + 1,
+            itemCount: movies == null ? 0 : movies.length,
           itemBuilder: (context, index) {
-            if (index < movies.length) {
-              final movie = movies[index];
-              return movie;
-            } else {
-              return const Padding(
-                  padding: EdgeInsets.symmetric(),
-                  child: Center(child: CircularProgressIndicator())
-              );
-            }
+            //return  Image(image: new NetworkImage(movies_url+movies[index]["poster_path"]));
+            return GestureDetector(
+              onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => MovieDetail(movies[index]))),
+              child: Image.network(movies_url + movies[index]["poster_path"]),
+            );
           }
         ),
       bottomSheet: Container(
