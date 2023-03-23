@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:night_solver/screens/preference_page.dart';
+import 'package:night_solver/screens/watch_providers.dart';
 import 'new_salon_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -102,7 +102,7 @@ class _SalonsState extends State<Salons> {
                   return MaterialButton(
                     child: SalonCell(salons[i]),
                     padding: const EdgeInsets.all(0.0),
-                    onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => Preferences())),
+                    onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => Providers())),
                     color: Colors.white,
                   );
                 },
