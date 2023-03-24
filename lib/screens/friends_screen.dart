@@ -72,17 +72,19 @@ class _FriendsState extends State<Friends> {
 
   void addFriend(String value) async {
     final user = FirebaseAuth.instance.currentUser!;
+
+    final DocumentReference friendDocRef =
+    FirebaseFirestore.instance.collection('movies').doc(value);
+    friendDocRef.set({
+      'friends': FieldValue.arrayUnion([user.uid]),
+    }, SetOptions(merge: true));
+
     final DocumentReference ownDocRef =
     FirebaseFirestore.instance.collection('movies').doc(user.uid);
     ownDocRef.set({
       'friends': FieldValue.arrayUnion([value]),
     }, SetOptions(merge: true));
 
-    final DocumentReference friendDocRef =
-    FirebaseFirestore.instance.collection('movies').doc(value);
-    friendDocRef.set({
-    'friends': FieldValue.arrayUnion([user.uid]),
-    }, SetOptions(merge: true));
 
     FocusScope.of(context).unfocus();
     getData();
@@ -214,6 +216,14 @@ class FriendCell extends StatelessWidget {
   Color mainColor = const Color(0xff3C3261);
   FriendCell(this.friend);
   final user = FirebaseAuth.instance.currentUser!;
+  String friendName = '';
+
+  Future<String> getFriendName(String friendId) async{
+    final DocumentReference friendDocRef =
+    FirebaseFirestore.instance.collection('movies').doc(friendId);
+    DocumentSnapshot snapshot = await friendDocRef.get();
+    return snapshot['displayName'];
+  }
 
 
   void removeFriend(String value) async {
@@ -241,9 +251,18 @@ class FriendCell extends StatelessWidget {
     );
     AlertDialog alert = AlertDialog(
       title: Text("Warning"),
-      content: Text(
-        "You are about to unfriend $friend.\n"
-        "Do you wish to proceed?"
+      content: FutureBuilder(
+        future: getFriendName(friend),
+        builder: (context, snapshot) {
+          if (snapshot.hasData &&
+              snapshot.connectionState == ConnectionState.done) {
+            return Text(
+              'You are about to unfriend \'${snapshot.data!}\'\n'
+              'Do you wish to proceed?',
+            );
+          }
+          return CircularProgressIndicator();
+        },
       ),
       actions: [
         cancelButton,
@@ -296,12 +315,22 @@ class FriendCell extends StatelessWidget {
                   margin: const EdgeInsets.fromLTRB(0, 0.0, 0, 0.0),
                   child: new Column(
                     children: [
-                      new Text(
-                        friend,
-                        style: TextStyle(
-                          color: Colors.black
-                        ),
-                      ),
+                      FutureBuilder(
+                        future: getFriendName(friend),
+                        builder: (context, snapshot) {
+                          if (snapshot.hasData &&
+                              snapshot.connectionState == ConnectionState.done) {
+                            return Text(
+                              snapshot.data!,
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 20
+                              ),
+                            );
+                          }
+                          return CircularProgressIndicator();
+                        },
+                      )
                     ],
                     crossAxisAlignment: CrossAxisAlignment.start,
                   ),

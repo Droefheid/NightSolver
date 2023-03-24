@@ -30,6 +30,7 @@ class _NewSalonState extends State<NewSalon> {
     setState(() {
       persons = myFriends;
     });
+    print(persons);
   }
 
 
@@ -57,7 +58,6 @@ class _NewSalonState extends State<NewSalon> {
         setState(() {
           persons = searchPersons;
         });
-
     }
     catch (error) {
       print('Error occurred: $error');
@@ -65,17 +65,25 @@ class _NewSalonState extends State<NewSalon> {
   }
 
   void addPerson(String value) async {
+    final DocumentReference friendDocRef =
+    FirebaseFirestore.instance.collection('movies').doc(value);
+    DocumentSnapshot snapshot = await friendDocRef.get();
+    final String friendName = snapshot['displayName'];
     setState(() {
       salonMembers.add(value);
     });
-    var snackBar = SnackBar(duration: const Duration(seconds: 2), content: Text('$value added to the room'));
+    var snackBar = SnackBar(duration: const Duration(seconds: 2), content: Text('$friendName added to the room'));
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
   void removePerson(String value) async {
+    final DocumentReference friendDocRef =
+    FirebaseFirestore.instance.collection('movies').doc(value);
+    DocumentSnapshot snapshot = await friendDocRef.get();
+    final String friendName = snapshot['displayName'];
     setState(() {
       salonMembers.remove(value);
     });
-    var snackBar = SnackBar(duration: const Duration(seconds: 2), content: Text('$value removed from the room'));
+    var snackBar = SnackBar(duration: const Duration(seconds: 2), content: Text('$friendName removed from the room'));
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
@@ -93,8 +101,6 @@ class _NewSalonState extends State<NewSalon> {
           .doc(member)
           .set({'salons' : {'$salonName' : {'salon_members' : salonMembers}}}, SetOptions(merge : true));
     }
-
-
     Navigator.of(context).push(MaterialPageRoute(builder: (_) => Salons()));
   }
 
@@ -195,6 +201,14 @@ class PersonCell extends StatelessWidget {
   PersonCell(this.person);
 
 
+  Future<String> getFriendName(String friendId) async{
+    final DocumentReference friendDocRef =
+    FirebaseFirestore.instance.collection('movies').doc(friendId);
+    DocumentSnapshot snapshot = await friendDocRef.get();
+    return snapshot['displayName'];
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return new Container(
@@ -231,9 +245,22 @@ class PersonCell extends StatelessWidget {
                     margin: const EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 0.0),
                     child: new Column(
                       children: [
-                        new Text(
-                            person
-                        ),
+                        FutureBuilder(
+                          future: getFriendName(person),
+                          builder: (context, snapshot) {
+                            if (snapshot.hasData &&
+                                snapshot.connectionState == ConnectionState.done) {
+                              return Text(
+                                snapshot.data!,
+                                style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 20
+                                ),
+                              );
+                            }
+                            return CircularProgressIndicator();
+                          },
+                        )
                       ],
                       crossAxisAlignment: CrossAxisAlignment.start,
                     ),

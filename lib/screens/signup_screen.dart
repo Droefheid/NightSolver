@@ -1,5 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class SignUpScreen extends StatefulWidget {
   final VoidCallback showSignInScreen;
@@ -12,6 +14,7 @@ class SignUpScreen extends StatefulWidget {
 }
 
 class _SignUpScreenState extends State<SignUpScreen> {
+  final _usernameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
@@ -19,14 +22,32 @@ class _SignUpScreenState extends State<SignUpScreen> {
   Future signUp() async {
     if (_passwordController.text.trim() ==
         _confirmPasswordController.text.trim()) {
-      await FirebaseAuth.instance.createUserWithEmailAndPassword(
-          email: _emailController.text.trim(),
-          password: _passwordController.text.trim());
+      try {
+        final credential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+            email: _emailController.text.trim(),
+            password: _passwordController.text.trim());
+        await credential.user?.updateDisplayName(_usernameController.text.trim());
+        FirebaseFirestore.instance
+            .collection('movies')
+            .doc(FirebaseAuth.instance.currentUser!.uid)
+            .set({'displayName' : _usernameController.text.trim()}, SetOptions(merge : true));
+      } on FirebaseAuthException catch (e) {
+        Fluttertoast.showToast(
+            msg: e.message.toString(),
+            gravity: ToastGravity.TOP,
+            fontSize: 18,
+            backgroundColor: Colors.red.shade900
+        );
+      } catch (e) {
+        print(e);
+      }
+
     }
   }
 
   @override
   void dispose() {
+    _usernameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
@@ -52,6 +73,28 @@ class _SignUpScreenState extends State<SignUpScreen> {
               Text('Create an account',
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 40)),
               SizedBox(height: 50),
+
+              //username input
+              Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 25.0),
+                  child: TextField(
+                      controller: _usernameController,
+                      decoration: InputDecoration(
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.white),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.red.shade900),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        hintText: 'Username',
+                        fillColor: Colors.grey[100],
+                        filled: true,
+                      ))),
+
+                  SizedBox(height: 10),
+
 
               //email input
               Padding(

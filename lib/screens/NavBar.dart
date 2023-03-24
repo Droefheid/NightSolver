@@ -7,6 +7,7 @@ import 'salons.dart';
 import 'friends_screen.dart';
 
 class NavBar extends StatelessWidget{
+  final user = FirebaseAuth.instance.currentUser!;
   void signOut(){
     FirebaseAuth.instance.signOut();
   }
@@ -17,8 +18,9 @@ class NavBar extends StatelessWidget{
       child: ListView(
         children: [
           UserAccountsDrawerHeader(
-              accountName: Text('Marc Lainez'),
-              accountEmail: Text('marc.lainez@uclouvain.be')),
+              accountName: Text(user.displayName != null ? user.displayName as String : 'no username'),
+              accountEmail: Text(user.email as String)
+          ),
           ListTile(
             leading: Icon(Icons.face),
             title: Text('Friends'),
