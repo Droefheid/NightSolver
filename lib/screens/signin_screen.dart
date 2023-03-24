@@ -24,8 +24,16 @@ class _SignInScreenState extends State<SignInScreen> {
         password: _passwordController.text.trim(),
       );
     } on FirebaseAuthException catch (e) {
+      String errorMsg = "An error has occurred";
+      if (e.code == 'wrong-password') {
+        errorMsg = "The password provided is invalid.";
+      } else if (e.code == 'user-not-found') {
+        errorMsg = "No user was found for the email address provided.";
+      } else if (e.code == 'invalid-email'){
+        errorMsg = "The email provided is invalid.";
+      }
       Fluttertoast.showToast(
-          msg: e.message.toString(),
+          msg: errorMsg,
           gravity: ToastGravity.TOP,
           fontSize: 18,
           backgroundColor: Colors.red.shade900
