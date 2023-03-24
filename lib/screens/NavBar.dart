@@ -26,7 +26,7 @@ class NavBar extends StatelessWidget{
           ),
           ListTile(
             leading: Icon(Icons.home),
-            title: Text('Salons'),
+            title: Text('Rooms'),
             onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => Salons())),
           ),
           ListTile(

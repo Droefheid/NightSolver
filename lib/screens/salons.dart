@@ -70,7 +70,7 @@ class _SalonsState extends State<Salons> {
               Navigator.push(context,PageRouteBuilder(pageBuilder: (_,__,___) => const NewSalon()));
             },
           label: const Text(
-            "New salon"
+            "New room"
           )
         ),
         appBar: AppBar(
@@ -83,7 +83,7 @@ class _SalonsState extends State<Salons> {
             onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => HomeScreen())),
           ),
           title: Text(
-            'Salons',
+            'Rooms',
             style: TextStyle(
               color: mainColor,
               fontFamily: 'Arvo',
@@ -98,7 +98,7 @@ class _SalonsState extends State<Salons> {
             children: [
               TextField(
                 decoration: InputDecoration(
-                  hintText: 'Search salon',
+                  hintText: 'Search room',
                 ),
                 controller: _controller,
                 onChanged: _onSearchChanged,
@@ -160,7 +160,7 @@ class SalonCell extends StatelessWidget {
     AlertDialog alert = AlertDialog(
       title: Text("Warning"),
       content: Text(
-        "You are about to leave the salon $salonName.\n"
+        "You are about to leave the room \'$salonName\'.\n"
         "Do you wish to proceed?"
       ),
       actions: [

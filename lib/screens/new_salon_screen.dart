@@ -68,14 +68,14 @@ class _NewSalonState extends State<NewSalon> {
     setState(() {
       salonMembers.add(value);
     });
-    var snackBar = SnackBar(duration: const Duration(seconds: 2), content: Text('$value added to the salon'));
+    var snackBar = SnackBar(duration: const Duration(seconds: 2), content: Text('$value added to the room'));
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
   void removePerson(String value) async {
     setState(() {
       salonMembers.remove(value);
     });
-    var snackBar = SnackBar(duration: const Duration(seconds: 2), content: Text('$value removed from the salon'));
+    var snackBar = SnackBar(duration: const Duration(seconds: 2), content: Text('$value removed from the room'));
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
@@ -107,7 +107,7 @@ class _NewSalonState extends State<NewSalon> {
         floatingActionButton: FloatingActionButton.extended(
             onPressed:() {
               if(salonName == ''){
-                var snackBar = SnackBar(content: Text('No salon name given'));
+                var snackBar = SnackBar(content: Text('No room name given'));
                 ScaffoldMessenger.of(context).showSnackBar(snackBar);
               }
               else{
@@ -126,7 +126,7 @@ class _NewSalonState extends State<NewSalon> {
             onPressed: () => Navigator.of(context).pop(),
           ),
           title: Text(
-            'Creating a new salon',
+            'Creating a new room',
             style: TextStyle(
               color: mainColor,
               fontFamily: 'Arvo',
@@ -144,7 +144,7 @@ class _NewSalonState extends State<NewSalon> {
                 maxLength: 30,
                 autofocus: true,
                 decoration: InputDecoration(
-                  hintText: "Name of the salon",
+                  hintText: "Name of the room",
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(15)
                   )
