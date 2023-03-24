@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class SignUpScreen extends StatefulWidget {
   final VoidCallback showSignInScreen;
@@ -26,13 +27,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
             password: _passwordController.text.trim());
 
         await credential.user?.updateDisplayName(_usernameController.text.trim());
-
       } on FirebaseAuthException catch (e) {
-        if (e.code == 'weak-password') {
-          print('The password provided is too weak.');
-        } else if (e.code == 'email-already-in-use') {
-          print('The account already exists for that email.');
-        }
+        Fluttertoast.showToast(
+            msg: e.message.toString(),
+            gravity: ToastGravity.TOP,
+            fontSize: 18,
+            backgroundColor: Colors.red.shade900
+        );
       } catch (e) {
         print(e);
       }
