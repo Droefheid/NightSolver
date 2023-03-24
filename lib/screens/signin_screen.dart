@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:night_solver/screens/reset_password_screen.dart';
 
 class SignInScreen extends StatefulWidget {
   final VoidCallback showSignUpScreen;
@@ -112,7 +113,30 @@ class _SignInScreenState extends State<SignInScreen> {
                     obscureText: true,
                   )),
 
-              SizedBox(height: 10),
+              SizedBox(height: 20),
+
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const ResetPasswordScreen()),
+                      );
+                    },
+                    child: Text('Forgot password ?',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 15,
+                        )),
+                  ),
+                ],
+              ),
+
+              SizedBox(height: 20),
+
+
               //sign in button
               GestureDetector(
                 onTap: signIn,
