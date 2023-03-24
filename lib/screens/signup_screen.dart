@@ -12,6 +12,7 @@ class SignUpScreen extends StatefulWidget {
 }
 
 class _SignUpScreenState extends State<SignUpScreen> {
+  final _usernameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
@@ -19,14 +20,29 @@ class _SignUpScreenState extends State<SignUpScreen> {
   Future signUp() async {
     if (_passwordController.text.trim() ==
         _confirmPasswordController.text.trim()) {
-      await FirebaseAuth.instance.createUserWithEmailAndPassword(
-          email: _emailController.text.trim(),
-          password: _passwordController.text.trim());
+      try {
+        final credential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+            email: _emailController.text.trim(),
+            password: _passwordController.text.trim());
+
+        await credential.user?.updateDisplayName(_usernameController.text.trim());
+
+      } on FirebaseAuthException catch (e) {
+        if (e.code == 'weak-password') {
+          print('The password provided is too weak.');
+        } else if (e.code == 'email-already-in-use') {
+          print('The account already exists for that email.');
+        }
+      } catch (e) {
+        print(e);
+      }
+
     }
   }
 
   @override
   void dispose() {
+    _usernameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
@@ -52,6 +68,28 @@ class _SignUpScreenState extends State<SignUpScreen> {
               Text('Create an account',
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 40)),
               SizedBox(height: 50),
+
+              //username input
+              Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 25.0),
+                  child: TextField(
+                      controller: _usernameController,
+                      decoration: InputDecoration(
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.white),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.red.shade900),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        hintText: 'Username',
+                        fillColor: Colors.grey[100],
+                        filled: true,
+                      ))),
+
+                  SizedBox(height: 10),
+
 
               //email input
               Padding(
