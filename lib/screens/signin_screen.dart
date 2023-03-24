@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:night_solver/screens/reset_password_screen.dart';
 
 class SignInScreen extends StatefulWidget {
   final VoidCallback showSignUpScreen;
@@ -24,8 +25,16 @@ class _SignInScreenState extends State<SignInScreen> {
         password: _passwordController.text.trim(),
       );
     } on FirebaseAuthException catch (e) {
+      String errorMsg = "An error has occurred";
+      if (e.code == 'wrong-password') {
+        errorMsg = "The password provided is invalid.";
+      } else if (e.code == 'user-not-found') {
+        errorMsg = "No user was found for the email address provided.";
+      } else if (e.code == 'invalid-email'){
+        errorMsg = "The email provided is invalid.";
+      }
       Fluttertoast.showToast(
-          msg: e.message.toString(),
+          msg: errorMsg,
           gravity: ToastGravity.TOP,
           fontSize: 18,
           backgroundColor: Colors.red.shade900
@@ -104,7 +113,30 @@ class _SignInScreenState extends State<SignInScreen> {
                     obscureText: true,
                   )),
 
-              SizedBox(height: 10),
+              SizedBox(height: 20),
+
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const ResetPasswordScreen()),
+                      );
+                    },
+                    child: Text('Forgot password ?',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 15,
+                        )),
+                  ),
+                ],
+              ),
+
+              SizedBox(height: 20),
+
+
               //sign in button
               GestureDetector(
                 onTap: signIn,

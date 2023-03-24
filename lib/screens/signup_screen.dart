@@ -28,8 +28,16 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
         await credential.user?.updateDisplayName(_usernameController.text.trim());
       } on FirebaseAuthException catch (e) {
+        String errorMsg = "An error has occurred";
+        if (e.code == 'weak-password') {
+          errorMsg = "The password provided is too weak.";
+        } else if (e.code == 'email-already-in-use') {
+          errorMsg = "The account already exists for that email.";
+        } else if (e.code == 'invalid-email'){
+          errorMsg = "The email provided is invalid.";
+        }
         Fluttertoast.showToast(
-            msg: e.message.toString(),
+            msg: errorMsg,
             gravity: ToastGravity.TOP,
             fontSize: 18,
             backgroundColor: Colors.red.shade900
