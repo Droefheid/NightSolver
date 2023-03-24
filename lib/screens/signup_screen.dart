@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -25,8 +26,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
         final credential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
             email: _emailController.text.trim(),
             password: _passwordController.text.trim());
-
         await credential.user?.updateDisplayName(_usernameController.text.trim());
+        FirebaseFirestore.instance
+            .collection('movies')
+            .doc(FirebaseAuth.instance.currentUser!.uid)
+            .set({'displayName' : _usernameController.text.trim()}, SetOptions(merge : true));
       } on FirebaseAuthException catch (e) {
         String errorMsg = "An error has occurred";
         if (e.code == 'weak-password') {

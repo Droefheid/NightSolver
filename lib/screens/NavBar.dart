@@ -4,8 +4,10 @@ import 'package:night_solver/screens/preference_page.dart';
 import 'movie_list.dart';
 import 'recommendation_movie_list.dart';
 import 'salons.dart';
+import 'friends_screen.dart';
 
 class NavBar extends StatelessWidget{
+  final user = FirebaseAuth.instance.currentUser!;
   void signOut(){
     FirebaseAuth.instance.signOut();
   }
@@ -16,16 +18,17 @@ class NavBar extends StatelessWidget{
       child: ListView(
         children: [
           UserAccountsDrawerHeader(
-              accountName: Text('Marc Lainez'),
-              accountEmail: Text('marc.lainez@uclouvain.be')),
+              accountName: Text(user.displayName != null ? user.displayName as String : 'no username'),
+              accountEmail: Text(user.email as String)
+          ),
           ListTile(
             leading: Icon(Icons.face),
             title: Text('Friends'),
-            onTap: () => null,
+            onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => Friends())),
           ),
           ListTile(
             leading: Icon(Icons.home),
-            title: Text('Salons'),
+            title: Text('Rooms'),
             onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => Salons())),
           ),
           ListTile(
