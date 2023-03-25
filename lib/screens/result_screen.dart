@@ -112,16 +112,13 @@ class ResultScreenSate extends State<ResultScreen> {
       appBar: AppBar(
         elevation: 0.3,
         centerTitle: true,
-        backgroundColor: Colors.white,
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
-          color: mainColor,
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(
           'Recomended Movies',
           style: TextStyle(
-            color: mainColor,
             fontFamily: 'Arvo',
             fontWeight: FontWeight.bold,
           ),
