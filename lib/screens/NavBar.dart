@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:night_solver/screens/preference_page.dart';
+import 'package:night_solver/screens/settings_screen.dart';
 import 'movie_list.dart';
 import 'recommendation_movie_list.dart';
 import 'salons.dart';
@@ -34,7 +35,7 @@ class NavBar extends StatelessWidget{
           ListTile(
             leading: Icon(Icons.settings),
             title: Text('Settings'),
-            onTap: () => null,
+            onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => SettingsScreen())),
           ),
           ListTile(
             leading: Icon(Icons.movie),

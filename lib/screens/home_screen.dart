@@ -58,8 +58,6 @@ class _HomeScreenState extends State<HomeScreen> {
       //backgroundColor: Colors.black,
         drawer: NavBar(),
         appBar: AppBar(
-          backgroundColor: Colors.white,
-          foregroundColor: Colors.black,
           title: Center(
             child: customSearchBar,
           ),
@@ -72,15 +70,12 @@ class _HomeScreenState extends State<HomeScreen> {
                     customSearchBar = ListTile(
                       leading: Icon(
                         Icons.search,
-                        color: Colors.black,
                         size: 28,
                       ),
                       title: TextField(
-                        style: TextStyle(color: Colors.black),
                         decoration: InputDecoration(
                           hintText: 'Type in movie name...',
                           hintStyle: TextStyle(
-                            color: Colors.black,
                             fontSize: 18,
                             fontStyle: FontStyle.italic,
                           ),

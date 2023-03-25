@@ -125,7 +125,6 @@ class _FriendsState extends State<Friends> {
         appBar: AppBar(
           elevation: 0.3,
           centerTitle: true,
-          backgroundColor: Colors.white,
           leading: IconButton(
             icon: Icon(Icons.arrow_back),
             color: mainColor,
