@@ -160,7 +160,6 @@ class _MovieDetailState extends State<MovieDetail> {
   Widget build(BuildContext context) {
     return new Scaffold(
       appBar: new AppBar(
-        backgroundColor: mainColor,
         title: new Text(widget.movie['title']),
       ),
       body: new Stack(fit: StackFit.expand, children: [

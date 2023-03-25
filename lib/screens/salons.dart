@@ -15,7 +15,6 @@ class Salons extends StatefulWidget {
 
 class _SalonsState extends State<Salons> {
   List<dynamic> salons = [];
-  Color mainColor = const Color(0xff3C3261);
   final TextEditingController _controller = TextEditingController();
   final user = FirebaseAuth.instance.currentUser!;
 
@@ -64,7 +63,6 @@ class _SalonsState extends State<Salons> {
     return GestureDetector(
         onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
         child : Scaffold(
-          backgroundColor: Colors.white,
           floatingActionButton: FloatingActionButton.extended(
               onPressed: () async {
                 Navigator.push(context,PageRouteBuilder(pageBuilder: (_,__,___) => const NewSalon()));
@@ -76,16 +74,13 @@ class _SalonsState extends State<Salons> {
           appBar: AppBar(
             elevation: 0.3,
             centerTitle: true,
-            backgroundColor: Colors.white,
             leading: IconButton(
               icon: Icon(Icons.arrow_back),
-              color: mainColor,
               onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => HomeScreen())),
             ),
             title: Text(
               'Rooms',
               style: TextStyle(
-                color: mainColor,
                 fontFamily: 'Arvo',
                 fontWeight: FontWeight.bold,
               ),

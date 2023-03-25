@@ -22,6 +22,11 @@ class NavBar extends StatelessWidget{
               accountEmail: Text(user.email as String)
           ),
           ListTile(
+            leading: Icon(Icons.movie),
+            title: Text('Recommendations'),
+            onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => RecommendationMovieList())),
+          ),
+          ListTile(
             leading: Icon(Icons.face),
             title: Text('Friends'),
             onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => Friends())),
@@ -32,19 +37,14 @@ class NavBar extends StatelessWidget{
             onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => Salons())),
           ),
           ListTile(
-            leading: Icon(Icons.settings),
-            title: Text('Settings'),
-            onTap: () => null,
-          ),
-          ListTile(
-            leading: Icon(Icons.movie),
+            leading: Icon(Icons.history),
             title: Text('Historique'),
             onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => MovieList())),
           ),
           ListTile(
-            leading: Icon(Icons.movie),
-            title: Text('Recommendations'),
-            onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => RecommendationMovieList())),
+            leading: Icon(Icons.settings),
+            title: Text('Settings'),
+            onTap: () => null,
           ),
 
           ListTile(

@@ -13,7 +13,6 @@ class Friends extends StatefulWidget {
 }
 
 class _FriendsState extends State<Friends> {
-  Color mainColor = const Color(0xff3C3261);
   final TextEditingController _SearchController = TextEditingController();
   final TextEditingController _addControler = TextEditingController();
   List<dynamic> friends = [];
@@ -125,19 +124,12 @@ class _FriendsState extends State<Friends> {
         appBar: AppBar(
           elevation: 0.3,
           centerTitle: true,
-          backgroundColor: Colors.white,
           leading: IconButton(
             icon: Icon(Icons.arrow_back),
-            color: mainColor,
             onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => HomeScreen()))
           ),
           title: Text(
             'Friends',
-            style: TextStyle(
-              color: mainColor,
-              fontFamily: 'Arvo',
-              fontWeight: FontWeight.bold,
-            ),
           ),
         ),
         body: Padding(

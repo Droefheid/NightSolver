@@ -11,7 +11,6 @@ class RecommendationMovieList extends StatefulWidget {
 
 class _RecommendationMovieListState extends State<RecommendationMovieList> {
   List<dynamic> movies = [];
-  Color mainColor = const Color(0xff3C3261);
 
   Future<void> getData() async {
     final url =
@@ -36,16 +35,13 @@ class _RecommendationMovieListState extends State<RecommendationMovieList> {
       appBar: AppBar(
         elevation: 0.3,
         centerTitle: true,
-        backgroundColor: Colors.white,
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
-          color: mainColor,
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(
           'Movies',
           style: TextStyle(
-            color: mainColor,
             fontFamily: 'Arvo',
             fontWeight: FontWeight.bold,
           ),
@@ -56,7 +52,7 @@ class _RecommendationMovieListState extends State<RecommendationMovieList> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            MovieTitle(mainColor),
+            MovieTitle(const Color(0xff000000)),
             Expanded(
               child: ListView.builder(
                 itemCount: movies == null ? 0 : movies.length,

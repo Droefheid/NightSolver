@@ -44,10 +44,6 @@ class _HomeScreenState extends State<HomeScreen> {
     getData();
   }
 
-  @override
-  void dispose() {
-    controller.dispose();
-  }
 
 
   @override
@@ -58,8 +54,6 @@ class _HomeScreenState extends State<HomeScreen> {
       //backgroundColor: Colors.black,
         drawer: NavBar(),
         appBar: AppBar(
-          backgroundColor: Colors.white,
-          foregroundColor: Colors.black,
           title: Center(
             child: customSearchBar,
           ),
