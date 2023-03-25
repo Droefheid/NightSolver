@@ -20,7 +20,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final user = FirebaseAuth.instance.currentUser!;
   Icon customIcon = const Icon(Icons.search);
-  Widget customSearchBar = const Text("search");
+  Widget customSearchBar = const Text("Trending movies");
   String searchValue = "";
   List<dynamic> movies = [];
   final controller = ScrollController();
@@ -30,7 +30,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> getData() async {
     final url =
-        'https://api.themoviedb.org/3/movie/top_rated?api_key=9478d83ca04bd6ee25b942dd7a0ad777';
+        'https://api.themoviedb.org/3/trending/movie/week?api_key=9478d83ca04bd6ee25b942dd7a0ad777';
     final response = await http.get(Uri.parse(url));
     final Map<String, dynamic> responseData = json.decode(response.body);
     setState(() {
