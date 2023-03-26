@@ -131,10 +131,10 @@ class SalonCell extends StatelessWidget {
   void leaveSalon(dynamic salon) async {
     String salonName = salon.keys.toList().first;
     for (String member in salon[salon.keys.toList().first]['salon_members']){
-      final DocumentReference ownDocRef = FirebaseFirestore.instance.collection('movies').doc(member);
+      final DocumentReference ownDocRef = FirebaseFirestore.instance.collection('users').doc(member);
       ownDocRef.update({'salons.$salonName.salon_members': FieldValue.arrayRemove([user.uid])});
     }
-    final DocumentReference docRef = FirebaseFirestore.instance.collection('movies').doc(user.uid);
+    final DocumentReference docRef = FirebaseFirestore.instance.collection('users').doc(user.uid);
     docRef.update({'salons.$salonName' : FieldValue.delete()});
   }
   showWarningDialog(BuildContext context, dynamic salon){
@@ -176,7 +176,7 @@ class SalonCell extends StatelessWidget {
     List resultList = [];
     for (int i = 0; i < list.length; i++){
       final DocumentReference friendDocRef =
-      FirebaseFirestore.instance.collection('movies').doc(list[i]);
+      FirebaseFirestore.instance.collection('users').doc(list[i]);
       DocumentSnapshot snapshot = await friendDocRef.get();
       final String friendName = snapshot['displayName'];
       resultList.add(friendName);

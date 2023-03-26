@@ -20,17 +20,46 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final _confirmPasswordController = TextEditingController();
 
   Future signUp() async {
+    String username = _usernameController.text.trim();
+    FirebaseFirestore fInstance = FirebaseFirestore.instance;
+
     if (_passwordController.text.trim() ==
         _confirmPasswordController.text.trim()) {
+
+      /*var name = fInstance.collection('usernames').doc(username).get();
+      print("SIGNUP SCREEN");
+      print(name);*/
+
+
+
       try {
         final credential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
             email: _emailController.text.trim(),
             password: _passwordController.text.trim());
+
         await credential.user?.updateDisplayName(_usernameController.text.trim());
         FirebaseFirestore.instance
-            .collection('movies')
+            .collection('users')
             .doc(FirebaseAuth.instance.currentUser!.uid)
             .set({'displayName' : _usernameController.text.trim()}, SetOptions(merge : true));
+
+
+        /*var userDoc = fInstance.collection('users').doc(credential.user?.uid);
+        var usernameDoc = fInstance.collection('usernames').doc(username);
+
+        var batch = fInstance.batch();
+        batch.set(userDoc, {username});
+        batch.set(usernameDoc, { 'uid': credential.user?.uid});
+
+        await batch.commit();*/
+
+
+
+
+
+
+
+
       } on FirebaseAuthException catch (e) {
         String errorMsg = "An error has occurred";
         if (e.code == 'weak-password') {
@@ -71,16 +100,17 @@ class _SignUpScreenState extends State<SignUpScreen> {
           child: SingleChildScrollView(
             child:
                 Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-              Icon(
-                Icons.movie,
+              ImageIcon(
+                AssetImage("assets/logo_foreground.png"),
                 size: 80,
               ),
+
 
               SizedBox(height: 10),
 
               Text('Create an account',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 40)),
-              SizedBox(height: 50),
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30)),
+              SizedBox(height: 30),
 
               //username input
               Padding(
@@ -169,7 +199,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   )),
 
               SizedBox(
-                height: 10,
+                height: 30,
               ),
               //sign in button
               GestureDetector(

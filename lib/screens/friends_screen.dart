@@ -22,7 +22,7 @@ class _FriendsState extends State<Friends> {
   Future<void> getData() async {
     final user = FirebaseAuth.instance.currentUser!;
     final snapshot = await FirebaseFirestore.instance
-        .collection('movies')
+        .collection('users')
         .doc(user.uid)
         .get();
 
@@ -47,7 +47,7 @@ class _FriendsState extends State<Friends> {
   void _onSearchChanged(String value) async {
     try {
       final int letterCount = value.length;
-      final snapshot = await FirebaseFirestore.instance.collection('movies')
+      final snapshot = await FirebaseFirestore.instance.collection('users')
           .doc(user.uid)
           .get();
       List<dynamic> searchFriends = [];
@@ -73,13 +73,13 @@ class _FriendsState extends State<Friends> {
     final user = FirebaseAuth.instance.currentUser!;
 
     final DocumentReference friendDocRef =
-    FirebaseFirestore.instance.collection('movies').doc(value);
+    FirebaseFirestore.instance.collection('users').doc(value);
     friendDocRef.set({
       'friends': FieldValue.arrayUnion([user.uid]),
     }, SetOptions(merge: true));
 
     final DocumentReference ownDocRef =
-    FirebaseFirestore.instance.collection('movies').doc(user.uid);
+    FirebaseFirestore.instance.collection('users').doc(user.uid);
     ownDocRef.set({
       'friends': FieldValue.arrayUnion([value]),
     }, SetOptions(merge: true));
@@ -212,17 +212,17 @@ class FriendCell extends StatelessWidget {
 
   Future<String> getFriendName(String friendId) async{
     final DocumentReference friendDocRef =
-    FirebaseFirestore.instance.collection('movies').doc(friendId);
+    FirebaseFirestore.instance.collection('users').doc(friendId);
     DocumentSnapshot snapshot = await friendDocRef.get();
     return snapshot['displayName'];
   }
 
 
   void removeFriend(String value) async {
-    final DocumentReference ownDocRef = FirebaseFirestore.instance.collection('movies').doc(user.uid);
+    final DocumentReference ownDocRef = FirebaseFirestore.instance.collection('users').doc(user.uid);
     ownDocRef.update({'friends': FieldValue.arrayRemove([value])});
 
-    final DocumentReference friendDocRef = FirebaseFirestore.instance.collection('movies').doc(value);
+    final DocumentReference friendDocRef = FirebaseFirestore.instance.collection('users').doc(value);
     friendDocRef.update({'friends': FieldValue.arrayRemove([user.uid])});
   }
 

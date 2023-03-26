@@ -39,6 +39,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
           fontSize: 18,
           backgroundColor: Colors.red.shade900);
     }
+    FocusManager.instance.primaryFocus?.unfocus();
     Navigator.pop(context);
   }
 
@@ -52,15 +53,16 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
           child: SingleChildScrollView(
             child:
                 Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-              Icon(
-                Icons.movie,
+
+              ImageIcon(
+                AssetImage("assets/logo_foreground.png"),
                 size: 80,
               ),
 
               SizedBox(height: 10),
 
-              Text('Forgot password ?',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 40)),
+              Text('Forgot your password ?',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30)),
               SizedBox(height: 50),
 
               //email input
@@ -82,7 +84,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                         filled: true,
                       ))),
 
-              SizedBox(height: 10),
+              SizedBox(height: 30),
 
               //sign in button
               GestureDetector(
@@ -102,6 +104,20 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                           ))),
                 ),
               ),
+
+                SizedBox(height: 25),
+                //register now
+
+                GestureDetector(
+                  onTap: (){Navigator.pop(context);},
+                  child: Text('Login now',
+                      style: TextStyle(
+                        color: Colors.red[900],
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15,
+                      )),
+                ),
+
             ]),
           ),
         )));
