@@ -97,9 +97,20 @@ class _NewSalonState extends State<NewSalon> {
     final snapshot = await FirebaseFirestore.instance.collection('movies')
         .doc(user.uid)
         .get();
-    if (snapshot.data()!['salons'].keys.toList().contains(salonName)){
-      var snackBar = SnackBar(content: Text('This room name is already used'));
-      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    if (snapshot.data()!['salons'] != null){
+      if (snapshot.data()!['salons'].keys.toList().contains(salonName)){
+        var snackBar = SnackBar(content: Text('This room name is already used'));
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      }
+      else{
+        for (String member in salonMembers){
+          FirebaseFirestore.instance
+              .collection('movies')
+              .doc(member)
+              .set({'salons' : {'$salonName' : {'salon_members' : salonMembers}}}, SetOptions(merge : true));
+        }
+        Navigator.pop(context, true);
+      }
     }
     else{
       for (String member in salonMembers){
