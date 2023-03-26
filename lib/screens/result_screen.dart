@@ -26,7 +26,7 @@ class ResultScreenSate extends State<ResultScreen> {
   List<dynamic> movies = [];
   Future<void> getData() async {
     final user = FirebaseAuth.instance.currentUser!;
-    final snapshot = await FirebaseFirestore.instance.collection('movies').doc(user.uid).get();
+    final snapshot = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
     List<dynamic>? moviesId = snapshot.data()!['movies_id'];
     List<dynamic> moviesData = [];
     List<dynamic> moviesDataTitels = [];

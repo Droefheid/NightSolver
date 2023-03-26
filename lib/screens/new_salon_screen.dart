@@ -42,7 +42,7 @@ class _NewSalonState extends State<NewSalon> {
   void _onSearchChanged(String value) async {
     try {
       final int letterCount = value.length;
-        final snapshot = await FirebaseFirestore.instance.collection('movies')
+        final snapshot = await FirebaseFirestore.instance.collection('users')
             .doc(user.uid)
             .get();
         List<dynamic> searchPersons = [];
@@ -65,7 +65,7 @@ class _NewSalonState extends State<NewSalon> {
 
   void addPerson(String value) async {
     final DocumentReference friendDocRef =
-    FirebaseFirestore.instance.collection('movies').doc(value);
+    FirebaseFirestore.instance.collection('users').doc(value);
     DocumentSnapshot snapshot = await friendDocRef.get();
     final String friendName = snapshot['displayName'];
     setState(() {
@@ -76,7 +76,7 @@ class _NewSalonState extends State<NewSalon> {
   }
   void removePerson(String value) async {
     final DocumentReference friendDocRef =
-    FirebaseFirestore.instance.collection('movies').doc(value);
+    FirebaseFirestore.instance.collection('users').doc(value);
     DocumentSnapshot snapshot = await friendDocRef.get();
     final String friendName = snapshot['displayName'];
     setState(() {
@@ -105,7 +105,7 @@ class _NewSalonState extends State<NewSalon> {
       else{
         for (String member in salonMembers){
           FirebaseFirestore.instance
-              .collection('movies')
+              .collection('users')
               .doc(member)
               .set({'salons' : {'$salonName' : {'salon_members' : salonMembers}}}, SetOptions(merge : true));
         }
@@ -115,7 +115,7 @@ class _NewSalonState extends State<NewSalon> {
     else{
       for (String member in salonMembers){
         FirebaseFirestore.instance
-            .collection('movies')
+            .collection('users')
             .doc(member)
             .set({'salons' : {'$salonName' : {'salon_members' : salonMembers}}}, SetOptions(merge : true));
       }
@@ -222,7 +222,7 @@ class PersonCell extends StatelessWidget {
 
   Future<String> getFriendName(String friendId) async{
     final DocumentReference friendDocRef =
-    FirebaseFirestore.instance.collection('movies').doc(friendId);
+    FirebaseFirestore.instance.collection('users').doc(friendId);
     DocumentSnapshot snapshot = await friendDocRef.get();
     return snapshot['displayName'];
   }

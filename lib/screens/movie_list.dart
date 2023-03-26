@@ -20,7 +20,7 @@ class _MovieListState extends State<MovieList> {
   Future<void> getData() async {
     final user = FirebaseAuth.instance.currentUser!;
     final snapshot = await FirebaseFirestore.instance
-        .collection('movies')
+        .collection('users')
         .doc(user.uid)
         .get();
     List<dynamic>? moviesId = snapshot.data()!['movies_id'];
