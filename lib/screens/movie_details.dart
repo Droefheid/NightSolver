@@ -141,15 +141,6 @@ class _MovieDetailState extends State<MovieDetail> {
   }
 
 
-
-
-
-
-
-
-
-
-
   @override
   void initState() {
     super.initState();
