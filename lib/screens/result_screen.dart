@@ -26,7 +26,7 @@ class ResultScreenSate extends State<ResultScreen> {
   List<dynamic> movies = [];
   Future<void> getData() async {
     final user = FirebaseAuth.instance.currentUser!;
-    final snapshot = await FirebaseFirestore.instance.collection('movies').doc(user.uid).get();
+    final snapshot = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
     List<dynamic>? moviesId = snapshot.data()!['movies_id'];
     List<dynamic> moviesData = [];
     List<dynamic> moviesDataTitels = [];
@@ -112,16 +112,13 @@ class ResultScreenSate extends State<ResultScreen> {
       appBar: AppBar(
         elevation: 0.3,
         centerTitle: true,
-        backgroundColor: Colors.white,
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
-          color: mainColor,
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(
           'Recomended Movies',
           style: TextStyle(
-            color: mainColor,
             fontFamily: 'Arvo',
             fontWeight: FontWeight.bold,
           ),

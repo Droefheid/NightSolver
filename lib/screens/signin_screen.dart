@@ -60,16 +60,17 @@ class _SignInScreenState extends State<SignInScreen> {
           child: SingleChildScrollView(
             child:
                 Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-              Icon(
-                Icons.movie,
+
+              ImageIcon(
+                AssetImage("assets/logo_foreground.png"),
                 size: 80,
               ),
 
               SizedBox(height: 10),
 
-              Text('Welcome',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 40)),
-              SizedBox(height: 50),
+              Text('Welcome on NightSolver',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30)),
+              SizedBox(height: 40),
 
               //email input
               Padding(

@@ -13,7 +13,6 @@ class Friends extends StatefulWidget {
 }
 
 class _FriendsState extends State<Friends> {
-  Color mainColor = const Color(0xff3C3261);
   final TextEditingController _SearchController = TextEditingController();
   final TextEditingController _addControler = TextEditingController();
   List<dynamic> friends = [];
@@ -23,7 +22,7 @@ class _FriendsState extends State<Friends> {
   Future<void> getData() async {
     final user = FirebaseAuth.instance.currentUser!;
     final snapshot = await FirebaseFirestore.instance
-        .collection('movies')
+        .collection('users')
         .doc(user.uid)
         .get();
 
@@ -31,7 +30,11 @@ class _FriendsState extends State<Friends> {
 
     if (snapshot.data()!['friends'] != null) {
       for (String friend in snapshot.data()!['friends']) {
-        myFriends.add(friend);
+        final DocumentReference friendDocRef =
+        FirebaseFirestore.instance.collection('movies').doc(friend);
+        DocumentSnapshot snapshot = await friendDocRef.get();
+        final String friendName = snapshot['displayName'];
+        myFriends.add(friendName);
       }
     }
     setState(() {
@@ -48,22 +51,24 @@ class _FriendsState extends State<Friends> {
   void _onSearchChanged(String value) async {
     try {
       final int letterCount = value.length;
-      final snapshot = await FirebaseFirestore.instance.collection('movies')
+      final snapshot = await FirebaseFirestore.instance.collection('users')
           .doc(user.uid)
           .get();
       List<dynamic> searchFriends = [];
       if(snapshot.data()!['friends'] != null) {
         for (String friend in snapshot.data()!['friends']) {
-          if (friend.substring(0, letterCount).toLowerCase() ==
-              value.toLowerCase()) {
-            searchFriends.add(friend);
+          final DocumentReference friendDocRef =
+          FirebaseFirestore.instance.collection('movies').doc(friend);
+          DocumentSnapshot snapshot = await friendDocRef.get();
+          final String friendName = snapshot['displayName'];
+          if (friendName.substring(0, letterCount).toLowerCase() == value.toLowerCase()) {
+            searchFriends.add(friendName);
           }
         }
       }
       setState(() {
         friends = searchFriends;
       });
-
     }
     catch (error) {
       print('Error occurred: $error');
@@ -71,16 +76,14 @@ class _FriendsState extends State<Friends> {
   }
 
   void addFriend(String value) async {
-    final user = FirebaseAuth.instance.currentUser!;
-
     final DocumentReference friendDocRef =
-    FirebaseFirestore.instance.collection('movies').doc(value);
+    FirebaseFirestore.instance.collection('users').doc(value);
     friendDocRef.set({
       'friends': FieldValue.arrayUnion([user.uid]),
     }, SetOptions(merge: true));
 
     final DocumentReference ownDocRef =
-    FirebaseFirestore.instance.collection('movies').doc(user.uid);
+    FirebaseFirestore.instance.collection('users').doc(user.uid);
     ownDocRef.set({
       'friends': FieldValue.arrayUnion([value]),
     }, SetOptions(merge: true));
@@ -95,13 +98,13 @@ class _FriendsState extends State<Friends> {
     Widget okButton = MaterialButton(
       child: Text("Ok"),
       onPressed:  () {
-        Navigator.of(context).pop();
+        Navigator.pop(context, true);
       },
     );
     AlertDialog alert = AlertDialog(
       title: Text("Help"),
       content: Text(
-          "To add a friend, type his uid in this field, then click the + icon."
+          "To add a friend, type his username in this field, then click the + icon."
       ),
       actions: [
         okButton,
@@ -115,6 +118,14 @@ class _FriendsState extends State<Friends> {
     );
   }
 
+  Future getFriendName(String friendId) async {
+      final DocumentReference friendDocRef =
+      FirebaseFirestore.instance.collection('movies').doc(friendId);
+      DocumentSnapshot snapshot = await friendDocRef.get();
+      final String friendName = snapshot['displayName'];
+    return friendName;
+  }
+
 
 
   @override
@@ -125,19 +136,12 @@ class _FriendsState extends State<Friends> {
         appBar: AppBar(
           elevation: 0.3,
           centerTitle: true,
-          backgroundColor: Colors.white,
           leading: IconButton(
             icon: Icon(Icons.arrow_back),
-            color: mainColor,
-            onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => HomeScreen()))
+            onPressed: () => Navigator.pop(context, true)
           ),
           title: Text(
             'Friends',
-            style: TextStyle(
-              color: mainColor,
-              fontFamily: 'Arvo',
-              fontWeight: FontWeight.bold,
-            ),
           ),
         ),
         body: Padding(
@@ -151,22 +155,23 @@ class _FriendsState extends State<Friends> {
                   prefixIcon: new IconButton(
                       icon: Icon(Icons.add_circle_outline),
                       onPressed: () async {
-                        if (_addControler.text == user.uid){
+                        if (_addControler.text == user.displayName){
                           var snackBar = SnackBar(content: Text('This is yourself silly'));
                           ScaffoldMessenger.of(context).showSnackBar(snackBar);
                         }
                         else{
                           QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection("movies").get();
                           final allUsers = querySnapshot.docs.map((doc) => doc.id).toList();
-                          if (!allUsers.contains(_addControler.text)){
-                            var snackBar = SnackBar(content: Text('No user found'));
-                            ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                          for(String friendId in allUsers){
+                            String friendName = await getFriendName(friendId);
+                            if (_addControler.text == friendName){
+                              var snackBar = SnackBar(content: Text('$friendName added as a friend'));
+                              addFriend(friendId);
+                              ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                            }
                           }
-                          else{
-                            var snackBar = SnackBar(content: Text('Friend added'));
-                            addFriend(_addControler.text);
-                            ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                          }
+                          var snackBar = SnackBar(content: Text('No user found'));
+                          ScaffoldMessenger.of(context).showSnackBar(snackBar);
                         }
                       },
                   ),
@@ -216,22 +221,36 @@ class FriendCell extends StatelessWidget {
   Color mainColor = const Color(0xff3C3261);
   FriendCell(this.friend);
   final user = FirebaseAuth.instance.currentUser!;
-  String friendName = '';
 
   Future<String> getFriendName(String friendId) async{
+
+
+    print(friendId);
     final DocumentReference friendDocRef =
-    FirebaseFirestore.instance.collection('movies').doc(friendId);
+    FirebaseFirestore.instance.collection('users').doc(friendId);
     DocumentSnapshot snapshot = await friendDocRef.get();
     return snapshot['displayName'];
   }
 
 
-  void removeFriend(String value) async {
-    final DocumentReference ownDocRef = FirebaseFirestore.instance.collection('movies').doc(user.uid);
-    ownDocRef.update({'friends': FieldValue.arrayRemove([value])});
+  Future removeFriend(String friendName) async {
+    String friendId = '';
+    final DocumentReference ownDocRef = FirebaseFirestore.instance.collection('users').doc(user.uid);
+    DocumentSnapshot mySnapshot = await ownDocRef.get();
+    for(String someFriendId in mySnapshot['friends']){
+      final DocumentReference friendDocRef = FirebaseFirestore.instance.collection('users').doc(someFriendId);
+      DocumentSnapshot snapshot = await friendDocRef.get();
+      if (snapshot['displayName'] == friendName){
+        friendId = someFriendId;
+      }
+    }
 
-    final DocumentReference friendDocRef = FirebaseFirestore.instance.collection('movies').doc(value);
-    friendDocRef.update({'friends': FieldValue.arrayRemove([user.uid])});
+    final DocumentReference myDocRef = FirebaseFirestore.instance.collection('users').doc(user.uid);
+    myDocRef.update({'friends': FieldValue.arrayRemove([friendId])});
+
+    final DocumentReference myFriendDocRef = FirebaseFirestore.instance.collection('users').doc(friendId);
+    myFriendDocRef.update({'friends': FieldValue.arrayRemove([user.uid])});
+
   }
 
   showWarningDialog(BuildContext context, String friend) {
@@ -239,31 +258,23 @@ class FriendCell extends StatelessWidget {
     Widget cancelButton = MaterialButton(
       child: Text("Cancel"),
       onPressed:  () {
-        Navigator.of(context).pop();
+        Navigator.pop(context, true);
       },
     );
     Widget proceedButton = MaterialButton(
       child: Text("Proceed"),
-      onPressed:  () {
-        removeFriend(friend);
-        Navigator.of(context).push(MaterialPageRoute(builder: (_) => Friends()));
-      },
+      onPressed: () async {
+        await removeFriend(friend);
+        await Navigator.of(context).push(MaterialPageRoute(builder: (_) => Friends()));
+        Navigator.pop(context, true);
+        Navigator.pop(context, true);
+        },
     );
     AlertDialog alert = AlertDialog(
       title: Text("Warning"),
-      content: FutureBuilder(
-        future: getFriendName(friend),
-        builder: (context, snapshot) {
-          if (snapshot.hasData &&
-              snapshot.connectionState == ConnectionState.done) {
-            return Text(
-              'You are about to unfriend \'${snapshot.data!}\'\n'
-              'Do you wish to proceed?',
-            );
-          }
-          return CircularProgressIndicator();
-        },
-      ),
+      content: Text(
+      'You are about to unfriend \'$friend\'\n'
+      'Do you wish to proceed?'),
       actions: [
         cancelButton,
         proceedButton,
@@ -315,22 +326,13 @@ class FriendCell extends StatelessWidget {
                   margin: const EdgeInsets.fromLTRB(0, 0.0, 0, 0.0),
                   child: new Column(
                     children: [
-                      FutureBuilder(
-                        future: getFriendName(friend),
-                        builder: (context, snapshot) {
-                          if (snapshot.hasData &&
-                              snapshot.connectionState == ConnectionState.done) {
-                            return Text(
-                              snapshot.data!,
+                            Text(
+                              friend,
                               style: TextStyle(
                                 color: Colors.black,
                                 fontSize: 20
                               ),
-                            );
-                          }
-                          return CircularProgressIndicator();
-                        },
-                      )
+                            )
                     ],
                     crossAxisAlignment: CrossAxisAlignment.start,
                   ),

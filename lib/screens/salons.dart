@@ -1,8 +1,8 @@
 import 'dart:async';
+import 'dart:ui';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:night_solver/screens/watch_providers.dart';
-import 'home_screen.dart';
 import 'new_salon_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -15,7 +15,6 @@ class Salons extends StatefulWidget {
 
 class _SalonsState extends State<Salons> {
   List<dynamic> salons = [];
-  Color mainColor = const Color(0xff3C3261);
   final TextEditingController _controller = TextEditingController();
   final user = FirebaseAuth.instance.currentUser!;
 
@@ -64,10 +63,10 @@ class _SalonsState extends State<Salons> {
     return GestureDetector(
         onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
         child : Scaffold(
-          backgroundColor: Colors.white,
           floatingActionButton: FloatingActionButton.extended(
               onPressed: () async {
-                Navigator.push(context,PageRouteBuilder(pageBuilder: (_,__,___) => const NewSalon()));
+                await Navigator.push(context,PageRouteBuilder(pageBuilder: (_,__,___) => const NewSalon()));
+                getData();
               },
               label: const Text(
                   "New room"
@@ -76,16 +75,13 @@ class _SalonsState extends State<Salons> {
           appBar: AppBar(
             elevation: 0.3,
             centerTitle: true,
-            backgroundColor: Colors.white,
             leading: IconButton(
               icon: Icon(Icons.arrow_back),
-              color: mainColor,
-              onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => HomeScreen())),
+              onPressed: () => Navigator.pop(context, true),
             ),
             title: Text(
               'Rooms',
               style: TextStyle(
-                color: mainColor,
                 fontFamily: 'Arvo',
                 fontWeight: FontWeight.bold,
               ),
@@ -136,10 +132,10 @@ class SalonCell extends StatelessWidget {
   void leaveSalon(dynamic salon) async {
     String salonName = salon.keys.toList().first;
     for (String member in salon[salon.keys.toList().first]['salon_members']){
-      final DocumentReference ownDocRef = FirebaseFirestore.instance.collection('movies').doc(member);
+      final DocumentReference ownDocRef = FirebaseFirestore.instance.collection('users').doc(member);
       ownDocRef.update({'salons.$salonName.salon_members': FieldValue.arrayRemove([user.uid])});
     }
-    final DocumentReference docRef = FirebaseFirestore.instance.collection('movies').doc(user.uid);
+    final DocumentReference docRef = FirebaseFirestore.instance.collection('users').doc(user.uid);
     docRef.update({'salons.$salonName' : FieldValue.delete()});
   }
   showWarningDialog(BuildContext context, dynamic salon){
@@ -152,16 +148,18 @@ class SalonCell extends StatelessWidget {
     );
     Widget proceedButton = MaterialButton(
       child: Text("Proceed"),
-      onPressed:  () {
+      onPressed:  () async {
         leaveSalon(salon);
-        Navigator.of(context).push(MaterialPageRoute(builder: (_) => Salons()));
+        await Navigator.of(context).push(MaterialPageRoute(builder: (_) => Salons()));
+        Navigator.pop(context, true);
+        Navigator.pop(context, true);
       },
     );
     AlertDialog alert = AlertDialog(
       title: Text("Warning"),
       content: Text(
-          "You are about to leave the room $salonName.\n"
-              "Do you wish to proceed?"
+        "You are about to leave the room \'$salonName\'.\n"
+        "Do you wish to proceed?"
       ),
       actions: [
         cancelButton,
@@ -181,7 +179,7 @@ class SalonCell extends StatelessWidget {
     List resultList = [];
     for (int i = 0; i < list.length; i++){
       final DocumentReference friendDocRef =
-      FirebaseFirestore.instance.collection('movies').doc(list[i]);
+      FirebaseFirestore.instance.collection('users').doc(list[i]);
       DocumentSnapshot snapshot = await friendDocRef.get();
       final String friendName = snapshot['displayName'];
       resultList.add(friendName);
@@ -280,7 +278,7 @@ class SalonCell extends StatelessWidget {
                       icon: Icon(Icons.logout),
                       onPressed: () {
                         showWarningDialog(context, salon);
-                      },
+                        },
                     ),
                   ],
                 )

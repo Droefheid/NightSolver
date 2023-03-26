@@ -26,7 +26,7 @@ class _MovieDetailState extends State<MovieDetail> {
   Future addMovie(BuildContext context) async {
     final user = FirebaseAuth.instance.currentUser!;
     final DocumentReference docRef =
-        FirebaseFirestore.instance.collection('movies').doc(user.uid);
+        FirebaseFirestore.instance.collection('users').doc(user.uid);
     docRef.set({
       'movies_id': FieldValue.arrayUnion([widget.movie['id'].toString()]),
     }, SetOptions(merge: true));
@@ -47,7 +47,7 @@ class _MovieDetailState extends State<MovieDetail> {
   Future deleteMovie(BuildContext context, String movieId) async {
     final user = FirebaseAuth.instance.currentUser!;
     final DocumentReference docRef =
-        FirebaseFirestore.instance.collection('movies').doc(user.uid);
+        FirebaseFirestore.instance.collection('users').doc(user.uid);
     docRef.update({
       'movies_id': FieldValue.arrayRemove([movieId]),
     });
@@ -151,7 +151,6 @@ class _MovieDetailState extends State<MovieDetail> {
   Widget build(BuildContext context) {
     return new Scaffold(
       appBar: new AppBar(
-        backgroundColor: mainColor,
         title: new Text(widget.movie['title']),
       ),
       body: new Stack(fit: StackFit.expand, children: [

@@ -44,10 +44,6 @@ class _HomeScreenState extends State<HomeScreen> {
     getData();
   }
 
-  @override
-  void dispose() {
-    controller.dispose();
-  }
 
 
   @override
@@ -58,47 +54,8 @@ class _HomeScreenState extends State<HomeScreen> {
       //backgroundColor: Colors.black,
         drawer: NavBar(),
         appBar: AppBar(
-          backgroundColor: Colors.white,
-          foregroundColor: Colors.black,
-          title: Center(
-            child: customSearchBar,
-          ),
-          actions: [
-            IconButton(
-              onPressed: () {
-                setState(() {
-                  if (customIcon.icon == Icons.search) {
-                    customIcon = const Icon(Icons.cancel);
-                    customSearchBar = ListTile(
-                      leading: Icon(
-                        Icons.search,
-                        color: Colors.black,
-                        size: 28,
-                      ),
-                      title: TextField(
-                        style: TextStyle(color: Colors.black),
-                        decoration: InputDecoration(
-                          hintText: 'Type in movie name...',
-                          hintStyle: TextStyle(
-                            color: Colors.black,
-                            fontSize: 18,
-                            fontStyle: FontStyle.italic,
-                          ),
-                          border: InputBorder.none,
-                        ),
-                        onChanged: (
-                                (value) => setState(() => searchValue = value)
-                        ),
-                      ),
-                    );                } else {
-                    customIcon = const Icon(Icons.search);
-                    customSearchBar = const Text('Search a movie');
-                  }
-                });
-              },
-              icon: customIcon,
-            ),
-          ],
+          centerTitle: true,
+          title: Text("Trending Movies"),
         ),
         body: GridView.builder(
           controller: controller,

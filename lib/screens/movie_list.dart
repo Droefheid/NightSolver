@@ -14,14 +14,13 @@ class MovieList extends StatefulWidget {
 class _MovieListState extends State<MovieList> {
   final apiKey = '9478d83ca04bd6ee25b942dd7a0ad777';
   List<dynamic> movies = [];
-  Color mainColor = const Color(0xff3C3261);
   final TextEditingController _controller = TextEditingController();
   final ScrollController _scrollController = ScrollController();
 
   Future<void> getData() async {
     final user = FirebaseAuth.instance.currentUser!;
     final snapshot = await FirebaseFirestore.instance
-        .collection('movies')
+        .collection('users')
         .doc(user.uid)
         .get();
     List<dynamic>? moviesId = snapshot.data()!['movies_id'];
@@ -86,16 +85,13 @@ class _MovieListState extends State<MovieList> {
       appBar: AppBar(
         elevation: 0.3,
         centerTitle: true,
-        backgroundColor: Colors.white,
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
-          color: mainColor,
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(
           'Movies',
           style: TextStyle(
-            color: mainColor,
             fontFamily: 'Arvo',
             fontWeight: FontWeight.bold,
           ),
