@@ -30,7 +30,6 @@ class _NewSalonState extends State<NewSalon> {
     setState(() {
       persons = myFriends;
     });
-    print(persons);
   }
 
 
@@ -95,13 +94,22 @@ class _NewSalonState extends State<NewSalon> {
 
 
   void _createSalon(BuildContext context) async {
-    for (String member in salonMembers){
-      FirebaseFirestore.instance
-          .collection('movies')
-          .doc(member)
-          .set({'salons' : {'$salonName' : {'salon_members' : salonMembers}}}, SetOptions(merge : true));
+    final snapshot = await FirebaseFirestore.instance.collection('movies')
+        .doc(user.uid)
+        .get();
+    if (snapshot.data()!['salons'].keys.toList().contains(salonName)){
+      var snackBar = SnackBar(content: Text('This room name is already used'));
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
     }
-    Navigator.of(context).push(MaterialPageRoute(builder: (_) => Salons()));
+    else{
+      for (String member in salonMembers){
+        FirebaseFirestore.instance
+            .collection('movies')
+            .doc(member)
+            .set({'salons' : {'$salonName' : {'salon_members' : salonMembers}}}, SetOptions(merge : true));
+      }
+      Navigator.pop(context, true);
+    }
   }
 
 

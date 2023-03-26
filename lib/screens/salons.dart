@@ -1,8 +1,8 @@
 import 'dart:async';
+import 'dart:ui';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:night_solver/screens/watch_providers.dart';
-import 'home_screen.dart';
 import 'new_salon_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -65,7 +65,8 @@ class _SalonsState extends State<Salons> {
         child : Scaffold(
           floatingActionButton: FloatingActionButton.extended(
               onPressed: () async {
-                Navigator.push(context,PageRouteBuilder(pageBuilder: (_,__,___) => const NewSalon()));
+                await Navigator.push(context,PageRouteBuilder(pageBuilder: (_,__,___) => const NewSalon()));
+                getData();
               },
               label: const Text(
                   "New room"
@@ -76,7 +77,7 @@ class _SalonsState extends State<Salons> {
             centerTitle: true,
             leading: IconButton(
               icon: Icon(Icons.arrow_back),
-              onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => HomeScreen())),
+              onPressed: () => Navigator.pop(context, true),
             ),
             title: Text(
               'Rooms',
@@ -147,16 +148,18 @@ class SalonCell extends StatelessWidget {
     );
     Widget proceedButton = MaterialButton(
       child: Text("Proceed"),
-      onPressed:  () {
+      onPressed:  () async {
         leaveSalon(salon);
-        Navigator.of(context).push(MaterialPageRoute(builder: (_) => Salons()));
+        await Navigator.of(context).push(MaterialPageRoute(builder: (_) => Salons()));
+        Navigator.pop(context, true);
+        Navigator.pop(context, true);
       },
     );
     AlertDialog alert = AlertDialog(
       title: Text("Warning"),
       content: Text(
-          "You are about to leave the room $salonName.\n"
-              "Do you wish to proceed?"
+        "You are about to leave the room \'$salonName\'.\n"
+        "Do you wish to proceed?"
       ),
       actions: [
         cancelButton,
@@ -275,7 +278,7 @@ class SalonCell extends StatelessWidget {
                       icon: Icon(Icons.logout),
                       onPressed: () {
                         showWarningDialog(context, salon);
-                      },
+                        },
                     ),
                   ],
                 )
