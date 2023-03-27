@@ -2,8 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:night_solver/screens/home_screen.dart';
-
+import 'custom_toast.dart';
 
 class Friends extends StatefulWidget {
   const Friends({Key? key}) : super(key: key);
@@ -156,8 +155,7 @@ class _FriendsState extends State<Friends> {
                       icon: Icon(Icons.add_circle_outline),
                       onPressed: () async {
                         if (_addControler.text == user.displayName){
-                          var snackBar = SnackBar(content: Text('This is yourself silly'));
-                          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                          CustomToast.showToast(context, "You can't add yourself");
                         }
                         else{
                           QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection("users").get();
@@ -165,13 +163,11 @@ class _FriendsState extends State<Friends> {
                           for(String friendId in allUsers){
                             String friendName = await getFriendName(friendId);
                             if (_addControler.text == friendName){
-                              var snackBar = SnackBar(content: Text('$friendName added as a friend'));
                               addFriend(friendId);
-                              ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                              CustomToast.showToast(context, '$friendName added as a friend');
                             }
                           }
-                          var snackBar = SnackBar(content: Text('No user found'));
-                          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                          CustomToast.showToast(context, 'No user found');
                         }
                       },
                   ),

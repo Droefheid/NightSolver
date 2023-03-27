@@ -3,6 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
+import 'custom_toast.dart';
+
 class SignUpScreen extends StatefulWidget {
   final VoidCallback showSignInScreen;
 
@@ -29,12 +31,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
         .where('displayName', isEqualTo: username)
         .get();
     if (querySnapshot.docs.length > 0) {
-      Fluttertoast.showToast(
-          msg: "This username is already taken",
-          gravity: ToastGravity.TOP,
-          fontSize: 18,
-          backgroundColor: Colors.red.shade900);
-
+      CustomToast.showToast(context, "This username is already taken");
     }else if (_passwordController.text.trim() ==
         _confirmPasswordController.text.trim()) {
 
@@ -58,12 +55,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
         } else if (e.code == 'invalid-email'){
           errorMsg = "The email provided is invalid.";
         }
-        Fluttertoast.showToast(
-            msg: errorMsg,
-            gravity: ToastGravity.TOP,
-            fontSize: 18,
-            backgroundColor: Colors.red.shade900
-        );
+        CustomToast.showToast(context, errorMsg);
       } catch (e) {
         print(e);
       }

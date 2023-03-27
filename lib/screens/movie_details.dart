@@ -6,6 +6,8 @@ import 'dart:ui' as ui;
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+import 'custom_toast.dart';
+
 class MovieDetail extends StatefulWidget {
   final movie;
   final bool canDelete;
@@ -30,15 +32,7 @@ class _MovieDetailState extends State<MovieDetail> {
     docRef.set({
       'movies_id': FieldValue.arrayUnion([widget.movie['id'].toString()]),
     }, SetOptions(merge: true));
-
-    Fluttertoast.showToast(
-      msg: "Movie added to watched list",
-      toastLength: Toast.LENGTH_SHORT,
-      gravity: ToastGravity.BOTTOM,
-      backgroundColor: Colors.grey[600],
-      textColor: Colors.white,
-    );
-
+    CustomToast.showToast(context, 'Movie added to watched list');
     // Navigate back to the previous screen
     FocusScope.of(context).unfocus();
     Navigator.pop(context, true);
@@ -51,16 +45,7 @@ class _MovieDetailState extends State<MovieDetail> {
     docRef.update({
       'movies_id': FieldValue.arrayRemove([movieId]),
     });
-
-    // Show toast message
-    Fluttertoast.showToast(
-      msg: "Movie removed from watched list",
-      toastLength: Toast.LENGTH_SHORT,
-      gravity: ToastGravity.BOTTOM,
-      backgroundColor: Colors.grey[600],
-      textColor: Colors.white,
-    );
-
+    CustomToast.showToast(context, 'Movie removed from watched list');
     // Navigate back to the previous screen
     FocusScope.of(context).unfocus();
     Navigator.pop(context, true);
@@ -111,6 +96,21 @@ class _MovieDetailState extends State<MovieDetail> {
             );
           }
         });
+      } else {
+        if (value['flatrate'] != null && value['flatrate'].isNotEmpty) {
+          value['flatrate'].forEach((flatValue) {
+            if (flatValue['provider_name'] != null && !addedProviders.contains(flatValue['provider_name'])) {
+              addedProviders.add(flatValue['provider_name']);
+              providerWidgets.add(
+                Image.network(
+                  'https://image.tmdb.org/t/p/w92${flatValue['logo_path']}',
+                  width: 60,
+                ),
+              );
+            }
+          });
+        }
+
       }
     });
 
@@ -139,15 +139,6 @@ class _MovieDetailState extends State<MovieDetail> {
       ],
     );
   }
-
-
-
-
-
-
-
-
-
 
 
   @override

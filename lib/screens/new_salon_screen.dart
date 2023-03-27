@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'custom_toast.dart';
 import 'salons.dart';
 
 
@@ -73,8 +74,7 @@ class _NewSalonState extends State<NewSalon> {
     setState(() {
       salonMembers.add(value);
     });
-    var snackBar = SnackBar(duration: const Duration(seconds: 2), content: Text('$friendName added to the room'));
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    CustomToast.showToast(context, '$friendName added to the room');
   }
   void removePerson(String value) async {
     final DocumentReference friendDocRef =
@@ -84,8 +84,7 @@ class _NewSalonState extends State<NewSalon> {
     setState(() {
       salonMembers.remove(value);
     });
-    var snackBar = SnackBar(duration: const Duration(seconds: 2), content: Text('$friendName removed from the room'));
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    CustomToast.showToast(context, '$friendName removed from the room');
   }
 
   void _changeSalonName(String value) async {
@@ -101,8 +100,7 @@ class _NewSalonState extends State<NewSalon> {
         .get();
     if (snapshot.data()!['salons'] != null){
       if (snapshot.data()!['salons'].keys.toList().contains(salonName)){
-        var snackBar = SnackBar(content: Text('This room name is already used'));
-        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+        CustomToast.showToast(context, 'This room name is already used');
       }
       else{
         for (String member in salonMembers){
@@ -134,8 +132,7 @@ class _NewSalonState extends State<NewSalon> {
         floatingActionButton: FloatingActionButton.extended(
             onPressed:() {
               if(salonName == ''){
-                var snackBar = SnackBar(content: Text('No room name given'));
-                ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                CustomToast.showToast(context, 'No room name given');
               }
               else{
                 _createSalon(context);
