@@ -23,14 +23,20 @@ class _SignUpScreenState extends State<SignUpScreen> {
     String username = _usernameController.text.trim();
     FirebaseFirestore fInstance = FirebaseFirestore.instance;
 
-    if (_passwordController.text.trim() ==
+    // Check if username is unique
+    QuerySnapshot querySnapshot = await fInstance
+        .collection('users')
+        .where('displayName', isEqualTo: username)
+        .get();
+    if (querySnapshot.docs.length > 0) {
+      Fluttertoast.showToast(
+          msg: "This username is already taken",
+          gravity: ToastGravity.TOP,
+          fontSize: 18,
+          backgroundColor: Colors.red.shade900);
+
+    }else if (_passwordController.text.trim() ==
         _confirmPasswordController.text.trim()) {
-
-      /*var name = fInstance.collection('usernames').doc(username).get();
-      print("SIGNUP SCREEN");
-      print(name);*/
-
-
 
       try {
         final credential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
@@ -42,23 +48,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
             .collection('users')
             .doc(FirebaseAuth.instance.currentUser!.uid)
             .set({'displayName' : _usernameController.text.trim()}, SetOptions(merge : true));
-
-
-        /*var userDoc = fInstance.collection('users').doc(credential.user?.uid);
-        var usernameDoc = fInstance.collection('usernames').doc(username);
-
-        var batch = fInstance.batch();
-        batch.set(userDoc, {username});
-        batch.set(usernameDoc, { 'uid': credential.user?.uid});
-
-        await batch.commit();*/
-
-
-
-
-
-
-
 
       } on FirebaseAuthException catch (e) {
         String errorMsg = "An error has occurred";
