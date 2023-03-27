@@ -31,6 +31,7 @@ class ResultScreenSate extends State<ResultScreen> {
     List<dynamic> moviesData = [];
     List<dynamic> moviesDataTitels = [];
     List<dynamic> Genres = [];
+    List<dynamic> RecList = [];
     if(widget.aventure>=50){
       Genres.add(12);
     }
@@ -60,40 +61,41 @@ class ResultScreenSate extends State<ResultScreen> {
       for (String movieId in moviesId) {
         //get a list of recommend movies based on seen movies
         final result = await http.get(Uri.parse('https://api.themoviedb.org/3/movie/$movieId/recommendations?api_key=$apiKey&language=en-US&page=1'));
-          if (result.statusCode == 200) {
-            final Map<String, dynamic> resultData = json.decode(result.body);
-            for(int i=0;i<resultData['results'].length;i++){
-              //check if the movie recommended has the same genre as set in the preferences
-              if(resultData['results'][i]['genre_ids'].length != 0 && Genres.contains(resultData['results'][i]['genre_ids'][0] as int)){
-                //check if the movie recommended is not in the seen movies list
-                if(!moviesId.contains(resultData["results"][i]["id"].toString())) {
-                  String recId = resultData["results"][i]["id"].toString();
-                  //get the providers list of the recommended movie
-                  final movieProvider = await http.get(Uri.parse('https://api.themoviedb.org/3/movie/$recId/watch/providers?api_key=$apiKey'));
-                  if(movieProvider.statusCode == 200){
-                    final Map<String, dynamic> ProviderData = json.decode(movieProvider.body);
-                    //check if the movie has any provider in Belgium
-                    if(ProviderData["results"]["BE"] != null && ProviderData["results"]["BE"]["flatrate"] != null){
-                      for(int y=0; y<ProviderData["results"]["BE"]["flatrate"].length;y++){
-                        // check if the provider is in the providers list
-                        print(ProviderData["results"]["BE"]["flatrate"][y]["provider_name"]);
-                        if(widget.providers[ProviderData["results"]["BE"]["flatrate"][y]["provider_name"]] ==1){
-                          //check if movie added not in list of movie data
-                          if(!moviesDataTitels.contains(resultData["results"][i]["title"])){
-                            moviesDataTitels.add(resultData["results"][i]["title"]);
-                            moviesData.add(resultData["results"][i]);
-                          }
-                          break;
-                        }
-                      }
-                    }
-
-                  }
-                }
+        if (result.statusCode == 200) {
+          final Map<String, dynamic> resultData = json.decode(result.body);
+          for(int i=0;i<resultData['results'].length;i++){
+            //check if the movie recommended has the same genre as set in the preferences
+            if(resultData['results'][i]['genre_ids'].length != 0 && Genres.contains(resultData['results'][i]['genre_ids'][0] as int)){
+              //check if the movie recommended is not in the seen movies list
+              if(!moviesId.contains(resultData["results"][i]["id"].toString())){
+                RecList.add(resultData["results"][i]);
               }
             }
           }
         }
+      }
+      for( var Rec in RecList){
+        //get the providers list of the recommended movie
+        String recId = Rec["id"].toString();
+        final movieProvider = await http.get(Uri.parse('https://api.themoviedb.org/3/movie/$recId/watch/providers?api_key=$apiKey'));
+        if(movieProvider.statusCode == 200){
+          final Map<String, dynamic> ProviderData = json.decode(movieProvider.body);
+          //check if the movie has any provider in Belgium
+          if(ProviderData["results"]["BE"] != null && ProviderData["results"]["BE"]["flatrate"] != null){
+            for(int y=0; y<ProviderData["results"]["BE"]["flatrate"].length;y++){
+              // check if the provider is in the providers list
+              if(widget.providers[ProviderData["results"]["BE"]["flatrate"][y]["provider_name"]] ==1){
+                //check if movie added not in list of movie data
+                if(!moviesDataTitels.contains(Rec["title"])){
+                  moviesDataTitels.add(Rec["title"]);
+                  moviesData.add(Rec);
+                }
+                break;
+              }
+            }
+          }
+        }
+      }
     }
     setState(() {
       movies = moviesData;
