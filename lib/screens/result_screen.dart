@@ -26,6 +26,7 @@ class ResultScreenSate extends State<ResultScreen> {
   final apiKey = '9478d83ca04bd6ee25b942dd7a0ad777';
   Color mainColor = const Color(0xff3C3261);
   List<dynamic> movies = [];
+
   Future<void> getData() async {
     final user = FirebaseAuth.instance.currentUser!;
     final snapshot = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
@@ -99,24 +100,6 @@ class ResultScreenSate extends State<ResultScreen> {
         }
       }
     }
-    if(moviesData.length==0){
-      final url =
-          'https://api.themoviedb.org/3/trending/movie/week?api_key=9478d83ca04bd6ee25b942dd7a0ad777';
-      final response = await http.get(Uri.parse(url));
-      final Map<String, dynamic> responseData = json.decode(response.body);
-      print(responseData['results'].length);
-      for(int i=0;i<responseData['results'].length;i++){
-        if(responseData['results'][i]['genre_ids'].length != 0 && Genres.contains(responseData['results'][i]['genre_ids'][0] as int)){
-          //check if the movie recommended is not in the seen movies list
-          if(moviesId != null){
-            if(!moviesId.contains(responseData["results"][i]["id"].toString())){
-              moviesData.add(responseData["results"][i]);
-            }
-          }
-        }
-      }
-
-    }
     setState(() {
       movies = moviesData;
     });
@@ -153,9 +136,10 @@ class ResultScreenSate extends State<ResultScreen> {
           children: [
             Expanded(
               child: ListView.builder(
-                itemCount: movies == null ? 0 : movies.length,
+                cacheExtent: 0,
+                itemCount: movies.isEmpty ? 1 : movies.length,
                 itemBuilder: (context, i) {
-                  return MaterialButton(
+                  return movies.isEmpty ? const Center(child: CircularProgressIndicator(),): MaterialButton(
                     child:
                     MovieCell(movies[i]),
                     padding: const EdgeInsets.all(0.0),
