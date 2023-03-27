@@ -4,6 +4,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 
+import 'movie_details.dart';
+
 class ResultScreen extends StatefulWidget {
   const ResultScreen({Key? key,required this.aventure, required this.action, required this.comedie, required this.crime, required this.drama, required this.fantasy,required this.horror,required this.scifi, required this.providers}) : super(key: key);
   final double aventure;
@@ -97,6 +99,24 @@ class ResultScreenSate extends State<ResultScreen> {
         }
       }
     }
+    if(moviesData.length==0){
+      final url =
+          'https://api.themoviedb.org/3/trending/movie/week?api_key=9478d83ca04bd6ee25b942dd7a0ad777';
+      final response = await http.get(Uri.parse(url));
+      final Map<String, dynamic> responseData = json.decode(response.body);
+      print(responseData['results'].length);
+      for(int i=0;i<responseData['results'].length;i++){
+        if(responseData['results'][i]['genre_ids'].length != 0 && Genres.contains(responseData['results'][i]['genre_ids'][0] as int)){
+          //check if the movie recommended is not in the seen movies list
+          if(moviesId != null){
+            if(!moviesId.contains(responseData["results"][i]["id"].toString())){
+              moviesData.add(responseData["results"][i]);
+            }
+          }
+        }
+      }
+
+    }
     setState(() {
       movies = moviesData;
     });
@@ -139,7 +159,14 @@ class ResultScreenSate extends State<ResultScreen> {
                     child:
                     MovieCell(movies[i]),
                     padding: const EdgeInsets.all(0.0),
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => MovieDetail(movies[i]),
+                        ),
+                      );
+                    },
                     color: Colors.white,
                   );
                 },
