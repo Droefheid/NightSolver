@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:night_solver/screens/preference_page.dart';
 
 class Providers extends StatefulWidget {
-  const Providers({Key? key}) : super(key: key);
+  const Providers({Key? key, required this.IdList} ) : super(key: key);
+  final IdList;
   @override
   State<Providers> createState() => _ProvidersState();
 }
@@ -13,9 +14,7 @@ class _ProvidersState extends State<Providers>{
   "Netflix":0,
   "Amazon Prime Video" : 0,
   "Disney Plus" : 0,
-  "BeTV" : 0,
   "Apple TV":0,
-    "Pirate":0
   };
   @override
   Widget build(BuildContext context) {
@@ -38,15 +37,12 @@ class _ProvidersState extends State<Providers>{
           ),
         ),
       ),
-      body: GridView.count(
-        crossAxisCount: 2,
+      body: Wrap(
         children: [
           ProvideroCell("Netflix"),
           ProvideroCell("Amazon Prime Video"),
           ProvideroCell("Disney Plus"),
-          ProvideroCell("BeTV"),
           ProvideroCell("Apple TV"),
-          ProvideroCell("Pirate"),
         ],
       ),
         bottomSheet: buildSubmit(),
@@ -54,12 +50,11 @@ class _ProvidersState extends State<Providers>{
   }
   Widget ProvideroCell( String field){
     return Padding(
-        padding: const EdgeInsets.all(8),
+        padding: const EdgeInsets.all(4),
         child: ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: (providers[field]==0)?Colors.white : mainColor,
-              minimumSize: Size(100, 80),
-            ),
+          style: ElevatedButton.styleFrom(
+            padding: EdgeInsets.all(10),
+          ),
             onPressed: (){
               setState(() {
                 if(providers[field]==0){
@@ -72,7 +67,7 @@ class _ProvidersState extends State<Providers>{
               },
             child: Text(
               field,
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold,color: (providers[field]==0)?Colors.black:Colors.white),
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold,color: (providers[field]==0)?Colors.black:Colors.white),
             )
         )
     );
@@ -84,6 +79,7 @@ class _ProvidersState extends State<Providers>{
         ElevatedButton(
             onPressed: () => Navigator.of(context).push(MaterialPageRoute(
               builder: (context) => Preferences(
+                  IdList : widget.IdList,
                   providerStat : providers
               ))),
             child: Text('Next',

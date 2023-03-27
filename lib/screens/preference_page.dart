@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:night_solver/screens/result_screen.dart';
 
 class Preferences extends StatefulWidget {
-  const Preferences({Key? key,required this.providerStat}) : super(key: key);
+  const Preferences({Key? key,required this.IdList, required this.providerStat}) : super(key: key);
   final providerStat;
+  final IdList;
   @override
   State<Preferences> createState() => _PreferencesState();
 }
@@ -128,6 +129,7 @@ class _PreferencesState extends State<Preferences> {
           child: ElevatedButton(
             onPressed: () => Navigator.of(context).push(MaterialPageRoute(
                 builder: (context) => ResultScreen(
+                    IdList : widget.IdList,
                     aventure: aventureValue,
                     action: actionValue,
                     comedie: comedieValue,

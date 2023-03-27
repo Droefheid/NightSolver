@@ -1,13 +1,13 @@
 import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 
 import 'movie_details.dart';
 
 class ResultScreen extends StatefulWidget {
-  const ResultScreen({Key? key,required this.aventure, required this.action, required this.comedie, required this.crime, required this.drama, required this.fantasy,required this.horror,required this.scifi, required this.providers}) : super(key: key);
+  const ResultScreen({Key? key,required this.IdList, required this.aventure, required this.action, required this.comedie, required this.crime, required this.drama, required this.fantasy,required this.horror,required this.scifi, required this.providers}) : super(key: key);
+  final IdList;
   final double aventure;
   final double action;
   final double comedie;
@@ -28,9 +28,13 @@ class ResultScreenSate extends State<ResultScreen> {
   List<dynamic> movies = [];
 
   Future<void> getData() async {
-    final user = FirebaseAuth.instance.currentUser!;
-    final snapshot = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
-    List<dynamic>? moviesId = snapshot.data()!['movies_id'];
+    var moviesId = [];
+    for(String id in  widget.IdList){
+      final snapshot = await FirebaseFirestore.instance.collection('users').doc(id).get();
+      if(snapshot.data()!['movies_id'] != null){
+        moviesId.addAll(snapshot.data()!['movies_id']);
+      }
+    }
     List<dynamic> moviesData = [];
     List<dynamic> moviesDataTitels = [];
     List<dynamic> Genres = [];

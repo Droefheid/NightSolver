@@ -110,7 +110,10 @@ class _SalonsState extends State<Salons> {
                       return MaterialButton(
                         child: SalonCell(salons[i]),
                         padding: const EdgeInsets.all(0.0),
-                        onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => Providers())),
+                        onPressed: () {
+                          var members = salons[i].values.first;
+                          Navigator.of(context).push(MaterialPageRoute(builder: (_) => Providers(IdList : members.values.first)));
+                        },
                         color: Colors.white,
                       );
                     },
