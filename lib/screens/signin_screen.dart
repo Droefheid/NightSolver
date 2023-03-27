@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:night_solver/screens/reset_password_screen.dart';
 
+import 'custom_toast.dart';
+
 class SignInScreen extends StatefulWidget {
   final VoidCallback showSignUpScreen;
 
@@ -33,12 +35,7 @@ class _SignInScreenState extends State<SignInScreen> {
       } else if (e.code == 'invalid-email'){
         errorMsg = "The email provided is invalid.";
       }
-      Fluttertoast.showToast(
-          msg: errorMsg,
-          gravity: ToastGravity.TOP,
-          fontSize: 18,
-          backgroundColor: Colors.red.shade900
-      );
+      CustomToast.showToast(context, errorMsg);
     } catch (e) {
       print(e);
     }

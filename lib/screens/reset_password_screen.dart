@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+import 'custom_toast.dart';
 
 class ResetPasswordScreen extends StatefulWidget {
 
@@ -26,18 +26,9 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
       await FirebaseAuth.instance.sendPasswordResetEmail(
         email: _emailController.text.trim(),
       );
-      Fluttertoast.showToast(
-          msg:
-          "Password reset email sent. Please check your email to reset your password.",
-          gravity: ToastGravity.TOP,
-          fontSize: 18,
-          backgroundColor: Colors.green);
+      CustomToast.showToast(context, "Password reset email sent. Please check your email to reset your password.");
     } catch (e) {
-      Fluttertoast.showToast(
-          msg: "Failed to send password reset email. Please try again.",
-          gravity: ToastGravity.TOP,
-          fontSize: 18,
-          backgroundColor: Colors.red.shade900);
+      CustomToast.showToast(context, "Failed to send password reset email. Please try again.");
     }
     FocusManager.instance.primaryFocus?.unfocus();
     Navigator.pop(context);
