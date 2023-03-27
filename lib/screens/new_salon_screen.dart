@@ -22,14 +22,16 @@ class _NewSalonState extends State<NewSalon> {
   List<String> salonMembers = [FirebaseAuth.instance.currentUser!.uid];
 
   Future<void> getData() async {
-    DocumentSnapshot snapshot = await FirebaseFirestore.instance.collection("movies").doc(user.uid).get();
+    final snapshot = await FirebaseFirestore.instance.collection("users").doc(user.uid).get();
     List<dynamic> myFriends = [];
-    for (String friend in snapshot['friends']){
-      myFriends.add(friend);
+    if (snapshot.data()!['friends'] != null){
+      for (String friend in snapshot['friends']){
+        myFriends.add(friend);
+      }
+      setState(() {
+        persons = myFriends;
+      });
     }
-    setState(() {
-      persons = myFriends;
-    });
   }
 
 
@@ -94,7 +96,7 @@ class _NewSalonState extends State<NewSalon> {
 
 
   void _createSalon(BuildContext context) async {
-    final snapshot = await FirebaseFirestore.instance.collection('movies')
+    final snapshot = await FirebaseFirestore.instance.collection('users')
         .doc(user.uid)
         .get();
     if (snapshot.data()!['salons'] != null){

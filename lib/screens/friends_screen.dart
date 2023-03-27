@@ -31,7 +31,7 @@ class _FriendsState extends State<Friends> {
     if (snapshot.data()!['friends'] != null) {
       for (String friend in snapshot.data()!['friends']) {
         final DocumentReference friendDocRef =
-        FirebaseFirestore.instance.collection('movies').doc(friend);
+        FirebaseFirestore.instance.collection('users').doc(friend);
         DocumentSnapshot snapshot = await friendDocRef.get();
         final String friendName = snapshot['displayName'];
         myFriends.add(friendName);
@@ -58,7 +58,7 @@ class _FriendsState extends State<Friends> {
       if(snapshot.data()!['friends'] != null) {
         for (String friend in snapshot.data()!['friends']) {
           final DocumentReference friendDocRef =
-          FirebaseFirestore.instance.collection('movies').doc(friend);
+          FirebaseFirestore.instance.collection('users').doc(friend);
           DocumentSnapshot snapshot = await friendDocRef.get();
           final String friendName = snapshot['displayName'];
           if (friendName.substring(0, letterCount).toLowerCase() == value.toLowerCase()) {
@@ -120,7 +120,7 @@ class _FriendsState extends State<Friends> {
 
   Future getFriendName(String friendId) async {
       final DocumentReference friendDocRef =
-      FirebaseFirestore.instance.collection('movies').doc(friendId);
+      FirebaseFirestore.instance.collection('users').doc(friendId);
       DocumentSnapshot snapshot = await friendDocRef.get();
       final String friendName = snapshot['displayName'];
     return friendName;
@@ -160,7 +160,7 @@ class _FriendsState extends State<Friends> {
                           ScaffoldMessenger.of(context).showSnackBar(snackBar);
                         }
                         else{
-                          QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection("movies").get();
+                          QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection("users").get();
                           final allUsers = querySnapshot.docs.map((doc) => doc.id).toList();
                           for(String friendId in allUsers){
                             String friendName = await getFriendName(friendId);
