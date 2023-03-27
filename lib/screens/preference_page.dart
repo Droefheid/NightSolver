@@ -124,7 +124,7 @@ class _PreferencesState extends State<Preferences> {
       children: [
         Container(
           //width: MediaQuery.of(context).size.width- 80,
-          height: 50,
+          height: 60,
           child: ElevatedButton(
             onPressed: () => Navigator.of(context).push(MaterialPageRoute(
                 builder: (context) => ResultScreen(

@@ -4,6 +4,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 
+import 'movie_details.dart';
+
 class ResultScreen extends StatefulWidget {
   const ResultScreen({Key? key,required this.aventure, required this.action, required this.comedie, required this.crime, required this.drama, required this.fantasy,required this.horror,required this.scifi, required this.providers}) : super(key: key);
   final double aventure;
@@ -24,6 +26,7 @@ class ResultScreenSate extends State<ResultScreen> {
   final apiKey = '9478d83ca04bd6ee25b942dd7a0ad777';
   Color mainColor = const Color(0xff3C3261);
   List<dynamic> movies = [];
+
   Future<void> getData() async {
     final user = FirebaseAuth.instance.currentUser!;
     final snapshot = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
@@ -31,6 +34,7 @@ class ResultScreenSate extends State<ResultScreen> {
     List<dynamic> moviesData = [];
     List<dynamic> moviesDataTitels = [];
     List<dynamic> Genres = [];
+    List<dynamic> RecList = [];
     if(widget.aventure>=50){
       Genres.add(12);
     }
@@ -60,40 +64,41 @@ class ResultScreenSate extends State<ResultScreen> {
       for (String movieId in moviesId) {
         //get a list of recommend movies based on seen movies
         final result = await http.get(Uri.parse('https://api.themoviedb.org/3/movie/$movieId/recommendations?api_key=$apiKey&language=en-US&page=1'));
-          if (result.statusCode == 200) {
-            final Map<String, dynamic> resultData = json.decode(result.body);
-            for(int i=0;i<resultData['results'].length;i++){
-              //check if the movie recommended has the same genre as set in the preferences
-              if(resultData['results'][i]['genre_ids'].length != 0 && Genres.contains(resultData['results'][i]['genre_ids'][0] as int)){
-                //check if the movie recommended is not in the seen movies list
-                if(!moviesId.contains(resultData["results"][i]["id"].toString())) {
-                  String recId = resultData["results"][i]["id"].toString();
-                  //get the providers list of the recommended movie
-                  final movieProvider = await http.get(Uri.parse('https://api.themoviedb.org/3/movie/$recId/watch/providers?api_key=$apiKey'));
-                  if(movieProvider.statusCode == 200){
-                    final Map<String, dynamic> ProviderData = json.decode(movieProvider.body);
-                    //check if the movie has any provider in Belgium
-                    if(ProviderData["results"]["BE"] != null && ProviderData["results"]["BE"]["flatrate"] != null){
-                      for(int y=0; y<ProviderData["results"]["BE"]["flatrate"].length;y++){
-                        // check if the provider is in the providers list
-                        print(ProviderData["results"]["BE"]["flatrate"][y]["provider_name"]);
-                        if(widget.providers[ProviderData["results"]["BE"]["flatrate"][y]["provider_name"]] ==1){
-                          //check if movie added not in list of movie data
-                          if(!moviesDataTitels.contains(resultData["results"][i]["title"])){
-                            moviesDataTitels.add(resultData["results"][i]["title"]);
-                            moviesData.add(resultData["results"][i]);
-                          }
-                          break;
-                        }
-                      }
-                    }
-
-                  }
-                }
+        if (result.statusCode == 200) {
+          final Map<String, dynamic> resultData = json.decode(result.body);
+          for(int i=0;i<resultData['results'].length;i++){
+            //check if the movie recommended has the same genre as set in the preferences
+            if(resultData['results'][i]['genre_ids'].length != 0 && Genres.contains(resultData['results'][i]['genre_ids'][0] as int)){
+              //check if the movie recommended is not in the seen movies list
+              if(!moviesId.contains(resultData["results"][i]["id"].toString())){
+                RecList.add(resultData["results"][i]);
               }
             }
           }
         }
+      }
+      for( var Rec in RecList){
+        //get the providers list of the recommended movie
+        String recId = Rec["id"].toString();
+        final movieProvider = await http.get(Uri.parse('https://api.themoviedb.org/3/movie/$recId/watch/providers?api_key=$apiKey'));
+        if(movieProvider.statusCode == 200){
+          final Map<String, dynamic> ProviderData = json.decode(movieProvider.body);
+          //check if the movie has any provider in Belgium
+          if(ProviderData["results"]["BE"] != null && ProviderData["results"]["BE"]["flatrate"] != null){
+            for(int y=0; y<ProviderData["results"]["BE"]["flatrate"].length;y++){
+              // check if the provider is in the providers list
+              if(widget.providers[ProviderData["results"]["BE"]["flatrate"][y]["provider_name"]] ==1){
+                //check if movie added not in list of movie data
+                if(!moviesDataTitels.contains(Rec["title"])){
+                  moviesDataTitels.add(Rec["title"]);
+                  moviesData.add(Rec);
+                }
+                break;
+              }
+            }
+          }
+        }
+      }
     }
     setState(() {
       movies = moviesData;
@@ -131,13 +136,21 @@ class ResultScreenSate extends State<ResultScreen> {
           children: [
             Expanded(
               child: ListView.builder(
-                itemCount: movies == null ? 0 : movies.length,
+                cacheExtent: 0,
+                itemCount: movies.isEmpty ? 1 : movies.length,
                 itemBuilder: (context, i) {
-                  return MaterialButton(
+                  return movies.isEmpty ? const Center(child: CircularProgressIndicator(),): MaterialButton(
                     child:
                     MovieCell(movies[i]),
                     padding: const EdgeInsets.all(0.0),
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => MovieDetail(movies[i]),
+                        ),
+                      );
+                    },
                     color: Colors.white,
                   );
                 },

@@ -21,30 +21,34 @@ class _SalonsState extends State<Salons> {
 
 
   Future<void> getData() async {
-    DocumentSnapshot snapshot = await FirebaseFirestore.instance.collection("movies").doc(user.uid).get();
+    final snapshot = await FirebaseFirestore.instance.collection("users").doc(user.uid).get();
     List<dynamic> newSalons = [];
-    for (String key in snapshot['salons'].keys){
-      newSalons.add({key : snapshot['salons'][key]});
+    if (snapshot.data()!['salons'] != null){
+      for (String key in snapshot['salons'].keys){
+        newSalons.add({key : snapshot['salons'][key]});
+      }
+      setState(() {
+        salons = newSalons;
+      });
     }
-    setState(() {
-      salons = newSalons;
-    });
   }
 
   void _onSearchChanged(String value) async {
     try {
       final int letterCount = value.length;
-      DocumentSnapshot snapshot = await FirebaseFirestore.instance.collection("movies").doc(user.uid).get();
+      final snapshot = await FirebaseFirestore.instance.collection("users").doc(user.uid).get();
 
       List<dynamic> searchSalons = [];
-      for (String key in snapshot['salons'].keys){
-        if(key.substring(0,letterCount).toLowerCase() == value.toLowerCase()){
-          searchSalons.add({key : snapshot['salons'][key]});
+      if (snapshot.data()!['salons'] != null){
+        for (String key in snapshot['salons'].keys){
+          if(key.substring(0,letterCount).toLowerCase() == value.toLowerCase()){
+            searchSalons.add({key : snapshot['salons'][key]});
+          }
         }
+        setState(() {
+          salons = searchSalons;
+        });
       }
-      setState(() {
-        salons = searchSalons;
-      });
     } catch (error) {
       print('Error occurred: $error');
     }

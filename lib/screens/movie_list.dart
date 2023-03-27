@@ -102,13 +102,22 @@ class _MovieListState extends State<MovieList> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            TextField(
-              decoration: InputDecoration(
-                hintText: 'Add movies',
-              ),
-              controller: _controller,
-              onChanged: _onSearchChanged,
+            TextFormField(
+                controller: _controller,
+                decoration: InputDecoration(
+                    prefixIcon: new IconButton(
+                      icon: Icon(Icons.add_circle_outline),
+                      onPressed: null
+                    ),
+                    hintText: "Add movies",
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(15)
+                    )
+                ),
+                onChanged: _onSearchChanged
             ),
+
+
             Expanded(
               child: ListView.builder(
                 controller: _scrollController,
