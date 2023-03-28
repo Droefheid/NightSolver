@@ -1,5 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:night_solver/screens/reset_password_screen.dart';
+
+import 'custom_toast.dart';
 
 class SignInScreen extends StatefulWidget {
   final VoidCallback showSignUpScreen;
@@ -16,10 +20,25 @@ class _SignInScreenState extends State<SignInScreen> {
   final _passwordController = TextEditingController();
 
   Future signIn() async {
-    await FirebaseAuth.instance.signInWithEmailAndPassword(
-      email: _emailController.text.trim(),
-      password: _passwordController.text.trim(),
-    );
+
+    try {
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
+      );
+    } on FirebaseAuthException catch (e) {
+      String errorMsg = "An error has occurred";
+      if (e.code == 'wrong-password') {
+        errorMsg = "The password provided is invalid.";
+      } else if (e.code == 'user-not-found') {
+        errorMsg = "No user was found for the email address provided.";
+      } else if (e.code == 'invalid-email'){
+        errorMsg = "The email provided is invalid.";
+      }
+      CustomToast.showToast(context, errorMsg);
+    } catch (e) {
+      print(e);
+    }
   }
 
   @override
@@ -38,16 +57,17 @@ class _SignInScreenState extends State<SignInScreen> {
           child: SingleChildScrollView(
             child:
                 Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-              Icon(
-                Icons.movie,
+
+              ImageIcon(
+                AssetImage("assets/logo_foreground.png"),
                 size: 80,
               ),
 
               SizedBox(height: 10),
 
-              Text('Welcome',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 40)),
-              SizedBox(height: 50),
+              Text('Welcome on NightSolver',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30)),
+              SizedBox(height: 40),
 
               //email input
               Padding(
@@ -91,7 +111,30 @@ class _SignInScreenState extends State<SignInScreen> {
                     obscureText: true,
                   )),
 
-              SizedBox(height: 10),
+              SizedBox(height: 20),
+
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const ResetPasswordScreen()),
+                      );
+                    },
+                    child: Text('Forgot password ?',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 15,
+                        )),
+                  ),
+                ],
+              ),
+
+              SizedBox(height: 20),
+
+
               //sign in button
               GestureDetector(
                 onTap: signIn,

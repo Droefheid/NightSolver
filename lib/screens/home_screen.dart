@@ -20,7 +20,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final user = FirebaseAuth.instance.currentUser!;
   Icon customIcon = const Icon(Icons.search);
-  Widget customSearchBar = const Text("search");
+  Widget customSearchBar = const Text("Trending movies");
   String searchValue = "";
   List<dynamic> movies = [];
   final controller = ScrollController();
@@ -30,7 +30,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> getData() async {
     final url =
-        'https://api.themoviedb.org/3/movie/top_rated?api_key=9478d83ca04bd6ee25b942dd7a0ad777';
+        'https://api.themoviedb.org/3/trending/movie/week?api_key=9478d83ca04bd6ee25b942dd7a0ad777';
     final response = await http.get(Uri.parse(url));
     final Map<String, dynamic> responseData = json.decode(response.body);
     setState(() {
@@ -44,10 +44,6 @@ class _HomeScreenState extends State<HomeScreen> {
     getData();
   }
 
-  @override
-  void dispose() {
-    controller.dispose();
-  }
 
 
   @override
@@ -58,47 +54,8 @@ class _HomeScreenState extends State<HomeScreen> {
       //backgroundColor: Colors.black,
         drawer: NavBar(),
         appBar: AppBar(
-          backgroundColor: Colors.white,
-          foregroundColor: Colors.black,
-          title: Center(
-            child: customSearchBar,
-          ),
-          actions: [
-            IconButton(
-              onPressed: () {
-                setState(() {
-                  if (customIcon.icon == Icons.search) {
-                    customIcon = const Icon(Icons.cancel);
-                    customSearchBar = ListTile(
-                      leading: Icon(
-                        Icons.search,
-                        color: Colors.black,
-                        size: 28,
-                      ),
-                      title: TextField(
-                        style: TextStyle(color: Colors.black),
-                        decoration: InputDecoration(
-                          hintText: 'Type in movie name...',
-                          hintStyle: TextStyle(
-                            color: Colors.black,
-                            fontSize: 18,
-                            fontStyle: FontStyle.italic,
-                          ),
-                          border: InputBorder.none,
-                        ),
-                        onChanged: (
-                                (value) => setState(() => searchValue = value)
-                        ),
-                      ),
-                    );                } else {
-                    customIcon = const Icon(Icons.search);
-                    customSearchBar = const Text('Search a movie');
-                  }
-                });
-              },
-              icon: customIcon,
-            ),
-          ],
+          centerTitle: true,
+          title: Text("Trending Movies"),
         ),
         body: GridView.builder(
           controller: controller,

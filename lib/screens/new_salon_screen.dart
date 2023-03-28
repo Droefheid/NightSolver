@@ -3,6 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'custom_toast.dart';
+import 'salons.dart';
 
 
 class NewSalon extends StatefulWidget {
@@ -18,21 +20,32 @@ class _NewSalonState extends State<NewSalon> {
   List<dynamic> persons = [];
   final user = FirebaseAuth.instance.currentUser!;
   String salonName = '';
-  bool editableName = true;
-  List<String> salonMembers = [];
+  List<String> salonMembers = [FirebaseAuth.instance.currentUser!.uid];
+
+  Future<void> getData() async {
+    final snapshot = await FirebaseFirestore.instance.collection("users").doc(user.uid).get();
+    List<dynamic> myFriends = [];
+    if (snapshot.data()!['friends'] != null){
+      for (String friend in snapshot['friends']){
+        myFriends.add(friend);
+      }
+      setState(() {
+        persons = myFriends;
+      });
+    }
+  }
 
 
+  @override
+  void initState() {
+    super.initState();
+    getData();
+  }
 
   void _onSearchChanged(String value) async {
     try {
       final int letterCount = value.length;
-      if (letterCount == 0){
-        setState(() {
-          persons = [];
-        });
-      }
-      else {
-        final snapshot = await FirebaseFirestore.instance.collection('movies')
+        final snapshot = await FirebaseFirestore.instance.collection('users')
             .doc(user.uid)
             .get();
         List<dynamic> searchPersons = [];
@@ -47,22 +60,31 @@ class _NewSalonState extends State<NewSalon> {
         setState(() {
           persons = searchPersons;
         });
-      }
     }
     catch (error) {
       print('Error occurred: $error');
     }
   }
 
-  void _addPerson(String value) async {
+  void addPerson(String value) async {
+    final DocumentReference friendDocRef =
+    FirebaseFirestore.instance.collection('users').doc(value);
+    DocumentSnapshot snapshot = await friendDocRef.get();
+    final String friendName = snapshot['displayName'];
     setState(() {
       salonMembers.add(value);
     });
+    CustomToast.showToast(context, '$friendName added to the room');
   }
-  void _removePerson(String value) async {
+  void removePerson(String value) async {
+    final DocumentReference friendDocRef =
+    FirebaseFirestore.instance.collection('users').doc(value);
+    DocumentSnapshot snapshot = await friendDocRef.get();
+    final String friendName = snapshot['displayName'];
     setState(() {
       salonMembers.remove(value);
     });
+    CustomToast.showToast(context, '$friendName removed from the room');
   }
 
   void _changeSalonName(String value) async {
@@ -73,13 +95,32 @@ class _NewSalonState extends State<NewSalon> {
 
 
   void _createSalon(BuildContext context) async {
-    final snapshot1 = await FirebaseFirestore.instance.collection("movies").doc(user.uid).get();
-    FirebaseFirestore.instance.collection('movies').doc(user.uid).set({'salons' : {'$salonName' : {'salon_members' : salonMembers}}}, SetOptions(merge : true));
-
-    //for (String member in salonMembers){
-    //  salons["salons"][salonName].set({'salon_members': FieldValue.arrayUnion([member])});
-    //}
-    Navigator.pop(context, true);
+    final snapshot = await FirebaseFirestore.instance.collection('users')
+        .doc(user.uid)
+        .get();
+    if (snapshot.data()!['salons'] != null){
+      if (snapshot.data()!['salons'].keys.toList().contains(salonName)){
+        CustomToast.showToast(context, 'This room name is already used');
+      }
+      else{
+        for (String member in salonMembers){
+          FirebaseFirestore.instance
+              .collection('users')
+              .doc(member)
+              .set({'salons' : {'$salonName' : {'salon_members' : salonMembers}}}, SetOptions(merge : true));
+        }
+        Navigator.pop(context, true);
+      }
+    }
+    else{
+      for (String member in salonMembers){
+        FirebaseFirestore.instance
+            .collection('users')
+            .doc(member)
+            .set({'salons' : {'$salonName' : {'salon_members' : salonMembers}}}, SetOptions(merge : true));
+      }
+      Navigator.pop(context, true);
+    }
   }
 
 
@@ -89,7 +130,14 @@ class _NewSalonState extends State<NewSalon> {
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: Scaffold(
         floatingActionButton: FloatingActionButton.extended(
-            onPressed:() {_createSalon(context);},
+            onPressed:() {
+              if(salonName == ''){
+                CustomToast.showToast(context, 'No room name given');
+              }
+              else{
+                _createSalon(context);
+              }
+            },
             label: Text("Create")
         ),
         appBar: AppBar(
@@ -102,7 +150,7 @@ class _NewSalonState extends State<NewSalon> {
             onPressed: () => Navigator.of(context).pop(),
           ),
           title: Text(
-            'Creating a new salon',
+            'Creating a new room',
             style: TextStyle(
               color: mainColor,
               fontFamily: 'Arvo',
@@ -120,7 +168,7 @@ class _NewSalonState extends State<NewSalon> {
                 maxLength: 30,
                 autofocus: true,
                 decoration: InputDecoration(
-                  hintText: "Name of the salon",
+                  hintText: "Name of the room",
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(15)
                   )
@@ -143,7 +191,14 @@ class _NewSalonState extends State<NewSalon> {
                     return MaterialButton(
                       child: PersonCell(persons[i]),
                       padding: const EdgeInsets.all(0.0),
-                      onPressed: () => _addPerson(persons[i]),
+                      onPressed: () async {
+                        if (!salonMembers.contains(persons[i])){
+                          addPerson(persons[i]);
+                        }
+                        else{
+                          removePerson(persons[i]);
+                        }
+                      },
                       color: Colors.white,
                     );
                   },
@@ -163,79 +218,82 @@ class PersonCell extends StatelessWidget {
   Color mainColor = const Color(0xff3C3261);
   PersonCell(this.person);
 
+
+  Future<String> getFriendName(String friendId) async{
+    final DocumentReference friendDocRef =
+    FirebaseFirestore.instance.collection('users').doc(friendId);
+    DocumentSnapshot snapshot = await friendDocRef.get();
+    return snapshot['displayName'];
+  }
+
+
   @override
   Widget build(BuildContext context) {
-    return new Column(
-      children: <Widget>[
-        new Row(
-          children: <Widget>[
-            new Padding(
-              padding: const EdgeInsets.all(0.0),
-              child: new Container(
-                margin: const EdgeInsets.all(16.0),
+    return new Container(
+      child: new Column(
+        children: <Widget>[
+          new Row(
+            children: <Widget>[
+              new Padding(
+                padding: const EdgeInsets.all(0.0),
                 child: new Container(
-                  width: 70.0,
-                  height: 70.0,
-                ),
-                decoration: new BoxDecoration(
-                  borderRadius: new BorderRadius.circular(10.0),
-                  color: Colors.grey,
-                  image: new DecorationImage(
-                      image: new NetworkImage(
-                          "https://eitrawmaterials.eu/wp-content/uploads/2016/09/person-icon.png"),
-                      fit: BoxFit.cover),
-                  boxShadow: [
-                    new BoxShadow(
-                        color: mainColor,
-                        blurRadius: 5.0,
-                        offset: new Offset(2.0, 5.0))
-                  ],
-                ),
-              ),
-            ),
-            new Expanded(
-                child: new Container(
-                  margin: const EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 0.0),
-                  child: new Column(
-                    children: [
-                      new Text(
-                          person
-                      ),
-                    ],
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  margin: const EdgeInsets.all(16.0),
+                  child: new Container(
+                    width: 70.0,
+                    height: 70.0,
                   ),
-                )
-            ),
-            Container(
-              width: 30,
-              height: 30,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: mainColor,
-                  width: 2.5
+                  decoration: new BoxDecoration(
+                    borderRadius: new BorderRadius.circular(10.0),
+                    color: Colors.grey,
+                    image: new DecorationImage(
+                        image: new NetworkImage(
+                            "https://eitrawmaterials.eu/wp-content/uploads/2016/09/person-icon.png"),
+                        fit: BoxFit.cover),
+                    boxShadow: [
+                      new BoxShadow(
+                          color: mainColor,
+                          blurRadius: 5.0,
+                          offset: new Offset(2.0, 5.0))
+                    ],
+                  ),
                 ),
               ),
-              child: IconButton(
-                onPressed: () {},
-                icon: Icon(
-                  Icons.done,
-                  color: mainColor,
-                  size: 10,
-                ),
+              new Expanded(
+                  child: new Container(
+                    margin: const EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 0.0),
+                    child: new Column(
+                      children: [
+                        FutureBuilder(
+                          future: getFriendName(person),
+                          builder: (context, snapshot) {
+                            if (snapshot.hasData &&
+                                snapshot.connectionState == ConnectionState.done) {
+                              return Text(
+                                snapshot.data!,
+                                style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 20
+                                ),
+                              );
+                            }
+                            return CircularProgressIndicator();
+                          },
+                        )
+                      ],
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                    ),
+                  )
               ),
-            ),
-            Padding(padding: const EdgeInsets.all(10))
-          ],
-        ),
-        new Container(
-          width: 300.0,
-          height: 0.5,
-          color: const Color(0xD2D2E1ff),
-          margin: const EdgeInsets.all(16.0),
-        )
-      ],
+            ],
+          ),
+          new Container(
+            width: 300.0,
+            height: 0.5,
+            color: const Color(0xD2D2E1ff),
+            margin: const EdgeInsets.all(16.0),
+          )
+        ],
+      ),
     );
   }
 }

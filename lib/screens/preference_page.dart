@@ -2,16 +2,23 @@ import 'package:flutter/material.dart';
 import 'package:night_solver/screens/result_screen.dart';
 
 class Preferences extends StatefulWidget {
-  const Preferences({Key? key}) : super(key: key);
-
+  const Preferences({Key? key,required this.IdList, required this.providerStat}) : super(key: key);
+  final providerStat;
+  final IdList;
   @override
   State<Preferences> createState() => _PreferencesState();
 }
 
 class _PreferencesState extends State<Preferences> {
-  double aventureValue = 50;
   double actionValue = 50;
+  double aventureValue = 50;
   double comedieValue = 50;
+  double crimeValue = 50;
+  double dramaValue = 50;
+  double fantasyValue = 50;
+  double horrorValue = 50;
+  double scifiValue = 50;
+
   Color mainColor = const Color(0xff3C3261);
 
   @override
@@ -35,22 +42,39 @@ class _PreferencesState extends State<Preferences> {
           ),
         ),
       ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          Text('Aventure',
-              textAlign: TextAlign.left,
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-          buildSideLabel("aventureValue", aventureValue),
-          Text('Action',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-          buildSideLabel("actionValue", actionValue),
-          Text('Comédie',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-          buildSideLabel("comedieValue", comedieValue),
-          buildSubmit(),
-        ],
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Text('Adventure',
+                textAlign: TextAlign.left,
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+            buildSideLabel("aventureValue", aventureValue),
+            Text('Action',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+            buildSideLabel("actionValue", actionValue),
+            Text('Comedy',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+            buildSideLabel("comedieValue", comedieValue),
+            Text('Crime',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+            buildSideLabel("crimeValue", crimeValue),
+            Text('Drama',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+            buildSideLabel("dramaValue", dramaValue),
+            Text('Fantasy',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+            buildSideLabel("fantasyValue", fantasyValue),
+            Text('Horror',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+            buildSideLabel("horrorValue", horrorValue),
+            Text('Sci-Fi',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+            buildSideLabel("scifiValue", scifiValue),
+            buildSubmit(),
+          ],
+        ),
       ),
     );
   }
@@ -74,6 +98,16 @@ class _PreferencesState extends State<Preferences> {
                   actionValue = newValue;
                 } else if (field == "comedieValue") {
                   comedieValue = newValue;
+                }else if (field == "crimeValue") {
+                  crimeValue = newValue;
+                }else if (field == "dramaValue") {
+                  dramaValue = newValue;
+                }else if (field == "fantasyValue") {
+                  fantasyValue = newValue;
+                }else if (field == "horrorValue") {
+                  horrorValue = newValue;
+                }else if (field == "scifiValue") {
+                  scifiValue = newValue;
                 }
               });
             },
@@ -91,13 +125,21 @@ class _PreferencesState extends State<Preferences> {
       children: [
         Container(
           //width: MediaQuery.of(context).size.width- 80,
-          height: 50,
+          height: 60,
           child: ElevatedButton(
             onPressed: () => Navigator.of(context).push(MaterialPageRoute(
                 builder: (context) => ResultScreen(
+                    IdList : widget.IdList,
                     aventure: aventureValue,
                     action: actionValue,
-                    comedie: comedieValue))),
+                    comedie: comedieValue,
+                    crime: crimeValue,
+                    drama:dramaValue,
+                    fantasy: fantasyValue,
+                    horror: horrorValue,
+                    scifi: scifiValue,
+                    providers: widget.providerStat
+                ))),
             child: Text('Submit',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
           ),

@@ -1,5 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+
+import 'custom_toast.dart';
 
 class SignUpScreen extends StatefulWidget {
   final VoidCallback showSignInScreen;
@@ -12,21 +16,56 @@ class SignUpScreen extends StatefulWidget {
 }
 
 class _SignUpScreenState extends State<SignUpScreen> {
+  final _usernameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
 
   Future signUp() async {
-    if (_passwordController.text.trim() ==
+    String username = _usernameController.text.trim();
+    FirebaseFirestore fInstance = FirebaseFirestore.instance;
+
+    // Check if username is unique
+    QuerySnapshot querySnapshot = await fInstance
+        .collection('users')
+        .where('displayName', isEqualTo: username)
+        .get();
+    if (querySnapshot.docs.length > 0) {
+      CustomToast.showToast(context, "This username is already taken");
+    }else if (_passwordController.text.trim() ==
         _confirmPasswordController.text.trim()) {
-      await FirebaseAuth.instance.createUserWithEmailAndPassword(
-          email: _emailController.text.trim(),
-          password: _passwordController.text.trim());
+
+      try {
+        final credential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+            email: _emailController.text.trim(),
+            password: _passwordController.text.trim());
+
+        await credential.user?.updateDisplayName(_usernameController.text.trim());
+        FirebaseFirestore.instance
+            .collection('users')
+            .doc(FirebaseAuth.instance.currentUser!.uid)
+            .set({'displayName' : _usernameController.text.trim()}, SetOptions(merge : true));
+
+      } on FirebaseAuthException catch (e) {
+        String errorMsg = "An error has occurred";
+        if (e.code == 'weak-password') {
+          errorMsg = "The password provided is too weak.";
+        } else if (e.code == 'email-already-in-use') {
+          errorMsg = "The account already exists for that email.";
+        } else if (e.code == 'invalid-email'){
+          errorMsg = "The email provided is invalid.";
+        }
+        CustomToast.showToast(context, errorMsg);
+      } catch (e) {
+        print(e);
+      }
+
     }
   }
 
   @override
   void dispose() {
+    _usernameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
@@ -42,16 +81,39 @@ class _SignUpScreenState extends State<SignUpScreen> {
           child: SingleChildScrollView(
             child:
                 Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-              Icon(
-                Icons.movie,
+              ImageIcon(
+                AssetImage("assets/logo_foreground.png"),
                 size: 80,
               ),
+
 
               SizedBox(height: 10),
 
               Text('Create an account',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 40)),
-              SizedBox(height: 50),
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30)),
+              SizedBox(height: 30),
+
+              //username input
+              Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 25.0),
+                  child: TextField(
+                      controller: _usernameController,
+                      decoration: InputDecoration(
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.white),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.red.shade900),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        hintText: 'Username',
+                        fillColor: Colors.grey[100],
+                        filled: true,
+                      ))),
+
+                  SizedBox(height: 10),
+
 
               //email input
               Padding(
@@ -118,7 +180,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   )),
 
               SizedBox(
-                height: 10,
+                height: 30,
               ),
               //sign in button
               GestureDetector(
