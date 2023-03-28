@@ -60,7 +60,7 @@ class CustomToast extends StatelessWidget {
         fontSize: fontSize,
         iconData: iconData,
       ),
-      gravity: ToastGravity.BOTTOM,
+      gravity: ToastGravity.TOP,
       toastDuration: Duration(seconds: 3),
     );
   }
