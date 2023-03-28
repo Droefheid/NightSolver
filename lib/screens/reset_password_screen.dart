@@ -26,9 +26,9 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
       await FirebaseAuth.instance.sendPasswordResetEmail(
         email: _emailController.text.trim(),
       );
-      CustomToast.showToast(context, "Password reset email sent. Please check your email to reset your password.");
+      CustomToast.showToast(context, "Password reset email sent.");//Please check your email to reset your password.
     } catch (e) {
-      CustomToast.showToast(context, "Failed to send password reset email. Please try again.");
+      CustomToast.showToast(context, "Failed to send password reset email.");// Please try again.
     }
     FocusManager.instance.primaryFocus?.unfocus();
     Navigator.pop(context);
