@@ -28,11 +28,17 @@ class ResultScreenSate extends State<ResultScreen> {
   List<dynamic> movies = [];
 
   Future<void> getData() async {
-    var moviesId = [];
+    var RecommendedList = [];
+    var SeenMovies = [];
     for(String id in  widget.IdList){
       final snapshot = await FirebaseFirestore.instance.collection('users').doc(id).get();
       if(snapshot.data()!['movies_id'] != null){
-        moviesId.addAll(snapshot.data()!['movies_id']);
+        SeenMovies.addAll(snapshot.data()!['movies_id']);
+      }
+      if(snapshot.data()!['recommended'] != null){
+        for (var item in snapshot.data()!['recommended'].entries) {
+          RecommendedList.addAll(item.value);
+        }
       }
     }
     List<dynamic> moviesData = [];
@@ -40,51 +46,45 @@ class ResultScreenSate extends State<ResultScreen> {
     List<dynamic> Genres = [];
     List<dynamic> RecList = [];
     if(widget.aventure>=50){
-      Genres.add(12);
+      Genres.add("12");
     }
     if(widget.action>=50){
-      Genres.add(28);
+      Genres.add("28");
     }
     if(widget.comedie>=50){
-      Genres.add(35);
+      Genres.add("35");
     }
     if(widget.crime>=50){
-      Genres.add(80);
+      Genres.add("80");
     }
     if(widget.drama>=50){
-      Genres.add(18);
+      Genres.add("18");
     }
     if(widget.fantasy>=50){
-      Genres.add(14);
+      Genres.add("14");
     }
     if(widget.horror>=50){
-      Genres.add(27);
+      Genres.add("27");
     }
     if(widget.scifi>=50){
-      Genres.add(878);
+      Genres.add("878");
     }
 
-    if(moviesId != null){
-      for (String movieId in moviesId) {
+    if(!RecommendedList.isEmpty){
         //get a list of recommend movies based on seen movies
-        final result = await http.get(Uri.parse('https://api.themoviedb.org/3/movie/$movieId/recommendations?api_key=$apiKey&language=en-US&page=1'));
-        if (result.statusCode == 200) {
-          final Map<String, dynamic> resultData = json.decode(result.body);
-          for(int i=0;i<resultData['results'].length;i++){
-            //check if the movie recommended has the same genre as set in the preferences
-            if(resultData['results'][i]['genre_ids'].length != 0 && Genres.contains(resultData['results'][i]['genre_ids'][0] as int)){
-              //check if the movie recommended is not in the seen movies list
-              if(!moviesId.contains(resultData["results"][i]["id"].toString())){
-                RecList.add(resultData["results"][i]);
-              }
-            }
+      for(int i=0;i<RecommendedList.length;i++){
+        //check if the movie recommended has the same genre as set in the preferences
+        if(Genres.contains(RecommendedList[i]["genre"])){
+          //check if the movie recommended is not in the seen movies list
+          if(!SeenMovies.contains(RecommendedList[i]["id"])){
+            RecList.add(RecommendedList[i]["id"]);
           }
         }
       }
+    }
       for( var Rec in RecList){
         //get the providers list of the recommended movie
-        String recId = Rec["id"].toString();
-        final movieProvider = await http.get(Uri.parse('https://api.themoviedb.org/3/movie/$recId/watch/providers?api_key=$apiKey'));
+        final movieProvider = await http.get(Uri.parse('https://api.themoviedb.org/3/movie/$Rec/watch/providers?api_key=$apiKey'));
         if(movieProvider.statusCode == 200){
           final Map<String, dynamic> ProviderData = json.decode(movieProvider.body);
           //check if the movie has any provider in Belgium
@@ -93,9 +93,13 @@ class ResultScreenSate extends State<ResultScreen> {
               // check if the provider is in the providers list
               if(widget.providers[ProviderData["results"]["BE"]["flatrate"][y]["provider_name"]] ==1){
                 //check if movie added not in list of movie data
-                if(!moviesDataTitels.contains(Rec["title"])){
-                  moviesDataTitels.add(Rec["title"]);
-                  moviesData.add(Rec);
+                if(!moviesDataTitels.contains(Rec)){
+                  moviesDataTitels.add(Rec);
+                  final  finalRec = await http.get(Uri.parse('https://api.themoviedb.org/3/movie/$Rec?api_key=$apiKey'));
+                  if(finalRec.statusCode == 200){
+                    final Map<String, dynamic> finalRecCard = json.decode(finalRec.body);
+                    moviesData.add(finalRecCard);
+                  }
                 }
                 break;
               }
@@ -103,7 +107,6 @@ class ResultScreenSate extends State<ResultScreen> {
           }
         }
       }
-    }
     setState(() {
       movies = moviesData;
     });
