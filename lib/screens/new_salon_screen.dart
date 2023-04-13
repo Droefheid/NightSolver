@@ -107,7 +107,7 @@ class _NewSalonState extends State<NewSalon> {
           FirebaseFirestore.instance
               .collection('users')
               .doc(member)
-              .set({'salons' : {'$salonName' : {'salon_members' : salonMembers}}}, SetOptions(merge : true));
+              .set({'salons' : {'$salonName' : {'salon_members' : salonMembers, 'salon_creator' : user.uid}}}, SetOptions(merge : true));
         }
         Navigator.pop(context, true);
       }
@@ -117,7 +117,7 @@ class _NewSalonState extends State<NewSalon> {
         FirebaseFirestore.instance
             .collection('users')
             .doc(member)
-            .set({'salons' : {'$salonName' : {'salon_members' : salonMembers}}}, SetOptions(merge : true));
+            .set({'salons' : {'$salonName' : {'salon_members' : salonMembers, 'salon_creator' : user.uid}}}, SetOptions(merge : true));
       }
       Navigator.pop(context, true);
     }

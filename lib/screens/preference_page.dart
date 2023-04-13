@@ -1,8 +1,12 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:night_solver/screens/custom_toast.dart';
 import 'package:night_solver/screens/result_screen.dart';
 
 class Preferences extends StatefulWidget {
-  const Preferences({Key? key,required this.IdList, required this.providerStat}) : super(key: key);
+  const Preferences({Key? key, required this.salonName, required this.IdList, required this.providerStat}) : super(key: key);
+  final salonName;
   final providerStat;
   final IdList;
   @override
@@ -127,19 +131,55 @@ class _PreferencesState extends State<Preferences> {
           //width: MediaQuery.of(context).size.width- 80,
           height: 60,
           child: ElevatedButton(
-            onPressed: () => Navigator.of(context).push(MaterialPageRoute(
-                builder: (context) => ResultScreen(
-                    IdList : widget.IdList,
-                    aventure: aventureValue,
-                    action: actionValue,
-                    comedie: comedieValue,
-                    crime: crimeValue,
-                    drama:dramaValue,
-                    fantasy: fantasyValue,
-                    horror: horrorValue,
-                    scifi: scifiValue,
-                    providers: widget.providerStat
-                ))),
+            onPressed: () async {
+              final user = FirebaseAuth.instance.currentUser!;
+              for (String member in widget.IdList){
+                FirebaseFirestore.instance
+                  .collection('users')
+                  .doc(member)
+                  .set({
+                    'salons' :
+                      {widget.salonName :
+                        {'preferences' :
+                          {user.uid :
+                            {'aventure': aventureValue,
+                              'action': actionValue,
+                              'comedie': comedieValue,
+                              'crime': crimeValue,
+                              'drama':dramaValue,
+                              'fantasy': fantasyValue,
+                              'horror': horrorValue,
+                              'scifi': scifiValue,
+                            }
+                          }
+                        }
+                      }
+                    },
+                  SetOptions(merge : true));
+                }
+              final snapshot = await FirebaseFirestore.instance.collection("users").doc(user.uid).get();
+              var setPreferences = snapshot.data()!['salons'][widget.salonName]['preferences'].keys;
+              List result = widget.IdList.where((element) => !setPreferences.contains(element)).toList();
+              if(result.length != 0){
+                CustomToast.showToast(context, 'your preferences have been updated');
+                List names = [];
+                for (int i = 0; i < result.length; i++){
+                  final DocumentReference friendDocRef =
+                  FirebaseFirestore.instance.collection('users').doc(result[i]);
+                  DocumentSnapshot snapshot = await friendDocRef.get();
+                  final String friendName = snapshot['displayName'];
+                  names.add(friendName);
+                }
+                CustomToast.showToast(context, 'waiting for $names to set their preferences');
+              }
+              else{
+                Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => ResultScreen(
+                      salonName : widget.salonName,
+                      IdList : widget.IdList,
+                      providers: widget.providerStat
+                  )));}}
+,
             child: Text('Submit',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
           ),

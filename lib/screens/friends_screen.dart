@@ -160,14 +160,16 @@ class _FriendsState extends State<Friends> {
                         else{
                           QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection("users").get();
                           final allUsers = querySnapshot.docs.map((doc) => doc.id).toList();
+                          bool foundUser = false;
                           for(String friendId in allUsers){
                             String friendName = await getFriendName(friendId);
                             if (_addControler.text == friendName){
                               addFriend(friendId);
+                              foundUser = true;
                               CustomToast.showToast(context, '$friendName added as a friend');
                             }
                           }
-                          CustomToast.showToast(context, 'No user found');
+                          if (!foundUser) CustomToast.showToast(context, 'No user found');
                         }
                       },
                   ),
