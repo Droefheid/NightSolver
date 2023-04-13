@@ -1,10 +1,17 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:ui';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:night_solver/screens/custom_toast.dart';
+import 'package:night_solver/screens/preference_page.dart';
+import 'package:night_solver/screens/result_screen.dart';
 import 'package:night_solver/screens/watch_providers.dart';
+import 'movie_details.dart';
 import 'new_salon_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:http/http.dart' as http;
+
 
 
 
@@ -17,7 +24,7 @@ class _SalonsState extends State<Salons> {
   List<dynamic> salons = [];
   final TextEditingController _controller = TextEditingController();
   final user = FirebaseAuth.instance.currentUser!;
-
+  final apiKey = '9478d83ca04bd6ee25b942dd7a0ad777';
 
 
   Future<void> getData() async {
@@ -110,9 +117,54 @@ class _SalonsState extends State<Salons> {
                       return MaterialButton(
                         child: SalonCell(salons[i]),
                         padding: const EdgeInsets.all(0.0),
-                        onPressed: () {
-                          var members = salons[i].values.first;
-                          Navigator.of(context).push(MaterialPageRoute(builder: (_) => Providers(IdList : members.values.first)));
+                        onPressed: () async {
+                          String salonName = salons[i].keys.first;
+                          var members = salons[i].values.first['salon_members'];
+                          var votes = salons[i].values.first['votes'];
+                          if(votes != null){
+                            if(votes.keys.length == members.length){
+                              dynamic mostFrequent = votes.values.fold(null, (dynamic mostFrequent, dynamic current) =>
+                              mostFrequent == null || votes.values.where((dynamic e) => e == current).length > votes.values.where((dynamic e) => e == mostFrequent).length
+                                  ? current
+                                  : mostFrequent
+                              );
+                              final result = await http.get(Uri.parse('https://api.themoviedb.org/3/movie/$mostFrequent?api_key=$apiKey'));
+                              if (result.statusCode == 200) {
+                                final Map<String, dynamic> resultData = json.decode(result.body);
+                                CustomToast.showToast(context, 'Everyone has voted. This is the most voted movie');
+                                Navigator.of(context).push(MaterialPageRoute(builder: (_) => MovieDetail(resultData)));
+                          }
+                            }
+
+                            else if(votes.keys.contains(user.uid)){
+                              List waitingForId = members.where((element) => !votes.keys.contains(element)).toList();
+                              List waitingForNames = [];
+                              for (int i = 0; i < waitingForId.length; i++){
+                                final DocumentReference friendDocRef =
+                                FirebaseFirestore.instance.collection('users').doc(waitingForId[i]);
+                                DocumentSnapshot snapshot = await friendDocRef.get();
+                                final String friendName = snapshot['displayName'];
+                                waitingForNames.add(friendName);
+                              }
+                              CustomToast.showToast(context, 'waiting for $waitingForNames to vote for their movie');
+                            }
+                            else{
+                              Navigator.of(context).push(MaterialPageRoute(builder: (_) => ResultScreen(salonName: salonName, IdList: members, providers: salons[i].values.first['providers'])));
+                            }
+                          }
+                          else{
+                            if(!salons[i].values.first.keys.contains('providers')){
+                              if(salons[i].values.first['salon_creator'] != user.uid){
+                                CustomToast.showToast(context, "No providers chosen by room creator yet");
+                              }
+                              else{
+                                Navigator.of(context).push(MaterialPageRoute(builder: (_) => Providers(IdList: members, salonName : salonName)));
+                              }
+                            }
+                            else{
+                              Navigator.of(context).push(MaterialPageRoute(builder: (_) => Preferences(salonName: salonName, IdList: members, providerStat: salons[i].values.first['providers'])));
+                            }
+                          }
                         },
                         color: Colors.white,
                       );
@@ -141,6 +193,9 @@ class SalonCell extends StatelessWidget {
     for (String member in salon[salon.keys.toList().first]['salon_members']){
       final DocumentReference ownDocRef = FirebaseFirestore.instance.collection('users').doc(member);
       ownDocRef.update({'salons.$salonName.salon_members': FieldValue.arrayRemove([user.uid])});
+      ownDocRef.update({'salons.$salonName.preferences.${user.uid}' : FieldValue.delete()});
+      ownDocRef.update({'salons.$salonName.votes.${user.uid}' : FieldValue.delete()});
+
     }
     final DocumentReference docRef = FirebaseFirestore.instance.collection('users').doc(user.uid);
     docRef.update({'salons.$salonName' : FieldValue.delete()});

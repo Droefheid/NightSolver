@@ -1,21 +1,17 @@
 import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
+import 'package:night_solver/screens/custom_toast.dart';
 
 import 'movie_details.dart';
 
 class ResultScreen extends StatefulWidget {
-  const ResultScreen({Key? key,required this.IdList, required this.aventure, required this.action, required this.comedie, required this.crime, required this.drama, required this.fantasy,required this.horror,required this.scifi, required this.providers}) : super(key: key);
+  const ResultScreen({Key? key, required this.salonName, required this.IdList, required this.providers}) : super(key: key);
   final IdList;
-  final double aventure;
-  final double action;
-  final double comedie;
-  final double crime;
-  final double drama;
-  final double fantasy;
-  final double horror;
-  final double scifi;
+  final salonName;
   final providers;
   @override
   State<ResultScreen> createState() => ResultScreenSate();
@@ -26,43 +22,73 @@ class ResultScreenSate extends State<ResultScreen> {
   final apiKey = '9478d83ca04bd6ee25b942dd7a0ad777';
   Color mainColor = const Color(0xff3C3261);
   List<dynamic> movies = [];
+  int vote = 0;
+  double aventure = 0;
+  double action = 0;
+  double comedie = 0;
+  double crime = 0;
+  double drama = 0;
+  double fantasy = 0;
+  double horror = 0;
+  double scifi = 0;
 
   Future<void> getData() async {
     var moviesId = [];
-    for(String id in  widget.IdList){
+    for(String id in widget.IdList){
       final snapshot = await FirebaseFirestore.instance.collection('users').doc(id).get();
       if(snapshot.data()!['movies_id'] != null){
         moviesId.addAll(snapshot.data()!['movies_id']);
       }
+      Map preferences = snapshot.data()!['salons'][widget.salonName]['preferences'][id];
+      aventure += preferences['aventure'];
+      action += preferences['action'];
+      comedie += preferences['comedie'];
+      crime += preferences['crime'];
+      drama += preferences['drama'];
+      fantasy += preferences['fantasy'];
+      horror += preferences['horror'];
+      scifi += preferences['scifi'];
     }
+    int numberOfMembers = widget.IdList.length;
+    aventure = aventure/numberOfMembers;
+    action = action/numberOfMembers;
+    comedie = comedie/numberOfMembers;
+    crime = crime/numberOfMembers;
+    drama = drama/numberOfMembers;
+    fantasy = fantasy/numberOfMembers;
+    horror = horror/numberOfMembers;
+    scifi = scifi/numberOfMembers;
+
     List<dynamic> moviesData = [];
     List<dynamic> moviesDataTitels = [];
     List<dynamic> Genres = [];
     List<dynamic> RecList = [];
-    if(widget.aventure>=50){
+
+    if(aventure>=50){
       Genres.add(12);
     }
-    if(widget.action>=50){
+    if(action>=50){
       Genres.add(28);
     }
-    if(widget.comedie>=50){
+    if(comedie>=50){
       Genres.add(35);
     }
-    if(widget.crime>=50){
+    if(crime>=50){
       Genres.add(80);
     }
-    if(widget.drama>=50){
+    if(drama>=50){
       Genres.add(18);
     }
-    if(widget.fantasy>=50){
+    if(fantasy>=50){
       Genres.add(14);
     }
-    if(widget.horror>=50){
+    if(horror>=50){
       Genres.add(27);
     }
-    if(widget.scifi>=50){
+    if(scifi>=50){
       Genres.add(878);
     }
+
 
     if(moviesId != null){
       for (String movieId in moviesId) {
@@ -115,9 +141,35 @@ class ResultScreenSate extends State<ResultScreen> {
     getData();
   }
 
+  void changeVotedMovie(movie) {
+    setState(() {
+      vote = movie['id'];
+    });
+    CustomToast.showToast(context, 'your current vote is: ${movie['title']}');
+  }
+
+  void submitVotedMovie(movieID) {
+    final user = FirebaseAuth.instance.currentUser!;
+    for (String member in widget.IdList){
+      FirebaseFirestore.instance
+          .collection('users')
+          .doc(member)
+          .set({'salons': {widget.salonName: {'votes': {user.uid: movieID}}}},SetOptions(merge : true));
+    }
+    Navigator.popUntil(context, ModalRoute.withName('/'));  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButton: new FloatingActionButton.extended(
+        onPressed: (){
+          submitVotedMovie(vote);
+        },
+          label: const Text(
+              "Submit vote"
+          )
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       appBar: AppBar(
         elevation: 0.3,
         centerTitle: true,
@@ -143,19 +195,35 @@ class ResultScreenSate extends State<ResultScreen> {
                 cacheExtent: 0,
                 itemCount: movies.isEmpty ? 1 : movies.length,
                 itemBuilder: (context, i) {
-                  return movies.isEmpty ? const Center(child: CircularProgressIndicator(),): MaterialButton(
-                    child:
-                    MovieCell(movies[i]),
-                    padding: const EdgeInsets.all(0.0),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => MovieDetail(movies[i]),
-                        ),
-                      );
-                    },
-                    color: Colors.white,
+                  return movies.isEmpty ? const Center(child: CircularProgressIndicator(),):
+                  Slidable(
+                    startActionPane: ActionPane(
+                      motion: const StretchMotion(),
+                      children: [
+                        SlidableAction(
+                          backgroundColor: Colors.red,
+                          icon: Icons.favorite,
+                          label: 'vote',
+                          onPressed: (context) {
+                            changeVotedMovie(movies[i]);
+                          }
+                        )
+                      ],
+                    ),
+                      child: MaterialButton(
+                        child:
+                        MovieCell(movies[i]),
+                        padding: const EdgeInsets.all(0.0),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => MovieDetail(movies[i]),
+                            ),
+                          );
+                        },
+                        color: Colors.white,
+                      )
                   );
                 },
               ),
