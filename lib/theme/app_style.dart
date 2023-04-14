@@ -22,6 +22,15 @@ class AppStyle {
     fontWeight: FontWeight.w700,
   );
 
+  static TextStyle txtPoppinsBold30Red = TextStyle(
+    color: ColorConstant.red900,
+    fontSize: getFontSize(
+      30,
+    ),
+    fontFamily: 'Poppins',
+    fontWeight: FontWeight.w700,
+  );
+
   static TextStyle txtGilroyRegular12 = TextStyle(
     color: ColorConstant.gray700,
     fontSize: getFontSize(

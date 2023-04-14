@@ -126,3 +126,4 @@ double CustomRound(double number) {
   if(decimal <= 0.5 || decimal <=0.75) return number.floorToDouble()+0.5;
   return number.ceilToDouble();
 }
+
