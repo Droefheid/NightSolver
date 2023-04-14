@@ -9,13 +9,17 @@ import 'package:night_solver/screens/custom_toast.dart';
 import 'movie_details.dart';
 
 class ResultScreen extends StatefulWidget {
-  const ResultScreen({Key? key, required this.salonName, required this.IdList, required this.providers}) : super(key: key);
+  const ResultScreen(
+      {Key? key,
+      required this.salonName,
+      required this.IdList,
+      required this.providers})
+      : super(key: key);
   final IdList;
   final salonName;
   final providers;
   @override
   State<ResultScreen> createState() => ResultScreenSate();
-
 }
 
 class ResultScreenSate extends State<ResultScreen> {
@@ -34,12 +38,14 @@ class ResultScreenSate extends State<ResultScreen> {
 
   Future<void> getData() async {
     var moviesId = [];
-    for(String id in widget.IdList){
-      final snapshot = await FirebaseFirestore.instance.collection('users').doc(id).get();
-      if(snapshot.data()!['movies_id'] != null){
+    for (String id in widget.IdList) {
+      final snapshot =
+          await FirebaseFirestore.instance.collection('users').doc(id).get();
+      if (snapshot.data()!['movies_id'] != null) {
         moviesId.addAll(snapshot.data()!['movies_id']);
       }
-      Map preferences = snapshot.data()!['salons'][widget.salonName]['preferences'][id];
+      Map preferences =
+          snapshot.data()!['salons'][widget.salonName]['preferences'][id];
       aventure += preferences['aventure'];
       action += preferences['action'];
       comedie += preferences['comedie'];
@@ -50,76 +56,86 @@ class ResultScreenSate extends State<ResultScreen> {
       scifi += preferences['scifi'];
     }
     int numberOfMembers = widget.IdList.length;
-    aventure = aventure/numberOfMembers;
-    action = action/numberOfMembers;
-    comedie = comedie/numberOfMembers;
-    crime = crime/numberOfMembers;
-    drama = drama/numberOfMembers;
-    fantasy = fantasy/numberOfMembers;
-    horror = horror/numberOfMembers;
-    scifi = scifi/numberOfMembers;
+    aventure = aventure / numberOfMembers;
+    action = action / numberOfMembers;
+    comedie = comedie / numberOfMembers;
+    crime = crime / numberOfMembers;
+    drama = drama / numberOfMembers;
+    fantasy = fantasy / numberOfMembers;
+    horror = horror / numberOfMembers;
+    scifi = scifi / numberOfMembers;
 
     List<dynamic> moviesData = [];
     List<dynamic> moviesDataTitels = [];
     List<dynamic> Genres = [];
     List<dynamic> RecList = [];
 
-    if(aventure>=50){
-      Genres.add(12);
+    if (aventure >= 50) {
+      Genres.add('12');
     }
-    if(action>=50){
-      Genres.add(28);
+    if (action >= 50) {
+      Genres.add('28');
     }
-    if(comedie>=50){
-      Genres.add(35);
+    if (comedie >= 50) {
+      Genres.add('35');
     }
-    if(crime>=50){
-      Genres.add(80);
+    if (crime >= 50) {
+      Genres.add('80');
     }
-    if(drama>=50){
-      Genres.add(18);
+    if (drama >= 50) {
+      Genres.add('18');
     }
-    if(fantasy>=50){
-      Genres.add(14);
+    if (fantasy >= 50) {
+      Genres.add('14');
     }
-    if(horror>=50){
-      Genres.add(27);
+    if (horror >= 50) {
+      Genres.add('27');
     }
-    if(scifi>=50){
-      Genres.add(878);
+    if (scifi >= 50) {
+      Genres.add('878');
     }
 
-
-    if(moviesId != null){
+    if (moviesId != null) {
       for (String movieId in moviesId) {
         //get a list of recommend movies based on seen movies
-        final result = await http.get(Uri.parse('https://api.themoviedb.org/3/movie/$movieId/recommendations?api_key=$apiKey&language=en-US&page=1'));
+        final result = await http.get(Uri.parse(
+            'https://api.themoviedb.org/3/movie/$movieId/recommendations?api_key=$apiKey&language=en-US&page=1'));
         if (result.statusCode == 200) {
           final Map<String, dynamic> resultData = json.decode(result.body);
-          for(int i=0;i<resultData['results'].length;i++){
+          for (int i = 0; i < resultData['results'].length; i++) {
             //check if the movie recommended has the same genre as set in the preferences
-            if(resultData['results'][i]['genre_ids'].length != 0 && Genres.contains(resultData['results'][i]['genre_ids'][0] as int)){
+            if (resultData['results'][i]['genre_ids'].length != 0 &&
+                Genres.contains(
+                    resultData['results'][i]['genre_ids'][0] as int)) {
               //check if the movie recommended is not in the seen movies list
-              if(!moviesId.contains(resultData["results"][i]["id"].toString())){
+              if (!moviesId
+                  .contains(resultData["results"][i]["id"].toString())) {
                 RecList.add(resultData["results"][i]);
               }
             }
           }
         }
       }
-      for( var Rec in RecList){
+      for (var Rec in RecList) {
         //get the providers list of the recommended movie
         String recId = Rec["id"].toString();
-        final movieProvider = await http.get(Uri.parse('https://api.themoviedb.org/3/movie/$recId/watch/providers?api_key=$apiKey'));
-        if(movieProvider.statusCode == 200){
-          final Map<String, dynamic> ProviderData = json.decode(movieProvider.body);
+        final movieProvider = await http.get(Uri.parse(
+            'https://api.themoviedb.org/3/movie/$recId/watch/providers?api_key=$apiKey'));
+        if (movieProvider.statusCode == 200) {
+          final Map<String, dynamic> ProviderData =
+              json.decode(movieProvider.body);
           //check if the movie has any provider in Belgium
-          if(ProviderData["results"]["BE"] != null && ProviderData["results"]["BE"]["flatrate"] != null){
-            for(int y=0; y<ProviderData["results"]["BE"]["flatrate"].length;y++){
+          if (ProviderData["results"]["BE"] != null &&
+              ProviderData["results"]["BE"]["flatrate"] != null) {
+            for (int y = 0;
+                y < ProviderData["results"]["BE"]["flatrate"].length;
+                y++) {
               // check if the provider is in the providers list
-              if(widget.providers[ProviderData["results"]["BE"]["flatrate"][y]["provider_name"]] ==1){
+              if (widget.providers[ProviderData["results"]["BE"]["flatrate"][y]
+                      ["provider_name"]] ==
+                  1) {
                 //check if movie added not in list of movie data
-                if(!moviesDataTitels.contains(Rec["title"])){
+                if (!moviesDataTitels.contains(Rec["title"])) {
                   moviesDataTitels.add(Rec["title"]);
                   moviesData.add(Rec);
                 }
@@ -150,25 +166,26 @@ class ResultScreenSate extends State<ResultScreen> {
 
   void submitVotedMovie(movieID) {
     final user = FirebaseAuth.instance.currentUser!;
-    for (String member in widget.IdList){
-      FirebaseFirestore.instance
-          .collection('users')
-          .doc(member)
-          .set({'salons': {widget.salonName: {'votes': {user.uid: movieID}}}},SetOptions(merge : true));
+    for (String member in widget.IdList) {
+      FirebaseFirestore.instance.collection('users').doc(member).set({
+        'salons': {
+          widget.salonName: {
+            'votes': {user.uid: movieID}
+          }
+        }
+      }, SetOptions(merge: true));
     }
-    Navigator.popUntil(context, ModalRoute.withName('/'));  }
+    Navigator.popUntil(context, ModalRoute.withName('/'));
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       floatingActionButton: new FloatingActionButton.extended(
-        onPressed: (){
-          submitVotedMovie(vote);
-        },
-          label: const Text(
-              "Submit vote"
-          )
-      ),
+          onPressed: () {
+            submitVotedMovie(vote);
+          },
+          label: const Text("Submit vote")),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       appBar: AppBar(
         elevation: 0.3,
@@ -195,36 +212,36 @@ class ResultScreenSate extends State<ResultScreen> {
                 cacheExtent: 0,
                 itemCount: movies.isEmpty ? 1 : movies.length,
                 itemBuilder: (context, i) {
-                  return movies.isEmpty ? const Center(child: CircularProgressIndicator(),):
-                  Slidable(
-                    startActionPane: ActionPane(
-                      motion: const StretchMotion(),
-                      children: [
-                        SlidableAction(
-                          backgroundColor: Colors.red,
-                          icon: Icons.favorite,
-                          label: 'vote',
-                          onPressed: (context) {
-                            changeVotedMovie(movies[i]);
-                          }
+                  return movies.isEmpty
+                      ? const Center(
+                          child: CircularProgressIndicator(),
                         )
-                      ],
-                    ),
-                      child: MaterialButton(
-                        child:
-                        MovieCell(movies[i]),
-                        padding: const EdgeInsets.all(0.0),
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => MovieDetail(movies[i]),
-                            ),
-                          );
-                        },
-                        color: Colors.white,
-                      )
-                  );
+                      : Slidable(
+                          startActionPane: ActionPane(
+                            motion: const StretchMotion(),
+                            children: [
+                              SlidableAction(
+                                  backgroundColor: Colors.red,
+                                  icon: Icons.favorite,
+                                  label: 'vote',
+                                  onPressed: (context) {
+                                    changeVotedMovie(movies[i]);
+                                  })
+                            ],
+                          ),
+                          child: MaterialButton(
+                            child: MovieCell(movies[i]),
+                            padding: const EdgeInsets.all(0.0),
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => MovieDetail(movies[i]),
+                                ),
+                              );
+                            },
+                            color: Colors.white,
+                          ));
                 },
               ),
             )
@@ -232,7 +249,6 @@ class ResultScreenSate extends State<ResultScreen> {
         ),
       ),
     );
-
   }
 }
 
@@ -262,9 +278,9 @@ class MovieCell extends StatelessWidget {
                   color: Colors.grey,
                   image: movie['poster_path'] != null
                       ? new DecorationImage(
-                      image: new NetworkImage(
-                          image_url + movie['poster_path']),
-                      fit: BoxFit.cover)
+                          image: new NetworkImage(
+                              image_url + movie['poster_path']),
+                          fit: BoxFit.cover)
                       : null,
                   boxShadow: [
                     new BoxShadow(
@@ -277,28 +293,28 @@ class MovieCell extends StatelessWidget {
             ),
             new Expanded(
                 child: new Container(
-                  margin: const EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 0.0),
-                  child: new Column(
-                    children: [
-                      new Text(
-                        movie['title'] ?? 'Title Not Found',
-                        style: new TextStyle(
-                            fontSize: 20.0,
-                            fontFamily: 'Arvo',
-                            fontWeight: FontWeight.bold,
-                            color: mainColor),
-                      ),
-                      new Padding(padding: const EdgeInsets.all(2.0)),
-                      new Text(
-                        movie['overview'] ?? 'Overview Not Found',
-                        maxLines: 3,
-                        style: new TextStyle(
-                            color: const Color(0xff8785A4), fontFamily: 'Arvo'),
-                      )
-                    ],
-                    crossAxisAlignment: CrossAxisAlignment.start,
+              margin: const EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 0.0),
+              child: new Column(
+                children: [
+                  new Text(
+                    movie['title'] ?? 'Title Not Found',
+                    style: new TextStyle(
+                        fontSize: 20.0,
+                        fontFamily: 'Arvo',
+                        fontWeight: FontWeight.bold,
+                        color: mainColor),
                   ),
-                )),
+                  new Padding(padding: const EdgeInsets.all(2.0)),
+                  new Text(
+                    movie['overview'] ?? 'Overview Not Found',
+                    maxLines: 3,
+                    style: new TextStyle(
+                        color: const Color(0xff8785A4), fontFamily: 'Arvo'),
+                  )
+                ],
+                crossAxisAlignment: CrossAxisAlignment.start,
+              ),
+            )),
           ],
         ),
         new Container(
@@ -311,6 +327,3 @@ class MovieCell extends StatelessWidget {
     );
   }
 }
-
-
-
