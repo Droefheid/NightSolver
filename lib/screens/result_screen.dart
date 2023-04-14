@@ -40,28 +40,28 @@ class ResultScreenSate extends State<ResultScreen> {
     List<dynamic> Genres = [];
     List<dynamic> RecList = [];
 
-    if(aventure>=50){
+    if(widget.aventure>=50){
       Genres.add(12);
     }
-    if(action>=50){
+    if(widget.action>=50){
       Genres.add(28);
     }
-    if(comedie>=50){
+    if(widget.comedie>=50){
       Genres.add(35);
     }
-    if(crime>=50){
+    if(widget.crime>=50){
       Genres.add(80);
     }
-    if(drama>=50){
+    if(widget.drama>=50){
       Genres.add(18);
     }
-    if(fantasy>=50){
+    if(widget.fantasy>=50){
       Genres.add(14);
     }
-    if(horror>=50){
+    if(widget.horror>=50){
       Genres.add(27);
     }
-    if(scifi>=50){
+    if(widget.scifi>=50){
       Genres.add(878);
     }
 
