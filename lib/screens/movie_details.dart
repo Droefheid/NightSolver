@@ -1,6 +1,3 @@
-import 'dart:collection';
-import 'dart:ffi';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -26,48 +23,15 @@ class MovieDetail extends StatefulWidget {
 }
 
 class _MovieDetailState extends State<MovieDetail> {
-  final apiKey = '9478d83ca04bd6ee25b942dd7a0ad777';
   Color mainColor = const Color(0xffffffff);
-  final user = FirebaseAuth.instance.currentUser!;
-
-  Future<List> recommended(String id) async {
-    List<dynamic> RecList = [];
-    final result = await http.get(Uri.parse('https://api.themoviedb.org/3/movie/$id/recommendations?api_key=$apiKey&language=en-US&page=1'));
-    if (result.statusCode == 200) {
-      final Map<String, dynamic> resultData = json.decode(result.body);
-      ////check if the movie recommended is not in the seen movies list
-      final snapshot = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
-      for(int i=0;i<resultData['results'].length;i++){
-        if(snapshot.data()!['movies_id'] != null){
-          if(!(snapshot.data()!['movies_id'].contains(resultData["results"][i]["id"].toString()))){
-            if(resultData['results'][i]['genre_ids'].length != 0){
-              final recommended =
-              {
-                'id': resultData["results"][i]["id"].toString(),
-                'genre': resultData['results'][i]['genre_ids'][0].toString()
-              };
-              RecList.add(recommended);
-            }
-          }
-        }
-      }
-    }
-    return RecList;
-  }
 
   Future addMovie(BuildContext context) async {
     final user = FirebaseAuth.instance.currentUser!;
     final DocumentReference docRef =
         FirebaseFirestore.instance.collection('users').doc(user.uid);
-    print(widget.movie['id'].toString());
-    List<dynamic> Recres = await recommended(widget.movie['id'].toString());
     docRef.set({
-      'recommended': {
-        widget.movie['id'].toString(): Recres,
-      },
       'movies_id': FieldValue.arrayUnion([widget.movie['id'].toString()]),
     }, SetOptions(merge: true));
-
     CustomToast.showToast(context, 'Movie added to watched list');
     // Navigate back to the previous screen
     FocusScope.of(context).unfocus();
@@ -80,9 +44,6 @@ class _MovieDetailState extends State<MovieDetail> {
         FirebaseFirestore.instance.collection('users').doc(user.uid);
     docRef.update({
       'movies_id': FieldValue.arrayRemove([movieId]),
-    });
-    docRef.update({
-      'recommended': FieldValue.arrayRemove([movieId]),
     });
     CustomToast.showToast(context, 'Movie removed from watched list');
     // Navigate back to the previous screen
