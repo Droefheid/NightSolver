@@ -66,7 +66,7 @@ class ResultScreenSate extends State<ResultScreen> {
     scifi = scifi / numberOfMembers;
 
     List<dynamic> moviesData = [];
-    List<dynamic> moviesDataTitels = [];
+    List<dynamic> moviesDataTitles = [];
     List<dynamic> Genres = [];
     List<dynamic> RecList = [];
 
@@ -95,7 +95,10 @@ class ResultScreenSate extends State<ResultScreen> {
       Genres.add('878');
     }
 
-    if (moviesId != null) {
+    //TODO Si Movies disponible dans firestore les prendre sinon effectuer tout ce qui il y a en dessous
+
+
+    if (!moviesId.isEmpty) {
       for (String movieId in moviesId) {
         //get a list of recommend movies based on seen movies
         final result = await http.get(Uri.parse(
@@ -135,8 +138,8 @@ class ResultScreenSate extends State<ResultScreen> {
                       ["provider_name"]] ==
                   1) {
                 //check if movie added not in list of movie data
-                if (!moviesDataTitels.contains(Rec["title"])) {
-                  moviesDataTitels.add(Rec["title"]);
+                if (!moviesDataTitles.contains(Rec["title"])) {
+                  moviesDataTitles.add(Rec["title"]);
                   moviesData.add(Rec);
                 }
                 break;
@@ -146,8 +149,14 @@ class ResultScreenSate extends State<ResultScreen> {
         }
       }
     }
+
+
+    //TODO Save movies inside firestore
+
+
     setState(() {
       movies = moviesData;
+      print(movies);
     });
   }
 
