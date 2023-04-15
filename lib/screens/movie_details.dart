@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'dart:ui' as ui;
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -23,15 +22,48 @@ class MovieDetail extends StatefulWidget {
 }
 
 class _MovieDetailState extends State<MovieDetail> {
+  final apiKey = '9478d83ca04bd6ee25b942dd7a0ad777';
   Color mainColor = const Color(0xffffffff);
+  final user = FirebaseAuth.instance.currentUser!;
+
+  Future<List> recommended(String id) async {
+    List<dynamic> RecList = [];
+    final result = await http.get(Uri.parse('https://api.themoviedb.org/3/movie/$id/recommendations?api_key=$apiKey&language=en-US&page=1'));
+    if (result.statusCode == 200) {
+      final Map<String, dynamic> resultData = json.decode(result.body);
+      ////check if the movie recommended is not in the seen movies list
+      final snapshot = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
+      for(int i=0;i<resultData['results'].length;i++){
+        if(snapshot.data()!['movies_id'] != null){
+          if(!(snapshot.data()!['movies_id'].contains(resultData["results"][i]["id"].toString()))){
+            if(resultData['results'][i]['genre_ids'].length != 0){
+              final recommended =
+              {
+                'id': resultData["results"][i]["id"].toString(),
+                'genre': resultData['results'][i]['genre_ids'][0].toString()
+              };
+              RecList.add(recommended);
+            }
+          }
+        }
+      }
+    }
+    return RecList;
+  }
 
   Future addMovie(BuildContext context) async {
     final user = FirebaseAuth.instance.currentUser!;
     final DocumentReference docRef =
-        FirebaseFirestore.instance.collection('users').doc(user.uid);
+    FirebaseFirestore.instance.collection('users').doc(user.uid);
+    print(widget.movie['id'].toString());
+    List<dynamic> Recres = await recommended(widget.movie['id'].toString());
     docRef.set({
+      'recommended': {
+        widget.movie['id'].toString(): Recres,
+      },
       'movies_id': FieldValue.arrayUnion([widget.movie['id'].toString()]),
     }, SetOptions(merge: true));
+
     CustomToast.showToast(context, 'Movie added to watched list');
     // Navigate back to the previous screen
     FocusScope.of(context).unfocus();
@@ -41,9 +73,12 @@ class _MovieDetailState extends State<MovieDetail> {
   Future deleteMovie(BuildContext context, String movieId) async {
     final user = FirebaseAuth.instance.currentUser!;
     final DocumentReference docRef =
-        FirebaseFirestore.instance.collection('users').doc(user.uid);
+    FirebaseFirestore.instance.collection('users').doc(user.uid);
     docRef.update({
       'movies_id': FieldValue.arrayRemove([movieId]),
+    });
+    docRef.update({
+      'recommended': FieldValue.arrayRemove([movieId]),
     });
     CustomToast.showToast(context, 'Movie removed from watched list');
     // Navigate back to the previous screen
@@ -216,7 +251,7 @@ class _MovieDetailState extends State<MovieDetail> {
                 ),
                 new Text(widget.movie['overview'],
                     style:
-                        new TextStyle(color: Colors.white, fontFamily: 'Arvo')),
+                    new TextStyle(color: Colors.white, fontFamily: 'Arvo')),
                 buildProviderList(),
                 new Padding(padding: const EdgeInsets.all(10.0)),
                 new Row(
@@ -224,47 +259,47 @@ class _MovieDetailState extends State<MovieDetail> {
                   children: <Widget>[
                     widget.canDelete
                         ? // Render delete button only if user has permission
-                        new Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: new GestureDetector(
-                              onTap: () {
-                                deleteMovie(
-                                    context, widget.movie['id'].toString());
-                              },
-                              child: new Container(
-                                padding: const EdgeInsets.all(16.0),
-                                alignment: Alignment.center,
-                                child: new Icon(
-                                  Icons.delete,
-                                  color: Colors.white,
-                                ),
-                                decoration: new BoxDecoration(
-                                  borderRadius: new BorderRadius.circular(10.0),
-                                  color: Colors.red,
-                                ),
-                              ),
-                            ),
-                          )
-                        : new Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: new GestureDetector(
-                              onTap: () {
-                                addMovie(context);
-                              },
-                              child: new Container(
-                                padding: const EdgeInsets.all(16.0),
-                                alignment: Alignment.center,
-                                child: new Icon(
-                                  Icons.add,
-                                  color: Colors.white,
-                                ),
-                                decoration: new BoxDecoration(
-                                  borderRadius: new BorderRadius.circular(10.0),
-                                  color: Colors.green,
-                                ),
-                              ),
-                            ),
+                    new Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: new GestureDetector(
+                        onTap: () {
+                          deleteMovie(
+                              context, widget.movie['id'].toString());
+                        },
+                        child: new Container(
+                          padding: const EdgeInsets.all(16.0),
+                          alignment: Alignment.center,
+                          child: new Icon(
+                            Icons.delete,
+                            color: Colors.white,
                           ),
+                          decoration: new BoxDecoration(
+                            borderRadius: new BorderRadius.circular(10.0),
+                            color: Colors.red,
+                          ),
+                        ),
+                      ),
+                    )
+                        : new Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: new GestureDetector(
+                        onTap: () {
+                          addMovie(context);
+                        },
+                        child: new Container(
+                          padding: const EdgeInsets.all(16.0),
+                          alignment: Alignment.center,
+                          child: new Icon(
+                            Icons.add,
+                            color: Colors.white,
+                          ),
+                          decoration: new BoxDecoration(
+                            borderRadius: new BorderRadius.circular(10.0),
+                            color: Colors.green,
+                          ),
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ],
