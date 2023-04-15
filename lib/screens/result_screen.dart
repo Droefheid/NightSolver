@@ -18,6 +18,7 @@ class ResultScreen extends StatefulWidget {
   final IdList;
   final salonName;
   final providers;
+
   @override
   State<ResultScreen> createState() => ResultScreenSate();
 }
@@ -26,6 +27,7 @@ class ResultScreenSate extends State<ResultScreen> {
   final apiKey = '9478d83ca04bd6ee25b942dd7a0ad777';
   Color mainColor = const Color(0xff3C3261);
   List<dynamic> movies = [];
+  bool no_recommendations = false;
   int vote = 0;
   double aventure = 0;
   double action = 0;
@@ -39,18 +41,21 @@ class ResultScreenSate extends State<ResultScreen> {
   Future<void> getData() async {
     var RecommendedList = [];
     var SeenMovies = [];
+    var RecommendedMoviesAlreadySavedInFirestore = [];
+
     for (String id in widget.IdList) {
-      final snapshot = await FirebaseFirestore.instance.collection('users').doc(id).get();
-      if(snapshot.data()!['movies_id'] != null){
+      final snapshot =
+          await FirebaseFirestore.instance.collection('users').doc(id).get();
+      if (snapshot.data()!['movies_id'] != null) {
         SeenMovies.addAll(snapshot.data()!['movies_id']);
       }
-      if(snapshot.data()!['recommended'] != null){
+      if (snapshot.data()!['recommended'] != null) {
         for (var item in snapshot.data()!['recommended'].entries) {
           RecommendedList.addAll(item.value);
         }
       }
-      print(RecommendedList);
-    Map preferences =
+
+      Map preferences =
           snapshot.data()!['salons'][widget.salonName]['preferences'][id];
       aventure += preferences['aventure'];
       action += preferences['action'];
@@ -60,95 +65,122 @@ class ResultScreenSate extends State<ResultScreen> {
       fantasy += preferences['fantasy'];
       horror += preferences['horror'];
       scifi += preferences['scifi'];
-    }
-    int numberOfMembers = widget.IdList.length;
-    aventure = aventure / numberOfMembers;
-    action = action / numberOfMembers;
-    comedie = comedie / numberOfMembers;
-    crime = crime / numberOfMembers;
-    drama = drama / numberOfMembers;
-    fantasy = fantasy / numberOfMembers;
-    horror = horror / numberOfMembers;
-    scifi = scifi / numberOfMembers;
 
-    List<dynamic> moviesData = [];
-    List<dynamic> moviesDataTitles = [];
-    List<dynamic> Genres = [];
-    List<dynamic> RecList = [];
-
-    if (aventure >= 50) {
-      Genres.add('12');
-    }
-    if (action >= 50) {
-      Genres.add('28');
-    }
-    if (comedie >= 50) {
-      Genres.add('35');
-    }
-    if (crime >= 50) {
-      Genres.add('80');
-    }
-    if (drama >= 50) {
-      Genres.add('18');
-    }
-    if (fantasy >= 50) {
-      Genres.add('14');
-    }
-    if (horror >= 50) {
-      Genres.add('27');
-    }
-    if (scifi >= 50) {
-      Genres.add('878');
-    }
-    
-    //TODO Si Movies disponible dans firestore les prendre sinon effectuer tout ce qui il y a en dessous
-
-    if(!RecommendedList.isEmpty){
-      //get a list of recommend movies based on seen movies
-      for(int i=0;i<RecommendedList.length;i++){
-        //check if the movie recommended has the same genre as set in the preferences
-        if(Genres.contains(RecommendedList[i]["genre"])){
-          //check if the movie recommended is not in the seen movies list
-          if(!SeenMovies.contains(RecommendedList[i]["id"])){
-            RecList.add(RecommendedList[i]["id"]);
-          }
-        }
+      var data =
+          snapshot.data()!['salons'][widget.salonName]['recommended_movies'];
+      if (data != null) {
+        RecommendedMoviesAlreadySavedInFirestore.addAll(data);
       }
-    }
-    for( var Rec in RecList){
-      //get the providers list of the recommended movie
-      final movieProvider = await http.get(Uri.parse('https://api.themoviedb.org/3/movie/$Rec/watch/providers?api_key=$apiKey'));
-      if(movieProvider.statusCode == 200){
-        final Map<String, dynamic> ProviderData = json.decode(movieProvider.body);
-        //check if the movie has any provider in Belgium
-        if(ProviderData["results"]["BE"] != null && ProviderData["results"]["BE"]["flatrate"] != null){
-          for(int y=0; y<ProviderData["results"]["BE"]["flatrate"].length;y++){
-            // check if the provider is in the providers list
-            if(widget.providers[ProviderData["results"]["BE"]["flatrate"][y]["provider_name"]] ==1){
-              //check if movie added not in list of movie data
-              if(!moviesDataTitels.contains(Rec)){
-                moviesDataTitels.add(Rec);
-                final  finalRec = await http.get(Uri.parse('https://api.themoviedb.org/3/movie/$Rec?api_key=$apiKey'));
-                if(finalRec.statusCode == 200){
-                  final Map<String, dynamic> finalRecCard = json.decode(finalRec.body);
-                  moviesData.add(finalRecCard);
-                }
+
+      int numberOfMembers = widget.IdList.length;
+      aventure = aventure / numberOfMembers;
+      action = action / numberOfMembers;
+      comedie = comedie / numberOfMembers;
+      crime = crime / numberOfMembers;
+      drama = drama / numberOfMembers;
+      fantasy = fantasy / numberOfMembers;
+      horror = horror / numberOfMembers;
+      scifi = scifi / numberOfMembers;
+
+      List<dynamic> moviesData = [];
+      List<dynamic> moviesDataTitles = [];
+      List<dynamic> Genres = [];
+      List<dynamic> RecList = [];
+
+      if (aventure >= 50) {
+        Genres.add('12');
+      }
+      if (action >= 50) {
+        Genres.add('28');
+      }
+      if (comedie >= 50) {
+        Genres.add('35');
+      }
+      if (crime >= 50) {
+        Genres.add('80');
+      }
+      if (drama >= 50) {
+        Genres.add('18');
+      }
+      if (fantasy >= 50) {
+        Genres.add('14');
+      }
+      if (horror >= 50) {
+        Genres.add('27');
+      }
+      if (scifi >= 50) {
+        Genres.add('878');
+      }
+
+      if (RecommendedMoviesAlreadySavedInFirestore.isEmpty) {
+        if (!RecommendedList.isEmpty) {
+          //get a list of recommend movies based on seen movies
+          for (int i = 0; i < RecommendedList.length; i++) {
+            //check if the movie recommended has the same genre as set in the preferences
+            if (Genres.contains(RecommendedList[i]["genre"])) {
+              //check if the movie recommended is not in the seen movies list
+              if (!SeenMovies.contains(RecommendedList[i]["id"])) {
+                RecList.add(RecommendedList[i]["id"]);
               }
-              break;
             }
           }
         }
+        for (var Rec in RecList) {
+          //get the providers list of the recommended movie
+          final movieProvider = await http.get(Uri.parse(
+              'https://api.themoviedb.org/3/movie/$Rec/watch/providers?api_key=$apiKey'));
+          if (movieProvider.statusCode == 200) {
+            final Map<String, dynamic> ProviderData =
+                json.decode(movieProvider.body);
+            //check if the movie has any provider in Belgium
+            if (ProviderData["results"]["BE"] != null &&
+                ProviderData["results"]["BE"]["flatrate"] != null) {
+              for (int y = 0;
+                  y < ProviderData["results"]["BE"]["flatrate"].length;
+                  y++) {
+                // check if the provider is in the providers list
+                if (widget.providers[ProviderData["results"]["BE"]["flatrate"]
+                        [y]["provider_name"]] ==
+                    1) {
+                  //check if movie added not in list of movie data
+                  if (!moviesDataTitles.contains(Rec)) {
+                    moviesDataTitles.add(Rec);
+                    final finalRec = await http.get(Uri.parse(
+                        'https://api.themoviedb.org/3/movie/$Rec?api_key=$apiKey'));
+                    if (finalRec.statusCode == 200) {
+                      final Map<String, dynamic> finalRecCard =
+                          json.decode(finalRec.body);
+                      moviesData.add(finalRecCard);
+                    }
+                  }
+                  break;
+                }
+              }
+            }
+          }
+        }
+
+        for (String member in widget.IdList) {
+          FirebaseFirestore.instance.collection('users').doc(member).set({
+            'salons': {
+              widget.salonName: {'recommended_movies': moviesData}
+            }
+          }, SetOptions(merge: true));
+        }
+      } else {
+        moviesData = RecommendedMoviesAlreadySavedInFirestore;
+      }
+
+      if (moviesData.isEmpty) {
+        setState(() {
+          no_recommendations = true;
+        });
+      } else {
+        setState(() {
+          movies = moviesData;
+        });
       }
     }
-
-
-    //TODO Save movies inside firestore
-
-
-    setState(() {
-      movies = moviesData;
-      print(movies);
-    });
   }
 
   @override
@@ -208,43 +240,55 @@ class ResultScreenSate extends State<ResultScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Expanded(
-              child: ListView.builder(
+              child: movies.isEmpty && no_recommendations
+                  ? Center(
+                child: Text(
+                  'Sorry, no recommendations are available.',
+                  style: TextStyle(
+                    fontSize: 16.0,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              )
+                  : movies.isEmpty
+                  ? Center(
+                child: CircularProgressIndicator(),
+              )
+                  : ListView.builder(
                 cacheExtent: 0,
-                itemCount: movies.isEmpty ? 1 : movies.length,
+                itemCount: movies.length,
                 itemBuilder: (context, i) {
-                  return movies.isEmpty
-                      ? const Center(
-                          child: CircularProgressIndicator(),
-                        )
-                      : Slidable(
-                          startActionPane: ActionPane(
-                            motion: const StretchMotion(),
-                            children: [
-                              SlidableAction(
-                                  backgroundColor: Colors.red,
-                                  icon: Icons.favorite,
-                                  label: 'vote',
-                                  onPressed: (context) {
-                                    changeVotedMovie(movies[i]);
-                                  })
-                            ],
-                          ),
-                          child: MaterialButton(
-                            child: MovieCell(movies[i]),
-                            padding: const EdgeInsets.all(0.0),
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => MovieDetail(movies[i]),
-                                ),
-                              );
-                            },
-                            color: Colors.white,
-                          ));
+                  return Slidable(
+                      startActionPane: ActionPane(
+                        motion: const StretchMotion(),
+                        children: [
+                          SlidableAction(
+                              backgroundColor: Colors.red,
+                              icon: Icons.favorite,
+                              label: 'vote',
+                              onPressed: (context) {
+                                changeVotedMovie(movies[i]);
+                              }
+                          )
+                        ],
+                      ),
+                      child: MaterialButton(
+                        child: MovieCell(movies[i]),
+                        padding: const EdgeInsets.all(0.0),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => MovieDetail(movies[i]),
+                            ),
+                          );
+                        },
+                        color: Colors.white,
+                      )
+                  );
                 },
               ),
-            )
+            ),
           ],
         ),
       ),
