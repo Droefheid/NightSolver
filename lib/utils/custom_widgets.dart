@@ -18,7 +18,7 @@ class VerticalMovieCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => InkWell(
-      onTap: () => Navigator.of(context).pushReplacement(new MaterialPageRoute(builder: (context) => MovieDetail(item: item))),
+      onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => MovieDetail(item: item))),
       child: Container(
     width: getHorizontalSize(379),
     height: getVerticalSize(273),
@@ -27,7 +27,14 @@ class VerticalMovieCard extends StatelessWidget {
       children: [
         ClipRRect(
             borderRadius: BorderRadius.circular(20),
-            child: Image.network(item.urlImage, fit: BoxFit.fill, filterQuality: FilterQuality.high,)
+            child: Stack( children:[
+              Image.network(item.urlImage, fit: BoxFit.fill, filterQuality: FilterQuality.high,),
+              Positioned(
+                  right: getHorizontalSize(-1),
+                  child: IconButton(onPressed: null, icon: Icon(Icons.bookmark_border, color: ColorConstant.whiteA700))
+              )
+              
+            ])
         ),
         Padding(padding: getMargin(left: 16),
             child: Column(
@@ -80,7 +87,9 @@ class VerticalMovieCard extends StatelessWidget {
                       width: getHorizontalSize(180),
                       child: Text(
                           item.synopsis,
-                          style: AppStyle.txtPoppinsRegular13
+                          style: AppStyle.txtPoppinsRegular13,
+                          maxLines: 7,
+                          overflow: TextOverflow.ellipsis,
                       )
                   )
                 ])
@@ -88,4 +97,38 @@ class VerticalMovieCard extends StatelessWidget {
       ],
     ),
   ));
+}
+
+class GenreButton extends StatefulWidget {
+
+  final String title;
+
+  const GenreButton({
+    super.key,
+    required this.title
+  });
+
+  @override
+  State<GenreButton> createState() => _GenreButtonState();
+}
+
+class _GenreButtonState extends State<GenreButton> {
+  @override
+  Widget build(BuildContext context) {
+    bool hasBeenPressed = false;
+    return SizedBox(
+      height: getVerticalSize(25),
+        child: TextButton(
+          onPressed: () => {
+            setState(() {
+              hasBeenPressed = !hasBeenPressed;
+            })
+          },
+        child: Text(widget.title, style: hasBeenPressed ? AppStyle.txtPoppinsRegular14Gray900 : AppStyle.txtPoppinsRegular14),
+        style: TextButton.styleFrom(
+            backgroundColor: hasBeenPressed ? ColorConstant.red900 : ColorConstant.gray90001,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        ),
+    ));
+  }
 }

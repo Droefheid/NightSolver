@@ -157,6 +157,15 @@ class AppStyle {
     fontWeight: FontWeight.w500,
   );
 
+  static TextStyle txtPoppinsMedium18Grey = TextStyle(
+    color: ColorConstant.whiteA70033,
+    fontSize: getFontSize(
+      18,
+    ),
+    fontFamily: 'Poppins',
+    fontWeight: FontWeight.w500,
+  );
+
   static TextStyle txtPoppinsBold36WhiteA700 = TextStyle(
     color: ColorConstant.whiteA700,
     fontSize: getFontSize(

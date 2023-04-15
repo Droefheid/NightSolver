@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:night_solver/screens/home_screen.dart';
+import 'package:night_solver/screens/search_screen.dart';
 import 'package:night_solver/theme/app_style.dart';
 import 'package:night_solver/utils/custom_widgets.dart';
 import '../utils/color_constant.dart';
@@ -85,12 +86,9 @@ class _MovieListState extends State<MovieList> {
   }
 
   void onTabTapped(int index) {
-    if(index==0) {
-      Navigator.of(context).pushReplacement(new MaterialPageRoute(builder: (context) => new HomeScreen()));
-    }
-    if(index==3) {
-      Navigator.of(context).pushReplacement(new MaterialPageRoute(builder: (context) => new MovieList()));
-    }
+    if(index==0) Navigator.of(context).push(MaterialPageRoute(builder: (_) => HomeScreen()));
+    if(index==1) Navigator.of(context).push(MaterialPageRoute(builder: (_) => SearchScreen()));
+    if(index==3) Navigator.of(context).push(MaterialPageRoute(builder: (_) => MovieList()));
   }
 
   @override
@@ -113,16 +111,18 @@ class _MovieListState extends State<MovieList> {
               TextSpan(
                   text: ".",
                   style: AppStyle.txtPoppinsBold30Red
-              )
+              ),
             ]),
             textAlign: TextAlign.left
         )
       ),
-      body: ListView.separated(
+      body: Padding(
+          padding: getPadding(left: 16, top: 16),
+          child: ListView.separated(
           itemBuilder: (context, index) => VerticalMovieCard(item: new MovieInfo(movies[index])),
           separatorBuilder: (context, _) => SizedBox(height: getVerticalSize(16),),
           itemCount: movies.length
-      ),
+      )),
       bottomNavigationBar: BottomNavigationBar(
           backgroundColor: ColorConstant.gray900,
           selectedItemColor: ColorConstant.red900,

@@ -10,6 +10,7 @@ import 'package:night_solver/screens/movie_details.dart';
 import 'package:night_solver/screens/new_salon_screen.dart';
 import 'package:night_solver/screens/preference_page.dart';
 import 'package:http/http.dart' as http;
+import 'package:night_solver/screens/search_screen.dart';
 import 'package:night_solver/theme/app_decoration.dart';
 import 'package:night_solver/utils/color_constant.dart';
 import 'package:night_solver/utils/image_constant.dart';
@@ -40,9 +41,8 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void onTabTapped(int index) {
-    if(index==3) {
-      Navigator.of(context).pushReplacement(new MaterialPageRoute(builder: (context) => new MovieList()));
-    }
+    if(index==1) Navigator.of(context).push(MaterialPageRoute(builder: (_) => SearchScreen()));
+    if(index==3) Navigator.of(context).push(MaterialPageRoute(builder: (_) => MovieList()));
   }
 
   Future<void> getData() async {
@@ -173,7 +173,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget buildHorizontalCard({required MovieInfo item}) => InkWell(
-    onTap: () => Navigator.of(context).pushReplacement(new MaterialPageRoute(builder: (context) => MovieDetail(item: item))),
+    onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => MovieDetail(item: item))),
       child: Container(
     width: getHorizontalSize(300),
     height: getVerticalSize(266),
