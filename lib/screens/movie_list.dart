@@ -4,6 +4,15 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
+import 'package:night_solver/screens/home_screen.dart';
+import 'package:night_solver/screens/recommendation_screen.dart';
+import 'package:night_solver/screens/search_screen.dart';
+import 'package:night_solver/screens/settings_screen.dart';
+import 'package:night_solver/theme/app_style.dart';
+import 'package:night_solver/utils/custom_widgets.dart';
+import '../utils/color_constant.dart';
+import '../utils/movie_info.dart';
+import '../utils/size_utils.dart';
 import 'movie_details.dart';
 
 class MovieList extends StatefulWidget {
@@ -78,74 +87,78 @@ class _MovieListState extends State<MovieList> {
     _scrollController.jumpTo(0.0);
   }
 
+  void onTabTapped(int index) {
+    if(index==0) Navigator.of(context).push(MaterialPageRoute(builder: (_) => HomeScreen()));
+    if(index==1) Navigator.of(context).push(MaterialPageRoute(builder: (_) => SearchScreen()));
+    if(index==2) Navigator.of(context).push(MaterialPageRoute(builder: (_) => Recommendation()));
+    if(index==4) Navigator.of(context).push(MaterialPageRoute(builder: (_) => SettingScreen()));
+  }
+
   @override
   Widget build(BuildContext context) {
+    int currentIndex = 3;
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: ColorConstant.gray900,
       appBar: AppBar(
-        elevation: 0.3,
-        centerTitle: true,
+        //forceMaterialTransparency: true,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () => Navigator.of(context).pop(),
+          icon: Icon(Icons.arrow_back_ios_new_rounded, color: ColorConstant.red900),
+          onPressed: () => Navigator.pop(context, true),
         ),
-        title: Text(
-          'Movies',
-          style: TextStyle(
-            fontFamily: 'Arvo',
-            fontWeight: FontWeight.bold,
-          ),
-        ),
+        title: RichText(
+            text: TextSpan(children: [
+              TextSpan(
+                  text: "Bookmarks",
+                  style: AppStyle.txtPoppinsBold30
+              ),
+              TextSpan(
+                  text: ".",
+                  style: AppStyle.txtPoppinsBold30Red
+              ),
+            ]),
+            textAlign: TextAlign.left
+        )
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            TextFormField(
-                controller: _controller,
-                decoration: InputDecoration(
-                    prefixIcon: new IconButton(
-                      icon: Icon(Icons.add_circle_outline),
-                      onPressed: null
-                    ),
-                    hintText: "Add movies",
-                    border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(15)
-                    )
-                ),
-                onChanged: _onSearchChanged
-            ),
-
-
-            Expanded(
-              child: ListView.builder(
-                controller: _scrollController,
-                itemCount: movies.isEmpty ? 0 : movies.length,
-                itemBuilder: (context, i) {
-                  return MaterialButton(
-                    child: MovieCell(movies[i]),
-                    padding: const EdgeInsets.all(0.0),
-                    onPressed: () async {
-                      final addedMovie = await Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => MovieDetail(movies[i]),
-                        ),
-                      );
-                      if (addedMovie != null && addedMovie) {
-                        _controller.clear();
-                        await getData();
-                      }
-                    },
-                    color: Colors.white,
-                  );
-                },
-              ),
-            )
-          ],
-        ),
-      ),
+          padding: getPadding(left: 16, top: 16),
+          child: ListView.separated(
+          itemBuilder: (context, index) => VerticalMovieCard(item: new MovieInfo(movies[index])),
+          separatorBuilder: (context, _) => SizedBox(height: getVerticalSize(16),),
+          itemCount: movies.length
+      )),
+      bottomNavigationBar: BottomNavigationBar(
+          backgroundColor: ColorConstant.gray900,
+          selectedItemColor: ColorConstant.red900,
+          unselectedItemColor: ColorConstant.whiteA700,
+          showSelectedLabels: false,
+          showUnselectedLabels: false,
+          type: BottomNavigationBarType.fixed,
+          currentIndex: currentIndex,
+          onTap: (index) => setState(() {
+            currentIndex = index;
+            onTabTapped(index);
+          }),
+          items: [
+      BottomNavigationBarItem(
+      icon: Icon(Icons.home),
+        label: "Home"
+    ),
+    BottomNavigationBarItem(
+    icon: Icon(Icons.search),
+    label: "Search"
+    ),
+    BottomNavigationBarItem(
+    icon: Icon(Icons.recommend),
+    label: "Recommendation"
+    ),
+    BottomNavigationBarItem(
+    icon: Icon(Icons.bookmark),
+    label: "bookmark"
+    ),
+    BottomNavigationBarItem(
+    icon: Icon(Icons.settings),
+    label: "Settings"
+    )]),
     );
   }
 }

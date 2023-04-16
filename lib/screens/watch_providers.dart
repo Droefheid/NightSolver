@@ -1,9 +1,11 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:night_solver/screens/preference_page.dart';
 
 class Providers extends StatefulWidget {
-  const Providers({Key? key, required this.IdList} ) : super(key: key);
+  const Providers({Key? key,required this.IdList, required this.salonName} ) : super(key: key);
   final IdList;
+  final salonName;
   @override
   State<Providers> createState() => _ProvidersState();
 }
@@ -77,11 +79,15 @@ class _ProvidersState extends State<Providers>{
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         ElevatedButton(
-            onPressed: () => Navigator.of(context).push(MaterialPageRoute(
-              builder: (context) => Preferences(
-                  IdList : widget.IdList,
-                  providerStat : providers
-              ))),
+            onPressed: () {
+              for (String member in widget.IdList){
+                FirebaseFirestore.instance
+                    .collection('users')
+                    .doc(member)
+                    .set({'salons' : {widget.salonName : {'providers' : providers}}}, SetOptions(merge : true));
+              }
+              Navigator.of(context).push(MaterialPageRoute(builder: (context) => Preferences(salonName: widget.salonName, IdList : widget.IdList, providerStat : providers)));
+            },
             child: Text('Next',
                 style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold)),
           ),

@@ -33,13 +33,16 @@ class CustomToast extends StatelessWidget {
             size: 28,
           ),
           SizedBox(width: 12),
-          Text(
-            message,
-            style: TextStyle(
-              color: textColor,
-              fontSize: fontSize,
-            ),
-          ),
+          Expanded(
+              child:Text(
+                message,
+                style: TextStyle(
+                  color: textColor,
+                  fontSize: fontSize,
+                ),
+              ),
+          )
+
         ],
       ),
     );
@@ -60,7 +63,7 @@ class CustomToast extends StatelessWidget {
         fontSize: fontSize,
         iconData: iconData,
       ),
-      gravity: ToastGravity.BOTTOM,
+      gravity: ToastGravity.TOP,
       toastDuration: Duration(seconds: 3),
     );
   }
