@@ -2,7 +2,12 @@ import 'dart:async';
 import 'dart:ui';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:night_solver/screens/search_screen.dart';
 import 'package:night_solver/screens/watch_providers.dart';
+import '../theme/app_style.dart';
+import '../utils/color_constant.dart';
+import 'home_screen.dart';
+import 'movie_list.dart';
 import 'new_salon_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -62,34 +67,49 @@ class _SalonsState extends State<Salons> {
     getData();
   }
 
+  void onTabTapped(int index) {
+    if (index==0) Navigator.of(context).push(MaterialPageRoute(builder: (_) => HomeScreen()));
+    if (index==1) Navigator.of(context).push(MaterialPageRoute(builder: (_) => SearchScreen()));
+    if(index==3) Navigator.of(context).push(MaterialPageRoute(builder: (_) => MovieList()));
+  }
+
   @override
   Widget build(BuildContext context) {
+    int currentIndex = 2;
     return GestureDetector(
         onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
         child : Scaffold(
+          backgroundColor: ColorConstant.gray900,
           floatingActionButton: FloatingActionButton.extended(
               onPressed: () async {
                 await Navigator.push(context,PageRouteBuilder(pageBuilder: (_,__,___) => const NewSalon()));
                 getData();
               },
-              label: const Text(
-                  "New room"
-              )
+              label: Text(
+                  "New room",
+                  style: AppStyle.txtPoppinsRegular14Gray900,
+              ),
+              backgroundColor: ColorConstant.red900,
           ),
           appBar: AppBar(
-            elevation: 0.3,
-            centerTitle: true,
-            leading: IconButton(
-              icon: Icon(Icons.arrow_back),
-              onPressed: () => Navigator.pop(context, true),
-            ),
-            title: Text(
-              'Rooms',
-              style: TextStyle(
-                fontFamily: 'Arvo',
-                fontWeight: FontWeight.bold,
+              forceMaterialTransparency: true,
+              leading: IconButton(
+                icon: Icon(Icons.arrow_back_ios_new_rounded, color: ColorConstant.red900),
+                onPressed: () => Navigator.pop(context, true),
               ),
-            ),
+              title: RichText(
+                  text: TextSpan(children: [
+                    TextSpan(
+                        text: "Rooms",
+                        style: AppStyle.txtPoppinsBold30
+                    ),
+                    TextSpan(
+                        text: ".",
+                        style: AppStyle.txtPoppinsBold30Red
+                    ),
+                  ]),
+                  textAlign: TextAlign.left
+              )
           ),
           body: Padding(
             padding: const EdgeInsets.all(16.0),
@@ -98,7 +118,14 @@ class _SalonsState extends State<Salons> {
               children: [
                 TextField(
                   decoration: InputDecoration(
+                    icon: Icon(Icons.search, color: ColorConstant.whiteA700),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(15)
+                    ),
+                    hintStyle: AppStyle.txtPoppinsMedium18Grey,
                     hintText: 'Search room',
+                    filled: true,
+                    fillColor: ColorConstant.gray90001
                   ),
                   controller: _controller,
                   onChanged: _onSearchChanged,
@@ -121,6 +148,41 @@ class _SalonsState extends State<Salons> {
                 ),
               ],
             ),
+          ),
+          bottomNavigationBar: BottomNavigationBar(
+            backgroundColor: ColorConstant.gray900,
+            selectedItemColor: ColorConstant.red900,
+            unselectedItemColor: ColorConstant.whiteA700,
+            showSelectedLabels: false,
+            showUnselectedLabels: false,
+            type: BottomNavigationBarType.fixed,
+            currentIndex: currentIndex,
+            onTap: (index) => setState(() {
+              currentIndex = index;
+              onTabTapped(index);
+            }),
+            items: [
+              BottomNavigationBarItem(
+                  icon: Icon(Icons.home),
+                  label: "Home"
+              ),
+              BottomNavigationBarItem(
+                  icon: Icon(Icons.search),
+                  label: "Search"
+              ),
+              BottomNavigationBarItem(
+                  icon: Icon(Icons.recommend),
+                  label: "Recommendation"
+              ),
+              BottomNavigationBarItem(
+                  icon: Icon(Icons.bookmark),
+                  label: "bookmark"
+              ),
+              BottomNavigationBarItem(
+                  icon: Icon(Icons.settings),
+                  label: "Settings"
+              ),
+            ],
           ),
         )
     );
@@ -275,7 +337,7 @@ class SalonCell extends StatelessWidget {
                   children: [
                     new IconButton(
                       highlightColor: Colors.blue,
-                      icon: Icon(Icons.person),
+                      icon: Icon(Icons.person_outline_rounded),
                       onPressed: () {
                         showMembersDialog(context, salon[salon.keys.toList().first]['salon_members']);
                       },

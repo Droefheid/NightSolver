@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:night_solver/screens/home_screen.dart';
+import 'package:night_solver/screens/recommendation_screen.dart';
 import 'package:night_solver/screens/search_screen.dart';
 import 'package:night_solver/theme/app_style.dart';
 import 'package:night_solver/utils/custom_widgets.dart';
@@ -88,7 +89,7 @@ class _MovieListState extends State<MovieList> {
   void onTabTapped(int index) {
     if(index==0) Navigator.of(context).push(MaterialPageRoute(builder: (_) => HomeScreen()));
     if(index==1) Navigator.of(context).push(MaterialPageRoute(builder: (_) => SearchScreen()));
-    if(index==3) Navigator.of(context).push(MaterialPageRoute(builder: (_) => MovieList()));
+    if(index==2) Navigator.of(context).push(MaterialPageRoute(builder: (_) => Recommendation()));
   }
 
   @override
