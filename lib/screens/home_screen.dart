@@ -1,14 +1,9 @@
-import 'dart:collection';
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
-import 'package:night_solver/screens/NavBar.dart';
 import 'package:night_solver/screens/movie_details.dart';
-import 'package:night_solver/screens/new_salon_screen.dart';
-import 'package:night_solver/screens/preference_page.dart';
 import 'package:http/http.dart' as http;
 import 'package:night_solver/screens/recommendation_screen.dart';
 import 'package:night_solver/screens/search_screen.dart';
@@ -16,7 +11,6 @@ import 'package:night_solver/screens/settings_screen.dart';
 import 'package:night_solver/theme/app_decoration.dart';
 import 'package:night_solver/utils/color_constant.dart';
 import 'package:night_solver/utils/constants.dart';
-import 'package:night_solver/utils/image_constant.dart';
 
 import '../theme/app_style.dart';
 import '../utils/custom_widgets.dart';

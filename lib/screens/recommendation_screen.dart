@@ -25,6 +25,10 @@ class RecommendationState extends State<Recommendation> {
 
   List<dynamic> movies = [];
 
+  void handleSelectedGenre(String genre, bool onSelect) {
+
+  }
+
   Future<void> getData() async {
     final url = 'https://api.themoviedb.org/3/trending/movie/week?api_key=9478d83ca04bd6ee25b942dd7a0ad777';
     final response = await http.get(Uri.parse(url));
@@ -88,7 +92,11 @@ class RecommendationState extends State<Recommendation> {
                   height: getVerticalSize(45),
                   child: ListView.separated(
                       scrollDirection: Axis.horizontal,
-                    itemBuilder: (context, index) => GenreButton(title: genres[index]),
+                    itemBuilder: (context, index) => GenreButton(
+                      title: genres[index],
+                      isSelected: false,
+                      onSelectedGenre: handleSelectedGenre,
+                    ),
                     separatorBuilder: (context, _) => SizedBox(width: getHorizontalSize(8)),
                     itemCount: genres.length),
                 )
