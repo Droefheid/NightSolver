@@ -102,10 +102,12 @@ class VerticalMovieCard extends StatelessWidget {
 class GenreButton extends StatefulWidget {
 
   final String title;
+  final Function(String, bool) onSelectedGenre;
 
   const GenreButton({
     super.key,
-    required this.title
+    required this.title,
+    required this.onSelectedGenre
   });
 
   @override
@@ -113,16 +115,18 @@ class GenreButton extends StatefulWidget {
 }
 
 class _GenreButtonState extends State<GenreButton> {
+  bool hasBeenPressed = false;
+
   @override
   Widget build(BuildContext context) {
-    bool hasBeenPressed = false;
     return SizedBox(
       height: getVerticalSize(25),
         child: TextButton(
           onPressed: () => {
             setState(() {
               hasBeenPressed = !hasBeenPressed;
-            })
+            }),
+            widget.onSelectedGenre(widget.title, hasBeenPressed)
           },
         child: Text(widget.title, style: hasBeenPressed ? AppStyle.txtPoppinsRegular14Gray900 : AppStyle.txtPoppinsRegular14),
         style: TextButton.styleFrom(

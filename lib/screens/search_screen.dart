@@ -9,7 +9,9 @@ import 'package:night_solver/screens/settings_screen.dart';
 
 import '../theme/app_style.dart';
 import '../utils/color_constant.dart';
+import '../utils/constants.dart';
 import '../utils/custom_widgets.dart';
+import '../utils/genre_utils.dart';
 import '../utils/movie_info.dart';
 import '../utils/size_utils.dart';
 import 'movie_list.dart';
@@ -22,9 +24,10 @@ class SearchScreen extends StatefulWidget {
 
 class _SearchScreenState extends State<SearchScreen> {
 
-  final apiKey = '9478d83ca04bd6ee25b942dd7a0ad777';
-  final List<String> genres = ["ALL"," ACTION", "ADVENTURE", "ANIMATION", "COMEDY", "CRIME", "DOCUMENTARY", "DRAMA", "FAMILY", "FANTASY", "HISTORY", "HORROR", "MUSIC", "MYSTERY", "ROMANCE", "SCIENCE FICTION", "THRILLER", "TV MOVIE", "WAR", "WESTERN"];
-  List<dynamic> movies = [];
+  final List<String> genres = ["ALL","ACTION", "ADVENTURE", "ANIMATION", "COMEDY", "CRIME", "DOCUMENTARY", "DRAMA", "FAMILY", "FANTASY", "HISTORY", "HORROR", "MUSIC", "MYSTERY", "ROMANCE", "SCIENCE FICTION", "THRILLER", "TV MOVIE", "WAR", "WESTERN"];
+  List<dynamic> searched_movies = [];
+  List<dynamic> filtered_movies_genre = [];
+
   int nb_movies = 0;
   final TextEditingController _controller = TextEditingController();
 
@@ -37,13 +40,13 @@ class _SearchScreenState extends State<SearchScreen> {
   void _onSearchChanged(String value) async {
     try {
       if (value != '') {
-        final url = 'https://api.themoviedb.org/3/search/movie?api_key=$apiKey&query=$value';
+        final url = 'https://api.themoviedb.org/3/search/movie?api_key='+Constants.theMovieDb+'&query=$value';
         final response = await http.get(Uri.parse(url));
         final responseData = json.decode(response.body);
         if (responseData['results'] != null) {
           setState(() {
-            movies = responseData['results'];
-            nb_movies = movies.length;
+            searched_movies = responseData['results'];
+            nb_movies = searched_movies.length;
           });
         } else {
           print('Response data is null');
@@ -56,12 +59,33 @@ class _SearchScreenState extends State<SearchScreen> {
     }
   }
 
+  void handleSelectedGenre(String genre, bool onSelect) {
+
+    int id = genreToId(genre);
+    List<dynamic> filteredMovies;
+    if (id != -1 && !searched_movies.isEmpty && onSelect){
+
+      // filter movies based on selected genre
+      List<dynamic> filteredMovies = searched_movies
+          .where((movie) =>
+          movie['genre_ids'].contains(id))
+          .toList();
+
+      setState(() {
+        searched_movies = filteredMovies;
+        nb_movies = filteredMovies.length;
+      });
+    }else if(!onSelect){
+      getData();
+    }
+  }
+
   Future<void> getData() async {
     final url = 'https://api.themoviedb.org/3/trending/movie/week?api_key=9478d83ca04bd6ee25b942dd7a0ad777';
     final response = await http.get(Uri.parse(url));
     final Map<String, dynamic> responseData = json.decode(response.body);
     setState(() {
-      movies = responseData['results'];
+      searched_movies = responseData['results'];
     });
   }
 
@@ -121,7 +145,10 @@ class _SearchScreenState extends State<SearchScreen> {
             height: getVerticalSize(45),
             child: ListView.separated(
                 scrollDirection: Axis.horizontal,
-                itemBuilder: (context, index) => GenreButton(title: genres[index]),
+                itemBuilder: (context, index) => GenreButton(
+                    title: genres[index],
+                    onSelectedGenre: handleSelectedGenre,
+                ),
                 separatorBuilder: (context, _) => SizedBox(width: getHorizontalSize(8)),
                 itemCount: genres.length),
           ),
@@ -134,9 +161,9 @@ class _SearchScreenState extends State<SearchScreen> {
           Container(
             height: getVerticalSize(462),
               child: ListView.separated(
-                  itemBuilder: (context, index) => VerticalMovieCard(item: new MovieInfo(movies[index])),
+                  itemBuilder: (context, index) => VerticalMovieCard(item: new MovieInfo(searched_movies[index])),
                   separatorBuilder: (context, _) => SizedBox(height: getVerticalSize(16)),
-                  itemCount: movies.length
+                  itemCount: searched_movies.length
               )
           ),
         ]
