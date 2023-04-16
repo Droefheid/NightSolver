@@ -5,6 +5,7 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:night_solver/screens/custom_toast.dart';
+import 'package:night_solver/utils/movie_info.dart';
 
 import 'movie_details.dart';
 
