@@ -11,6 +11,7 @@ import 'package:night_solver/screens/settings_screen.dart';
 import 'package:night_solver/theme/app_style.dart';
 import 'package:night_solver/utils/custom_widgets.dart';
 import '../utils/color_constant.dart';
+import '../utils/constants.dart';
 import '../utils/movie_info.dart';
 import '../utils/size_utils.dart';
 import 'movie_details.dart';
@@ -21,7 +22,6 @@ class MovieList extends StatefulWidget {
 }
 
 class _MovieListState extends State<MovieList> {
-  final apiKey = '9478d83ca04bd6ee25b942dd7a0ad777';
   List<dynamic> movies = [];
   final TextEditingController _controller = TextEditingController();
   final ScrollController _scrollController = ScrollController();
@@ -39,7 +39,7 @@ class _MovieListState extends State<MovieList> {
     if (moviesId != null) {
       for (String movieId in moviesId) {
         final response = await http.get(Uri.parse(
-            'https://api.themoviedb.org/3/movie/$movieId?api_key=$apiKey'));
+            'https://api.themoviedb.org/3/movie/$movieId?api_key='+Constants.theMovieDb));
 
         if (response.statusCode == 200) {
           final Map<String, dynamic> responseData = json.decode(response.body);
@@ -58,7 +58,7 @@ class _MovieListState extends State<MovieList> {
     try {
       if (value != '') {
         final url =
-            'https://api.themoviedb.org/3/search/movie?api_key=$apiKey&query=$value';
+            'https://api.themoviedb.org/3/search/movie?api_key='+Constants.theMovieDb+'&query=$value';
         final response = await http.get(Uri.parse(url));
         final responseData = json.decode(response.body);
         resetScrollPosition();

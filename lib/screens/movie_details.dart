@@ -2,8 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'dart:ui' as ui;
 import 'package:http/http.dart' as http;
 import 'package:night_solver/screens/home_screen.dart';
 import 'package:night_solver/screens/recommendation_screen.dart';

@@ -15,6 +15,7 @@ import 'package:night_solver/screens/search_screen.dart';
 import 'package:night_solver/screens/settings_screen.dart';
 import 'package:night_solver/theme/app_decoration.dart';
 import 'package:night_solver/utils/color_constant.dart';
+import 'package:night_solver/utils/constants.dart';
 import 'package:night_solver/utils/image_constant.dart';
 
 import '../theme/app_style.dart';
@@ -35,7 +36,8 @@ class _HomeScreenState extends State<HomeScreen> {
   Icon customIcon = const Icon(Icons.search);
   Widget customSearchBar = const Text("Trending movies");
   String searchValue = "";
-  List<dynamic> movies = [];
+  List<dynamic> trending_movies = [];
+  List<dynamic> latest_movies = [];
   final controller = ScrollController();
   int currentIndex = 0;
   void signOut(){
@@ -50,12 +52,19 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> getData() async {
-    final url =
-        'https://api.themoviedb.org/3/trending/movie/week?api_key=9478d83ca04bd6ee25b942dd7a0ad777';
-    final response = await http.get(Uri.parse(url));
-    final Map<String, dynamic> responseData = json.decode(response.body);
+    final trending_movies_url =
+        'https://api.themoviedb.org/3/trending/movie/week?api_key='+Constants.theMovieDb;
+    final trending_movies_response = await http.get(Uri.parse(trending_movies_url));
+    final Map<String, dynamic> trending_movies_responseData = json.decode(trending_movies_response.body);
+
+    final latest_movies_url = 'https://api.themoviedb.org/3/discover/movie?api_key='+Constants.theMovieDb
+        +'&sort_by=release_date.desc&vote_count.gte=100';
+    final latest_movies_response = await http.get(Uri.parse(latest_movies_url));
+    final Map<String, dynamic> latest_movies_responseData = json.decode(latest_movies_response.body);
+
     setState(() {
-      movies = responseData['results'];
+      trending_movies = trending_movies_responseData['results'];
+      latest_movies = latest_movies_responseData['results'];
     });
   }
 
@@ -102,10 +111,10 @@ class _HomeScreenState extends State<HomeScreen> {
               Container(
                   height: 300,
                   child: ListView.separated(
-                      itemBuilder: (context, index) => buildHorizontalCard(item: new MovieInfo(movies[index])),
+                      itemBuilder: (context, index) => buildHorizontalCard(item: new MovieInfo(trending_movies[index])),
                       scrollDirection: Axis.horizontal,
                       separatorBuilder: (context, _) => SizedBox(width: getHorizontalSize(16)),
-                      itemCount: movies.length
+                      itemCount: trending_movies.length
                   )
               ),
               Align(
@@ -130,9 +139,9 @@ class _HomeScreenState extends State<HomeScreen> {
               Container(
                 height: 190,
                 child: ListView.separated(
-                  itemBuilder: (context, index) => VerticalMovieCard(item: new MovieInfo(movies[index])),
+                  itemBuilder: (context, index) => VerticalMovieCard(item: new MovieInfo(latest_movies[index])),
                   separatorBuilder: (context, _) => SizedBox(height: getVerticalSize(16),),
-                  itemCount: movies.length,
+                  itemCount: latest_movies.length,
                 ),
               )
             ],
