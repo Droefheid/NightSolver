@@ -82,6 +82,7 @@ class ResultScreenSate extends State<ResultScreen> {
         }
       }
       for( var Rec in RecList){
+        //TODO Fais en sorte que les films récommandés sont aussi en rent et non pas que flatrate (que pour other)
         //get the providers list of the recommended movie
         String recId = Rec["id"].toString();
         final movieProvider = await http.get(Uri.parse('https://api.themoviedb.org/3/movie/$recId/watch/providers?api_key=$apiKey'));

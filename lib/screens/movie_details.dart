@@ -84,6 +84,19 @@ class _MovieDetailState extends State<MovieDetail> {
     Set<String> addedProviders = Set();
 
     widget.providers.forEach((key, value) {
+      if (value['flatrate'] != null && value['flatrate'].isNotEmpty) {
+        value['flatrate'].forEach((flatValue) {
+          if (flatValue['provider_name'] != null && !addedProviders.contains(flatValue['provider_name'])) {
+            addedProviders.add(flatValue['provider_name']);
+            providerWidgets.add(
+              Image.network(
+                'https://image.tmdb.org/t/p/w92${flatValue['logo_path']}',
+                width: 60,
+              ),
+            );
+          }
+        });
+      }
       if (value['rent'] != null && value['rent'].isNotEmpty) {
         value['rent'].forEach((rentValue) {
           if (rentValue['provider_name'] != null && !addedProviders.contains(rentValue['provider_name'])) {
@@ -96,21 +109,6 @@ class _MovieDetailState extends State<MovieDetail> {
             );
           }
         });
-      } else {
-        if (value['flatrate'] != null && value['flatrate'].isNotEmpty) {
-          value['flatrate'].forEach((flatValue) {
-            if (flatValue['provider_name'] != null && !addedProviders.contains(flatValue['provider_name'])) {
-              addedProviders.add(flatValue['provider_name']);
-              providerWidgets.add(
-                Image.network(
-                  'https://image.tmdb.org/t/p/w92${flatValue['logo_path']}',
-                  width: 60,
-                ),
-              );
-            }
-          });
-        }
-
       }
     });
 
