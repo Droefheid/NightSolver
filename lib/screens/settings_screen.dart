@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_settings_screens/flutter_settings_screens.dart';
@@ -35,7 +36,7 @@ class _SettingScreenState extends State<SettingScreen> {
     return Scaffold(
       backgroundColor: ColorConstant.gray900,
       appBar: AppBar(
-          forceMaterialTransparency: true,
+          //forceMaterialTransparency: true,
           leading: IconButton(
             icon: Icon(Icons.arrow_back_ios_new_rounded, color: ColorConstant.red900),
             onPressed: () => Navigator.pop(context, true),
@@ -60,6 +61,12 @@ class _SettingScreenState extends State<SettingScreen> {
               title: "Logout",
               titleTextStyle: AppStyle.txtPoppinsRegular16Bluegray400,
               leading: Icon(Icons.logout_rounded, color: ColorConstant.red900),
+              onTap: () => {
+                FirebaseAuth.instance.signOut(),
+                Navigator.of(context).pop()
+                //TODO
+                }
+              ,
           ),
           Align(
               alignment: Alignment.centerLeft,

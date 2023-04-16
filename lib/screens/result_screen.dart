@@ -280,7 +280,7 @@ class ResultScreenSate extends State<ResultScreen> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => MovieDetail(movies[i]),
+                              builder: (context) => MovieDetail(item: new MovieInfo(movies[i])),
                             ),
                           );
                         },

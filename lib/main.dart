@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:night_solver/auth/main_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:night_solver/theme/theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,7 +17,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Night Solver',
-      theme: lightTheme,
+      theme: ThemeData.light(),
       home: MainScreen(),
     );
   }

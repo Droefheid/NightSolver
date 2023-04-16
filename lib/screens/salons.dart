@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:night_solver/screens/custom_toast.dart';
 import 'package:night_solver/screens/preference_page.dart';
 import 'package:night_solver/screens/result_screen.dart';
+import '../utils/movie_info.dart';
 import 'movie_details.dart';
 import 'package:night_solver/screens/search_screen.dart';
 import 'package:night_solver/screens/settings_screen.dart';
@@ -101,7 +102,7 @@ class _SalonsState extends State<Salons> {
               backgroundColor: ColorConstant.red900,
           ),
           appBar: AppBar(
-              forceMaterialTransparency: true,
+              //forceMaterialTransparency: true,
               leading: IconButton(
                 icon: Icon(Icons.arrow_back_ios_new_rounded, color: ColorConstant.red900),
                 onPressed: () => Navigator.pop(context, true),
@@ -161,7 +162,7 @@ class _SalonsState extends State<Salons> {
                               if (result.statusCode == 200) {
                                 final Map<String, dynamic> resultData = json.decode(result.body);
                                 CustomToast.showToast(context, 'Everyone has voted. This is the most voted movie');
-                                Navigator.of(context).push(MaterialPageRoute(builder: (_) => MovieDetail(resultData)));
+                                Navigator.of(context).push(MaterialPageRoute(builder: (_) => MovieDetail(item: new MovieInfo(resultData))));
                           }
                             }
 

@@ -26,10 +26,7 @@ class MovieDetail extends StatefulWidget {
   var apiKey = '9478d83ca04bd6ee25b942dd7a0ad777';
   Map<String, dynamic> providers = {};
 
-  MovieDetail({
-    super.key,
-    required this.item
-  });
+  MovieDetail({super.key, required this.item});
 
   @override
   _MovieDetailState createState() => _MovieDetailState();
@@ -40,19 +37,42 @@ class _MovieDetailState extends State<MovieDetail> {
   Color mainColor = const Color(0xffffffff);
   final user = FirebaseAuth.instance.currentUser!;
 
+  void onTabTapped(int index) {
+    if (index == 0)
+      Navigator.of(context)
+          .push(MaterialPageRoute(builder: (_) => HomeScreen()));
+    if (index == 1)
+      Navigator.of(context)
+          .push(MaterialPageRoute(builder: (_) => SearchScreen()));
+    if (index == 2)
+      Navigator.of(context)
+          .push(MaterialPageRoute(builder: (_) => Recommendation()));
+    if (index == 3)
+      Navigator.of(context)
+          .push(MaterialPageRoute(builder: (_) => MovieList()));
+    if (index == 4)
+      Navigator.of(context)
+          .push(MaterialPageRoute(builder: (_) => SettingScreen()));
+  }
+
   Future<List> recommended(String id) async {
     List<dynamic> RecList = [];
-    final result = await http.get(Uri.parse('https://api.themoviedb.org/3/movie/$id/recommendations?api_key=$apiKey&language=en-US&page=1'));
+    final result = await http.get(Uri.parse(
+        'https://api.themoviedb.org/3/movie/$id/recommendations?api_key=$apiKey&language=en-US&page=1'));
     if (result.statusCode == 200) {
       final Map<String, dynamic> resultData = json.decode(result.body);
       ////check if the movie recommended is not in the seen movies list
-      final snapshot = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
-      for(int i=0;i<resultData['results'].length;i++){
-        if(snapshot.data()!['movies_id'] != null){
-          if(!(snapshot.data()!['movies_id'].contains(resultData["results"][i]["id"].toString()))){
-            if(resultData['results'][i]['genre_ids'].length != 0){
-              final recommended =
-              {
+      final snapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .get();
+      for (int i = 0; i < resultData['results'].length; i++) {
+        if (snapshot.data()!['movies_id'] != null) {
+          if (!(snapshot
+              .data()!['movies_id']
+              .contains(resultData["results"][i]["id"].toString()))) {
+            if (resultData['results'][i]['genre_ids'].length != 0) {
+              final recommended = {
                 'id': resultData["results"][i]["id"].toString(),
                 'genre': resultData['results'][i]['genre_ids'][0].toString()
               };
@@ -63,25 +83,19 @@ class _MovieDetailState extends State<MovieDetail> {
       }
     }
     return RecList;
-  void onTabTapped(int index) {
-    if (index==0) Navigator.of(context).push(MaterialPageRoute(builder: (_) => HomeScreen()));
-    if (index==1) Navigator.of(context).push(MaterialPageRoute(builder: (_) => SearchScreen()));
-    if (index==2) Navigator.of(context).push(MaterialPageRoute(builder: (_) => Recommendation()));
-    if(index==3) Navigator.of(context).push(MaterialPageRoute(builder: (_) => MovieList()));
-    if(index==4) Navigator.of(context).push(MaterialPageRoute(builder: (_) => SettingScreen()));
   }
 
   Future addMovie(BuildContext context) async {
     final user = FirebaseAuth.instance.currentUser!;
     final DocumentReference docRef =
-    FirebaseFirestore.instance.collection('users').doc(user.uid);
-    print(widget.movie['id'].toString());
-    List<dynamic> recommended_movies = await recommended(widget.movie['id'].toString());
+        FirebaseFirestore.instance.collection('users').doc(user.uid);
+    print(widget.item.id);
+    List<dynamic> recommendedMovies = await recommended(widget.item.id);
     docRef.set({
       'recommended': {
-        widget.movie['id'].toString(): recommended_movies,
+        widget.item.id: recommendedMovies,
       },
-      'movies_id': FieldValue.arrayUnion([widget.movie['id'].toString()]),
+      'movies_id': FieldValue.arrayUnion([widget.item.id]),
     }, SetOptions(merge: true));
 
     CustomToast.showToast(context, 'Movie added to watched list');
@@ -93,7 +107,7 @@ class _MovieDetailState extends State<MovieDetail> {
   Future deleteMovie(BuildContext context, String movieId) async {
     final user = FirebaseAuth.instance.currentUser!;
     final DocumentReference docRef =
-    FirebaseFirestore.instance.collection('users').doc(user.uid);
+        FirebaseFirestore.instance.collection('users').doc(user.uid);
     docRef.update({
       'movies_id': FieldValue.arrayRemove([movieId]),
     });
@@ -128,7 +142,8 @@ class _MovieDetailState extends State<MovieDetail> {
           SizedBox(height: 20),
           Text(
             'No providers available',
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
+            style: TextStyle(
+                fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
           ),
           SizedBox(height: 10),
         ],
@@ -141,7 +156,8 @@ class _MovieDetailState extends State<MovieDetail> {
     widget.providers.forEach((key, value) {
       if (value['rent'] != null && value['rent'].isNotEmpty) {
         value['rent'].forEach((rentValue) {
-          if (rentValue['provider_name'] != null && !addedProviders.contains(rentValue['provider_name'])) {
+          if (rentValue['provider_name'] != null &&
+              !addedProviders.contains(rentValue['provider_name'])) {
             addedProviders.add(rentValue['provider_name']);
             providerWidgets.add(
               Image.network(
@@ -154,7 +170,8 @@ class _MovieDetailState extends State<MovieDetail> {
       } else {
         if (value['flatrate'] != null && value['flatrate'].isNotEmpty) {
           value['flatrate'].forEach((flatValue) {
-            if (flatValue['provider_name'] != null && !addedProviders.contains(flatValue['provider_name'])) {
+            if (flatValue['provider_name'] != null &&
+                !addedProviders.contains(flatValue['provider_name'])) {
               addedProviders.add(flatValue['provider_name']);
               providerWidgets.add(
                 Image.network(
@@ -165,7 +182,6 @@ class _MovieDetailState extends State<MovieDetail> {
             }
           });
         }
-
       }
     });
 
@@ -175,7 +191,8 @@ class _MovieDetailState extends State<MovieDetail> {
         SizedBox(height: 20),
         Text(
           'Providers',
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
+          style: TextStyle(
+              fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
         ),
         SizedBox(height: 10),
         SingleChildScrollView(
@@ -194,7 +211,6 @@ class _MovieDetailState extends State<MovieDetail> {
       ],
     );
   }
-
 
   @override
   void initState() {
@@ -222,8 +238,8 @@ class _MovieDetailState extends State<MovieDetail> {
             height: getVerticalSize(581),
             width: getHorizontalSize(561),
             child: Image.network(
-                widget.item.urlImage,
-              height: MediaQuery.of(context).size.height *0.5,
+              widget.item.urlImage,
+              height: MediaQuery.of(context).size.height * 0.5,
               fit: BoxFit.cover,
             ),
           ),
@@ -238,51 +254,56 @@ class _MovieDetailState extends State<MovieDetail> {
             ),
           ))),*/
           Positioned(
-            child: Text(widget.item.title, style: AppStyle.txtPoppinsBold30, textAlign: TextAlign.center,),
+            child: Text(
+              widget.item.title,
+              style: AppStyle.txtPoppinsBold30,
+              textAlign: TextAlign.center,
+            ),
             top: getVerticalSize(540),
             left: getHorizontalSize(32),
           ),
           Positioned(
-              child: Text.rich(
-                  TextSpan(children: [
-                    WidgetSpan(child: SizedBox(width: getHorizontalSize(20))),
-                    TextSpan( text: widget.item.rating.toString()),
-                    WidgetSpan(child: SizedBox(width: getHorizontalSize(20))),
-                    WidgetSpan(child: RatingBarIndicator(
-                      itemBuilder: (context, index) => Icon(Icons.star_rounded, color: ColorConstant.red900),
-                      itemCount: 5,
-                      rating: widget.item.rating,
-                      itemSize: getSize(28),
-                      unratedColor: ColorConstant.gray700,
-                    ),
-                    )
-                  ],
-                      style: AppStyle.txtPoppinsMedium22
-                  )
-              ),
+            child: Text.rich(TextSpan(children: [
+              WidgetSpan(child: SizedBox(width: getHorizontalSize(20))),
+              TextSpan(text: widget.item.rating.toString()),
+              WidgetSpan(child: SizedBox(width: getHorizontalSize(20))),
+              WidgetSpan(
+                child: RatingBarIndicator(
+                  itemBuilder: (context, index) =>
+                      Icon(Icons.star_rounded, color: ColorConstant.red900),
+                  itemCount: 5,
+                  rating: widget.item.rating,
+                  itemSize: getSize(28),
+                  unratedColor: ColorConstant.gray700,
+                ),
+              )
+            ], style: AppStyle.txtPoppinsMedium22)),
             top: getVerticalSize(600),
           ),
           Positioned(
-              child: Container(
-                  height: getVerticalSize(120),
-                  width: getHorizontalSize(379),
-                  child: Text(
-                      widget.item.synopsis,
-                      style: AppStyle.txtPoppinsRegular13
-                  )
-              ),
+            child: Container(
+                height: getVerticalSize(120),
+                width: getHorizontalSize(379),
+                child: Text(widget.item.synopsis,
+                    style: AppStyle.txtPoppinsRegular13)),
             top: getVerticalSize(660),
             left: getHorizontalSize(16),
           ),
-          IconButton(onPressed: () => Navigator.pop(context, true), icon: Icon(Icons.arrow_back_ios_new_rounded, color: ColorConstant.red900, size: 45)),
+          IconButton(
+              onPressed: () => Navigator.pop(context, true),
+              icon: Icon(Icons.arrow_back_ios_new_rounded,
+                  color: ColorConstant.red900, size: 45)),
           Positioned(
-              child: IconButton(
-                icon: Icon(Icons.bookmark_border, color: ColorConstant.whiteA700, size: 45,),
-                onPressed: () => addMovie(context),
+            child: IconButton(
+              icon: Icon(
+                Icons.bookmark_border,
+                color: ColorConstant.whiteA700,
+                size: 45,
               ),
+              onPressed: () => addMovie(context),
+            ),
             right: getHorizontalSize(16),
           )
-
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
@@ -298,26 +319,14 @@ class _MovieDetailState extends State<MovieDetail> {
           onTabTapped(index);
         }),
         items: [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
+          BottomNavigationBarItem(icon: Icon(Icons.search), label: "Search"),
           BottomNavigationBarItem(
-              icon: Icon(Icons.home),
-              label: "Home"
-          ),
+              icon: Icon(Icons.recommend), label: "Recommendation"),
           BottomNavigationBarItem(
-              icon: Icon(Icons.search),
-              label: "Search"
-          ),
+              icon: Icon(Icons.bookmark), label: "bookmark"),
           BottomNavigationBarItem(
-              icon: Icon(Icons.recommend),
-              label: "Recommendation"
-          ),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.bookmark),
-              label: "bookmark"
-          ),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.settings),
-              label: "Settings"
-          ),
+              icon: Icon(Icons.settings), label: "Settings"),
         ],
       ),
     );

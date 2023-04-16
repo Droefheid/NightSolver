@@ -54,7 +54,7 @@ class RecommendationState extends State<Recommendation> {
     return Scaffold(
       backgroundColor: ColorConstant.gray900,
       appBar: AppBar(
-          forceMaterialTransparency: true,
+          //forceMaterialTransparency: true,
           leading: IconButton(
             icon: Icon(Icons.arrow_back_ios_new_rounded, color: ColorConstant.red900),
             onPressed: () => Navigator.pop(context, true),

@@ -9,6 +9,7 @@ class MovieInfo {
   late String id;
   late List<dynamic>? genres;
   MovieInfo(dynamic movie) {
+    // TODO CHECK null values
     this.title = movie["title"];
     this.urlImage = movies_url + movie["poster_path"];
     this.rating = CustomRound(movie["vote_average"]/2);
