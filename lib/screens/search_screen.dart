@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:night_solver/screens/home_screen.dart';
 import 'package:night_solver/screens/recommendation_screen.dart';
+import 'package:night_solver/screens/settings_screen.dart';
 
 import '../theme/app_style.dart';
 import '../utils/color_constant.dart';
@@ -69,6 +70,7 @@ class _SearchScreenState extends State<SearchScreen> {
     if (index==0) Navigator.of(context).push(MaterialPageRoute(builder: (_) => HomeScreen()));
     if (index==2) Navigator.of(context).push(MaterialPageRoute(builder: (_) => Recommendation()));
     if(index==3) Navigator.of(context).push(MaterialPageRoute(builder: (_) => MovieList()));
+    if(index==4) Navigator.of(context).push(MaterialPageRoute(builder: (_) => SettingScreen()));
   }
 
   @override

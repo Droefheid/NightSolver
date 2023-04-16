@@ -12,6 +12,7 @@ import 'package:night_solver/screens/preference_page.dart';
 import 'package:http/http.dart' as http;
 import 'package:night_solver/screens/recommendation_screen.dart';
 import 'package:night_solver/screens/search_screen.dart';
+import 'package:night_solver/screens/settings_screen.dart';
 import 'package:night_solver/theme/app_decoration.dart';
 import 'package:night_solver/utils/color_constant.dart';
 import 'package:night_solver/utils/image_constant.dart';
@@ -45,6 +46,7 @@ class _HomeScreenState extends State<HomeScreen> {
     if(index==1) Navigator.of(context).push(MaterialPageRoute(builder: (_) => SearchScreen()));
     if (index==2) Navigator.of(context).push(MaterialPageRoute(builder: (_) => Recommendation()));
     if(index==3) Navigator.of(context).push(MaterialPageRoute(builder: (_) => MovieList()));
+    if(index==4) Navigator.of(context).push(MaterialPageRoute(builder: (_) => SettingScreen()));
   }
 
   Future<void> getData() async {

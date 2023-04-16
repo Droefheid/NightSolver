@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:night_solver/screens/home_screen.dart';
 import 'package:night_solver/screens/recommendation_screen.dart';
 import 'package:night_solver/screens/search_screen.dart';
+import 'package:night_solver/screens/settings_screen.dart';
 import 'package:night_solver/theme/app_style.dart';
 import 'package:night_solver/utils/custom_widgets.dart';
 import '../utils/color_constant.dart';
@@ -90,6 +91,7 @@ class _MovieListState extends State<MovieList> {
     if(index==0) Navigator.of(context).push(MaterialPageRoute(builder: (_) => HomeScreen()));
     if(index==1) Navigator.of(context).push(MaterialPageRoute(builder: (_) => SearchScreen()));
     if(index==2) Navigator.of(context).push(MaterialPageRoute(builder: (_) => Recommendation()));
+    if(index==4) Navigator.of(context).push(MaterialPageRoute(builder: (_) => SettingScreen()));
   }
 
   @override

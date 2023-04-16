@@ -6,6 +6,9 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'dart:ui' as ui;
 import 'package:http/http.dart' as http;
 import 'package:night_solver/screens/home_screen.dart';
+import 'package:night_solver/screens/recommendation_screen.dart';
+import 'package:night_solver/screens/search_screen.dart';
+import 'package:night_solver/screens/settings_screen.dart';
 import 'package:night_solver/theme/app_style.dart';
 import 'package:night_solver/utils/color_constant.dart';
 import 'package:night_solver/utils/movie_info.dart';
@@ -35,10 +38,11 @@ class MovieDetail extends StatefulWidget {
 class _MovieDetailState extends State<MovieDetail> {
   Color mainColor = const Color(0xffffffff);
   void onTabTapped(int index) {
-    if(index == 0) Navigator.of(context).pushReplacement(new MaterialPageRoute(builder: (context) =>  HomeScreen()));
-    if(index==3) {
-      Navigator.of(context).pushReplacement(new MaterialPageRoute(builder: (context) =>  MovieList()));
-    }
+    if (index==0) Navigator.of(context).push(MaterialPageRoute(builder: (_) => HomeScreen()));
+    if (index==1) Navigator.of(context).push(MaterialPageRoute(builder: (_) => SearchScreen()));
+    if (index==2) Navigator.of(context).push(MaterialPageRoute(builder: (_) => Recommendation()));
+    if(index==3) Navigator.of(context).push(MaterialPageRoute(builder: (_) => MovieList()));
+    if(index==4) Navigator.of(context).push(MaterialPageRoute(builder: (_) => SettingScreen()));
   }
 
   Future addMovie(BuildContext context) async {

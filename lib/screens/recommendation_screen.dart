@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:night_solver/screens/salons.dart';
 import 'package:night_solver/screens/search_screen.dart';
+import 'package:night_solver/screens/settings_screen.dart';
 import 'package:night_solver/utils/movie_info.dart';
 import 'package:http/http.dart' as http;
 
@@ -43,6 +44,7 @@ class RecommendationState extends State<Recommendation> {
     if (index==0) Navigator.of(context).push(MaterialPageRoute(builder: (_) => HomeScreen()));
     if (index==1) Navigator.of(context).push(MaterialPageRoute(builder: (_) => SearchScreen()));
     if(index==3) Navigator.of(context).push(MaterialPageRoute(builder: (_) => MovieList()));
+    if(index==4) Navigator.of(context).push(MaterialPageRoute(builder: (_) => SettingScreen()));
   }
 
   @override

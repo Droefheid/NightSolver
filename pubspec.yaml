@@ -42,6 +42,7 @@ dependencies:
   fluttertoast: ^8.2.1
   flutter_launcher_icons: "^0.12.0"
   flutter_rating_bar: ^4.0.1
+  flutter_settings_screens: ^0.3.3-null-safety+2
 
 
 dev_dependencies:
