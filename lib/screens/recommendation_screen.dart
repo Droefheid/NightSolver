@@ -94,6 +94,7 @@ class RecommendationState extends State<Recommendation> {
                       scrollDirection: Axis.horizontal,
                     itemBuilder: (context, index) => GenreButton(
                       title: genres[index],
+                      isSelected: false,
                       onSelectedGenre: handleSelectedGenre,
                     ),
                     separatorBuilder: (context, _) => SizedBox(width: getHorizontalSize(8)),

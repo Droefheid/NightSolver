@@ -103,11 +103,13 @@ class GenreButton extends StatefulWidget {
 
   final String title;
   final Function(String, bool) onSelectedGenre;
+  final bool isSelected;
 
   const GenreButton({
     super.key,
     required this.title,
-    required this.onSelectedGenre
+    required this.onSelectedGenre,
+    required this.isSelected
   });
 
   @override
@@ -115,7 +117,6 @@ class GenreButton extends StatefulWidget {
 }
 
 class _GenreButtonState extends State<GenreButton> {
-  bool hasBeenPressed = false;
 
   @override
   Widget build(BuildContext context) {
@@ -123,16 +124,21 @@ class _GenreButtonState extends State<GenreButton> {
       height: getVerticalSize(25),
         child: TextButton(
           onPressed: () => {
-            setState(() {
-              hasBeenPressed = !hasBeenPressed;
-            }),
-            widget.onSelectedGenre(widget.title, hasBeenPressed)
+            widget.onSelectedGenre(widget.title, !widget.isSelected)
           },
-        child: Text(widget.title, style: hasBeenPressed ? AppStyle.txtPoppinsRegular14Gray900 : AppStyle.txtPoppinsRegular14),
-        style: TextButton.styleFrom(
-            backgroundColor: hasBeenPressed ? ColorConstant.red900 : ColorConstant.gray90001,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        ),
+          child: Text(
+            widget.title,
+            style: widget.isSelected
+                ? AppStyle.txtPoppinsRegular14Gray900
+                : AppStyle.txtPoppinsRegular14,
+          ),
+          style: TextButton.styleFrom(
+            backgroundColor:
+            widget.isSelected ? ColorConstant.red900 : ColorConstant.gray90001,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
+          ),
     ));
   }
 }
