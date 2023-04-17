@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:night_solver/screens/salons.dart';
@@ -6,6 +8,7 @@ import 'package:night_solver/utils/movie_info.dart';
 import 'package:http/http.dart' as http;
 import '../theme/app_style.dart';
 import '../utils/color_constant.dart';
+import '../utils/constants.dart';
 import '../utils/custom_widgets.dart';
 import '../utils/genre_utils.dart';
 import '../utils/size_utils.dart';
@@ -19,6 +22,8 @@ class Recommendation extends StatefulWidget {
 class RecommendationState extends State<Recommendation> {
   final List<String> _selectedGenres = ["ALL"];
   List<dynamic> movies = [];
+  final user = FirebaseAuth.instance.currentUser!;
+
 
   void onSelectedGenre(String genre, bool isSelected) {
     setState(() {
@@ -31,6 +36,9 @@ class RecommendationState extends State<Recommendation> {
         _selectedGenres.add(genre);
       } else {
         _selectedGenres.remove(genre);
+        if(_selectedGenres.isEmpty){
+          _selectedGenres.add("ALL");
+        }
       }
     });
 
@@ -41,22 +49,50 @@ class RecommendationState extends State<Recommendation> {
 
     if (!selectedGenreIds.isEmpty && !movies.isEmpty) {
 
-        List<dynamic> filteredMovies = movies
-            .where((movie) =>
-            selectedGenreIds.any((id) => movie['genre_ids'].contains(id)))
-            .toList();
+
+        List<dynamic> filteredMovies = movies.where((movie) {
+          List<dynamic> genres = movie['genres'];
+          for (int i = 0; i < genres.length; i++) {
+            if (selectedGenreIds.contains(genres[i]['id'])) {
+              return true;
+            }
+          }
+          return false;
+        }).toList();
+
         setState(() {
           movies = filteredMovies;
         });
-
+    }else{
+      getData();
     }
   }
+
+
   Future<void> getData() async {
-    final url = 'https://api.themoviedb.org/3/trending/movie/week?api_key=9478d83ca04bd6ee25b942dd7a0ad777';
-    final response = await http.get(Uri.parse(url));
-    final Map<String, dynamic> responseData = json.decode(response.body);
+    List<dynamic> Recmovie = [];
+    List<dynamic> moviesData = [];
+    List<dynamic> RecmovieIds = [];
+    final snapshot = await FirebaseFirestore.instance.collection("users").doc(user.uid).get();
+    if (snapshot.data()!['recommended'] != null) {
+      for (var item in snapshot.data()!['recommended'].entries) {
+        Recmovie.addAll(item.value);
+      }
+    }
+    for(int i=0;i<Recmovie.length;i++){
+      RecmovieIds.add(Recmovie[i]["id"]);
+    }
+    for(var movieId in RecmovieIds){
+      final response = await http.get(Uri.parse(
+          'https://api.themoviedb.org/3/movie/$movieId?api_key='+Constants.theMovieDb));
+      if(response.statusCode == 200){
+        final Map<String, dynamic> finalCard = json.decode(response.body);
+        moviesData.add(finalCard);
+      }
+    }
+
     setState(() {
-      movies = responseData['results'];
+      movies = moviesData;
     });
   }
 
@@ -69,8 +105,9 @@ class RecommendationState extends State<Recommendation> {
   void onTabTapped(int index) {
     if (index==0) Navigator.pushNamed(context, '/');
     if (index==1) Navigator.pushNamed(context, '/search');
-    if (index==3) Navigator.pushNamed(context, '/movieList');
-    if (index==4) Navigator.pushNamed(context, '/settings');
+    if (index==3) Navigator.pushNamed(context, '/friends');
+    if (index==4) Navigator.pushNamed(context, '/movieList');
+    if (index==5) Navigator.pushNamed(context, '/settings');
   }
 
   @override
@@ -176,6 +213,10 @@ class RecommendationState extends State<Recommendation> {
             BottomNavigationBarItem(
                 icon: Icon(Icons.recommend),
                 label: "Recommendation"
+            ),
+            BottomNavigationBarItem(
+                icon: Icon(Icons.group_rounded),
+                label: "Friends"
             ),
             BottomNavigationBarItem(
                 icon: Icon(Icons.bookmark),
