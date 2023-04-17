@@ -36,7 +36,7 @@ class _HomeScreenState extends State<HomeScreen> {
     if (index==2) Navigator.pushNamed(context, '/recommendation');
     if (index==3) Navigator.pushNamed(context, '/friends');
     if (index==4) Navigator.pushNamed(context, '/movieList');
-    if (index==4) Navigator.pushNamed(context, '/settings');
+    if (index==5) Navigator.pushNamed(context, '/settings');
   }
 
   Future<void> getData() async {
