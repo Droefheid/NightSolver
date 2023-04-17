@@ -2,6 +2,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:night_solver/screens/reset_password_screen.dart';
+import 'package:night_solver/theme/app_style.dart';
+import 'package:night_solver/utils/color_constant.dart';
+import 'package:night_solver/utils/size_utils.dart';
 
 import 'custom_toast.dart';
 
@@ -51,7 +54,7 @@ class _SignInScreenState extends State<SignInScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: Colors.grey[200],
+        backgroundColor: ColorConstant.gray900,
         body: SafeArea(
             child: Center(
           child: SingleChildScrollView(
@@ -60,61 +63,71 @@ class _SignInScreenState extends State<SignInScreen> {
 
               ImageIcon(
                 AssetImage("assets/logo_foreground.png"),
-                size: 80,
+                size: 100,
+                color: ColorConstant.red900,
               ),
-
-              SizedBox(height: 10),
-
-              Text('Welcome on NightSolver',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30)),
-              SizedBox(height: 40),
+              Text("NightSolver", style: AppStyle.txtPoppinsBold30,),
+              SizedBox(height: getVerticalSize(32),),
+              Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text.rich(
+                      TextSpan( children: [
+                        WidgetSpan(child: SizedBox(width: getHorizontalSize(24))), 
+                        TextSpan(
+                            text: "Welcome ",
+                            style: AppStyle.txtPoppinsBold36
+                        ), 
+                        TextSpan(
+                            text: "!", 
+                            style: AppStyle.txtPoppinsBold36Red
+                        ),
+                      ]
+                      )
+                  )
+              ),
+              SizedBox(height: getVerticalSize(16)),
 
               //email input
               Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 25.0),
+                  padding: getPadding(all: 16),
                   child: TextField(
                       controller: _emailController,
                       decoration: InputDecoration(
-                        enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.white),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.red.shade900),
-                          borderRadius: BorderRadius.circular(12),
+                        prefixIcon: Icon(Icons.email_rounded, color: ColorConstant.red900),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16)
                         ),
                         hintText: 'Email',
-                        fillColor: Colors.grey[100],
+                        hintStyle: AppStyle.txtPoppinsMedium18GreyLight,
+                        fillColor: ColorConstant.gray90001,
                         filled: true,
-                      ))),
-
-              SizedBox(height: 10),
+                      ),
+                      style: AppStyle.txtPoppinsMedium18,
+                  )
+              ),
 
               //password input
               Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 25.0),
+                  padding: getPadding(all: 16),
                   child: TextField(
                     controller: _passwordController,
                     decoration: InputDecoration(
-                      enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.white),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.red.shade900),
-                        borderRadius: BorderRadius.circular(12),
+                      prefixIcon: Icon(Icons.lock_rounded, color: ColorConstant.red900),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16)
                       ),
                       hintText: 'Password',
-                      fillColor: Colors.grey[100],
+                      hintStyle: AppStyle.txtPoppinsMedium18GreyLight,
+                      fillColor: ColorConstant.gray90001,
                       filled: true,
                     ),
+                    style: AppStyle.txtPoppinsMedium18,
                     obscureText: true,
                   )),
 
-              SizedBox(height: 20),
 
               Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   GestureDetector(
                     onTap: () {
@@ -123,58 +136,49 @@ class _SignInScreenState extends State<SignInScreen> {
                         MaterialPageRoute(builder: (context) => const ResetPasswordScreen()),
                       );
                     },
-                    child: Text('Forgot password ?',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 15,
-                        )),
+                    child: Text('Forgot Password ?',
+                        style: AppStyle.txtPoppinsRegular12
+                    ),
                   ),
+                  SizedBox(width: getHorizontalSize(16),)
                 ],
               ),
 
-              SizedBox(height: 20),
-
+              SizedBox(height: getVerticalSize(16),),
 
               //sign in button
               GestureDetector(
                 onTap: signIn,
                 child: Container(
-                  padding: EdgeInsets.all(20),
+                  padding: getPadding(all: 16),
                   margin: EdgeInsets.symmetric(horizontal: 25.0),
                   decoration: BoxDecoration(
-                      color: Colors.red[900],
-                      borderRadius: BorderRadius.circular(12)),
+                      color: ColorConstant.red900,
+                      borderRadius: BorderRadius.circular(16)),
                   child: Center(
-                      child: Text('Sign In',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 20,
-                          ))),
+                      child: Text(
+                          'SIGN IN',
+                          style: AppStyle.txtPoppinsMedium18Grey
+                      )),
                 ),
               ),
-
-              SizedBox(height: 25),
-              //register now
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text('Not a member?',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 15,
-                      )),
-                  GestureDetector(
-                    onTap: widget.showSignUpScreen,
-                    child: Text(' Register Now',
-                        style: TextStyle(
-                          color: Colors.red[900],
-                          fontWeight: FontWeight.bold,
-                          fontSize: 15,
-                        )),
+              SizedBox(height: getVerticalSize(16),),
+              GestureDetector(
+                onTap: widget.showSignUpScreen,
+                child: Container(
+                  padding: getPadding(all: 16),
+                  margin: EdgeInsets.symmetric(horizontal: 25.0),
+                  decoration: BoxDecoration(
+                      color: ColorConstant.red900,
+                      borderRadius: BorderRadius.circular(16)),
+                  child: Center(
+                      child: Text(
+                          'REGISTER',
+                          style: AppStyle.txtPoppinsMedium18Grey
+                      )
                   ),
-                ],
-              ),
+                ),
+              )
             ]),
           ),
         )));

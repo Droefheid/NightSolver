@@ -28,7 +28,11 @@ class VerticalMovieCard extends StatelessWidget {
         ClipRRect(
             borderRadius: BorderRadius.circular(20),
             child: Stack( children:[
-              Image.network(item.urlImage, fit: BoxFit.fill, filterQuality: FilterQuality.high,),
+              Container(
+                  height: getVerticalSize(273),
+                  width: getHorizontalSize(182),
+                  child:
+              Image.network(item.urlImage, fit: BoxFit.fill, filterQuality: FilterQuality.high,)),
               Positioned(
                   right: getHorizontalSize(-1),
                   child: IconButton(onPressed: null, icon: Icon(Icons.bookmark_border, color: ColorConstant.whiteA700))

@@ -2,7 +2,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:http/http.dart';
+import 'package:night_solver/utils/color_constant.dart';
+import 'package:night_solver/utils/size_utils.dart';
 
+import '../theme/app_style.dart';
 import 'custom_toast.dart';
 
 class SignUpScreen extends StatefulWidget {
@@ -75,143 +79,138 @@ class _SignUpScreenState extends State<SignUpScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: Colors.grey[200],
+        backgroundColor: ColorConstant.gray900,
         body: SafeArea(
             child: Center(
           child: SingleChildScrollView(
             child:
                 Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+
+                  Padding(
+                      padding: getPadding(bottom: 0),
+                      child: Align(
+                          alignment: Alignment.topLeft,
+                          child: IconButton(
+                              onPressed: widget.showSignInScreen,
+                              icon: Icon(Icons.arrow_back_ios_new_rounded, color: ColorConstant.red900, size: getSize(50),)
+                          )
+                      )
+                  ),
+
               ImageIcon(
                 AssetImage("assets/logo_foreground.png"),
-                size: 80,
+                size: 100,
+                color: ColorConstant.red900,
               ),
+              Text("NightSolver", style: AppStyle.txtPoppinsBold30,),
+              
+              SizedBox(height: getVerticalSize(16),),
 
-
-              SizedBox(height: 10),
-
-              Text('Create an account',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30)),
-              SizedBox(height: 30),
+              Padding(
+                  padding: getPadding(left: 18, top: 16),
+                  child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text.rich(
+                          TextSpan( children: [
+                            TextSpan(text: "Create an\naccount", style: AppStyle.txtPoppinsBold36),
+                            TextSpan(text: ".", style: AppStyle.txtPoppinsBold36Red)
+                          ]
+                          )
+                      )
+                  )
+              ),
 
               //username input
               Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 25.0),
+                  padding: getPadding(all: 16),
                   child: TextField(
                       controller: _usernameController,
                       decoration: InputDecoration(
-                        enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.white),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.red.shade900),
-                          borderRadius: BorderRadius.circular(12),
+                        prefixIcon: Icon(Icons.person_2_rounded, color: ColorConstant.red900),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16)
                         ),
                         hintText: 'Username',
-                        fillColor: Colors.grey[100],
+                        hintStyle: AppStyle.txtPoppinsMedium18GreyLight,
+                        fillColor: ColorConstant.gray90001,
                         filled: true,
-                      ))),
-
-                  SizedBox(height: 10),
-
+                      ),
+                      style: AppStyle.txtPoppinsMedium18,
+                  )
+              ),
 
               //email input
               Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 25.0),
+                  padding: getPadding(bottom: 16, left: 16, right: 16),
                   child: TextField(
                       controller: _emailController,
                       decoration: InputDecoration(
-                        enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.white),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.red.shade900),
-                          borderRadius: BorderRadius.circular(12),
+                        prefixIcon: Icon(Icons.email_rounded, color: ColorConstant.red900),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16)
                         ),
                         hintText: 'Email',
-                        fillColor: Colors.grey[100],
+                        hintStyle: AppStyle.txtPoppinsMedium18GreyLight,
+                        fillColor: ColorConstant.gray90001,
                         filled: true,
-                      ))),
+                      ),
+                      style: AppStyle.txtPoppinsMedium18,
+                  )
+              ),
 
-              SizedBox(height: 10),
 
               //password input
               Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 25.0),
+                  padding: getPadding(bottom: 16, left: 16, right: 16),
                   child: TextField(
                     controller: _passwordController,
                     decoration: InputDecoration(
-                      enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.white),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.red.shade900),
-                        borderRadius: BorderRadius.circular(12),
+                      prefixIcon: Icon(Icons.lock_rounded, color: ColorConstant.red900),
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16)
                       ),
                       hintText: 'Password',
-                      fillColor: Colors.grey[100],
+                      hintStyle: AppStyle.txtPoppinsMedium18GreyLight,
+                      fillColor: ColorConstant.gray90001,
                       filled: true,
                     ),
+                    style: AppStyle.txtPoppinsMedium18,
                     obscureText: true,
                   )),
 
-              SizedBox(height: 10),
               //confirm password input
               Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 25.0),
+                  padding: getPadding(bottom: 16, left: 16, right: 16),
                   child: TextField(
                     controller: _confirmPasswordController,
                     decoration: InputDecoration(
-                      enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.white),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.red.shade900),
-                        borderRadius: BorderRadius.circular(12),
+                      prefixIcon: Icon(Icons.lock_rounded, color: ColorConstant.red900),
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16)
                       ),
                       hintText: 'Confirm Password',
-                      fillColor: Colors.grey[100],
+                      hintStyle: AppStyle.txtPoppinsMedium18GreyLight,
+                      fillColor: ColorConstant.gray90001,
                       filled: true,
                     ),
+                    style: AppStyle.txtPoppinsMedium18,
                     obscureText: true,
                   )),
 
-              SizedBox(
-                height: 30,
-              ),
+              
               //sign in button
               GestureDetector(
                 onTap: signUp,
                 child: Container(
-                  padding: EdgeInsets.all(20),
-                  margin: EdgeInsets.symmetric(horizontal: 25.0),
+                  padding: getPadding(all: 16),
+                  margin: getMargin(left: 16, right: 16),
                   decoration: BoxDecoration(
-                      color: Colors.red[900],
+                      color: ColorConstant.red900,
                       borderRadius: BorderRadius.circular(12)),
                   child: Center(
-                      child: Text('Sign Up',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 20,
-                          ))),
+                      child: Text('REGISTER',
+                          style: AppStyle.txtPoppinsMedium18Grey)),
                 ),
-              ),
-
-              SizedBox(height: 25),
-              //register now
-
-              GestureDetector(
-                onTap: widget.showSignInScreen,
-                child: Text('Login now',
-                    style: TextStyle(
-                      color: Colors.red[900],
-                      fontWeight: FontWeight.bold,
-                      fontSize: 15,
-                    )),
               ),
             ]),
           ),

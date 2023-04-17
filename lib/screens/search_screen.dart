@@ -80,7 +80,7 @@ class _SearchScreenState extends State<SearchScreen> {
       resizeToAvoidBottomInset: false,
       backgroundColor: ColorConstant.gray900,
       appBar: AppBar(
-          //forceMaterialTransparency: true,
+          forceMaterialTransparency: true,
           leading: IconButton(
             icon: Icon(Icons.arrow_back_ios_new_rounded, color: ColorConstant.red900),
             onPressed: () => Navigator.pop(context, true),

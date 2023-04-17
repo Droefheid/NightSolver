@@ -36,7 +36,7 @@ class _SettingScreenState extends State<SettingScreen> {
     return Scaffold(
       backgroundColor: ColorConstant.gray900,
       appBar: AppBar(
-          //forceMaterialTransparency: true,
+          forceMaterialTransparency: true,
           leading: IconButton(
             icon: Icon(Icons.arrow_back_ios_new_rounded, color: ColorConstant.red900),
             onPressed: () => Navigator.pop(context, true),
@@ -57,31 +57,24 @@ class _SettingScreenState extends State<SettingScreen> {
       ),
       body: Column(
         children: [
-          SimpleSettingsTile(
-              title: "Logout",
-              titleTextStyle: AppStyle.txtPoppinsRegular16Bluegray400,
-              leading: Icon(Icons.logout_rounded, color: ColorConstant.red900),
+          TextField(
               onTap: () => {
                 FirebaseAuth.instance.signOut(),
                 Navigator.of(context).pop()
                 //TODO
-                }
-              ,
+              },
+              decoration: InputDecoration(
+                prefixIcon: Icon(Icons.logout_rounded, color: ColorConstant.red900),
+                hintText: "Log out",
+                hintStyle: AppStyle.txtPoppinsRegular16WhiteA700,
+                enabledBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(color: ColorConstant.red900),
+                ),
+                focusedBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(color: ColorConstant.red900),
+                ),
+              ),
           ),
-          Align(
-              alignment: Alignment.centerLeft,
-              child: Text.rich(
-                  TextSpan(
-                    children: [
-                      WidgetSpan(child: Icon(Icons.logout_rounded, color: ColorConstant.red900)),
-                      TextSpan(
-                          text: "Log out"
-                      ),
-                    ],
-                    style: AppStyle.txtPoppinsRegular16WhiteA700,
-                  )
-              )
-          )
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
