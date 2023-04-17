@@ -359,13 +359,13 @@ class RoomInfo extends StatelessWidget {
   showWarningDialog(BuildContext context, dynamic salon){
     String salonName = salon.keys.toList().first;
     Widget cancelButton = MaterialButton(
-      child: Text("Cancel"),
+      child: Text("Cancel", style: AppStyle.txtPoppinsMedium18,),
       onPressed:  () {
         Navigator.of(context).pop();
       },
     );
     Widget proceedButton = MaterialButton(
-      child: Text("Proceed"),
+      child: Text("Proceed", style: AppStyle.txtPoppinsMedium18Red,),
       onPressed:  () async {
         leaveSalon(salon);
         await Navigator.of(context).push(MaterialPageRoute(builder: (_) => Salons()));
@@ -374,15 +374,31 @@ class RoomInfo extends StatelessWidget {
       },
     );
     AlertDialog alert = AlertDialog(
-      title: Text("Warning"),
+      title: Text.rich(
+          TextSpan(children: [
+            TextSpan(
+              text:"Warning",
+              style: AppStyle.txtPoppinsMedium18,
+            ),
+            TextSpan(
+              text: " !",
+              style: AppStyle.txtPoppinsMedium18Red
+            )
+          ])
+      ),
       content: Text(
           "You are about to leave the room \'$salonName\'.\n"
-              "Do you wish to proceed?"
+              "Do you wish to proceed?",
+        style: AppStyle.txtPoppinsMedium18GreyLight,
       ),
       actions: [
         cancelButton,
         proceedButton,
       ],
+      backgroundColor: ColorConstant.gray90001,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16)
+      ),
     );
     showDialog(
       context: context,
