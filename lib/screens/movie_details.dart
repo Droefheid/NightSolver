@@ -24,6 +24,7 @@ class MovieDetail extends StatefulWidget {
   var apiKey = '9478d83ca04bd6ee25b942dd7a0ad777';
   Map<String, dynamic> providers = {};
 
+
   MovieDetail({super.key, required this.item});
 
   @override
@@ -208,14 +209,7 @@ class _MovieDetailState extends State<MovieDetail> {
 
   @override
   Widget build(BuildContext context) {
-    return new Scaffold(
-      /*appBar: new AppBar(
-        forceMaterialTransparency: true,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios_new_rounded, color: ColorConstant.red900),
-          onPressed: () => Navigator.pop(context, true),
-        ),
-      ),*/
+    return Scaffold(
       body: SafeArea(
         child: Stack(
           children: [
@@ -223,80 +217,102 @@ class _MovieDetailState extends State<MovieDetail> {
               height: double.infinity,
               color: ColorConstant.gray900,
             ),
-            Container(
-              height: getVerticalSize(581),
-              width: getHorizontalSize(561),
-              child: Image.network(
-                widget.item.urlImage,
-                height: MediaQuery.of(context).size.height * 0.5,
-                fit: BoxFit.cover,
-              ),
-            ),
-            /*const Positioned.fill(child: DecoratedBox(decoration: BoxDecoration(
-            gradient: LinearGradient(colors: [
-              Colors.transparent,
-              Color(0x111111)
-            ],
-            begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              stops: [0.3, 0.5]
-            ),
-          ))),*/
-            Positioned(
-              child: Text(
-                widget.item.title,
-                style: AppStyle.txtPoppinsBold30,
-                textAlign: TextAlign.center,
-              ),
-              top: getVerticalSize(540),
-              left: getHorizontalSize(32),
-            ),
-            Positioned(
-              child: Text.rich(TextSpan(children: [
-                WidgetSpan(child: SizedBox(width: getHorizontalSize(20))),
-                TextSpan(text: widget.item.rating.toString()),
-                WidgetSpan(child: SizedBox(width: getHorizontalSize(20))),
-                WidgetSpan(
-                  child: RatingBarIndicator(
-                    itemBuilder: (context, index) =>
-                        Icon(Icons.star_rounded, color: ColorConstant.red900),
-                    itemCount: 5,
-                    rating: widget.item.rating,
-                    itemSize: getSize(28),
-                    unratedColor: ColorConstant.gray700,
+            SingleChildScrollView(
+              child: Column(
+                children: [
+                  Container(
+                    height: getVerticalSize(500),
+                    width: getHorizontalSize(561),
+                    child: Image.network(
+                      widget.item.urlImage,
+                      height: MediaQuery.of(context).size.height * 0.3,
+                      fit: BoxFit.cover,
+                    ),
                   ),
-                )
-              ], style: AppStyle.txtPoppinsMedium22)),
-              top: getVerticalSize(600),
+                  SizedBox(height: getVerticalSize(20)),
+                  Text(
+                    widget.item.title,
+                    style: AppStyle.txtPoppinsBold30,
+                    textAlign: TextAlign.center,
+                  ),
+                  SizedBox(height: getVerticalSize(20)),
+                  Text.rich(TextSpan(children: [
+                    WidgetSpan(child: SizedBox(width: getHorizontalSize(20))),
+                    TextSpan(text: widget.item.rating.toString()),
+                    WidgetSpan(child: SizedBox(width: getHorizontalSize(20))),
+                    WidgetSpan(
+                      child: RatingBarIndicator(
+                        itemBuilder: (context, index) =>
+                            Icon(Icons.star_rounded, color: ColorConstant.red900),
+                        itemCount: 5,
+                        rating: widget.item.rating,
+                        itemSize: getSize(28),
+                        unratedColor: ColorConstant.gray700,
+                      ),
+                    )
+                  ], style: AppStyle.txtPoppinsMedium22)),
+                  SizedBox(height: getVerticalSize(20)),
+                  buildProviderList(),
+                  SizedBox(height: getVerticalSize(20)),
+                  Container(
+                    width: getHorizontalSize(379),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                      color: ColorConstant.gray800,
+                    ),
+                    padding: EdgeInsets.all(getSize(16)),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Synopsis",
+                          style: AppStyle.txtPoppinsBold20,
+                        ),
+                        SizedBox(height: getVerticalSize(10)),
+                        Text(
+                          widget.item.synopsis,
+                          style: AppStyle.txtPoppinsRegular13,
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: getVerticalSize(20)),
+                ],
+              ),
             ),
             Positioned(
-              child: Container(
-                  height: getVerticalSize(120),
-                  width: getHorizontalSize(379),
-                  child: Text(widget.item.synopsis,
-                      style: AppStyle.txtPoppinsRegular13)),
-              top: getVerticalSize(660),
+              top: getVerticalSize(20),
               left: getHorizontalSize(16),
-            ),
-            IconButton(
+              child: IconButton(
+                icon: Icon(
+                  Icons.arrow_back_ios_new_rounded,
+                  color: ColorConstant.red900,
+                  size: 45,
+                ),
                 onPressed: () => Navigator.pop(context, true),
-                icon: Icon(Icons.arrow_back_ios_new_rounded,
-                    color: ColorConstant.red900, size: 45)),
+              ),
+            ),
             Positioned(
+              top: getVerticalSize(20),
+              right: getHorizontalSize(16),
               child: IconButton(
                 icon: Icon(
                   Icons.bookmark_border,
                   color: ColorConstant.whiteA700,
                   size: 45,
                 ),
-                onPressed: () => addMovie(context),
+                onPressed: () {
+                  if (widget.item.canDelete) {
+                    deleteMovie(context,widget.item.id);
+                  } else {
+                    addMovie(context);
+                  }
+                },
               ),
-              right: getHorizontalSize(16),
-            )
+            ),
           ],
         ),
-    ),
-
+      ),
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: ColorConstant.gray900,
         selectedItemColor: ColorConstant.red900,
