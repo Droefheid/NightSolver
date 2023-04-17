@@ -1,20 +1,14 @@
 import 'dart:convert';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:night_solver/screens/salons.dart';
-import 'package:night_solver/screens/search_screen.dart';
-import 'package:night_solver/screens/settings_screen.dart';
 import 'package:night_solver/utils/movie_info.dart';
 import 'package:http/http.dart' as http;
-
 import '../theme/app_style.dart';
 import '../utils/color_constant.dart';
 import '../utils/custom_widgets.dart';
 import '../utils/size_utils.dart';
-import 'home_screen.dart';
 import 'movie_details.dart';
-import 'movie_list.dart';
 
 class Recommendation extends StatefulWidget {
   @override
@@ -24,6 +18,10 @@ class Recommendation extends StatefulWidget {
 class RecommendationState extends State<Recommendation> {
 
   List<dynamic> movies = [];
+
+  void handleSelectedGenre(String genre, bool onSelect) {
+
+  }
 
   Future<void> getData() async {
     final url = 'https://api.themoviedb.org/3/trending/movie/week?api_key=9478d83ca04bd6ee25b942dd7a0ad777';
@@ -41,10 +39,10 @@ class RecommendationState extends State<Recommendation> {
   }
 
   void onTabTapped(int index) {
-    if (index==0) Navigator.of(context).push(MaterialPageRoute(builder: (_) => HomeScreen()));
-    if (index==1) Navigator.of(context).push(MaterialPageRoute(builder: (_) => SearchScreen()));
-    if(index==3) Navigator.of(context).push(MaterialPageRoute(builder: (_) => MovieList()));
-    if(index==4) Navigator.of(context).push(MaterialPageRoute(builder: (_) => SettingScreen()));
+    if (index==0) Navigator.pushNamed(context, '/');
+    if (index==1) Navigator.pushNamed(context, '/search');
+    if (index==3) Navigator.pushNamed(context, '/movieList');
+    if (index==4) Navigator.pushNamed(context, '/settings');
   }
 
   @override
@@ -57,8 +55,7 @@ class RecommendationState extends State<Recommendation> {
           forceMaterialTransparency: true,
           leading: IconButton(
             icon: Icon(Icons.arrow_back_ios_new_rounded, color: ColorConstant.red900),
-            onPressed: () => Navigator.pop(context, true),
-          ),
+              onPressed: () => Navigator.of(context).pop()),
           title: RichText(
               text: TextSpan(children: [
                 TextSpan(
@@ -88,7 +85,11 @@ class RecommendationState extends State<Recommendation> {
                   height: getVerticalSize(45),
                   child: ListView.separated(
                       scrollDirection: Axis.horizontal,
-                    itemBuilder: (context, index) => GenreButton(title: genres[index]),
+                    itemBuilder: (context, index) => GenreButton(
+                      title: genres[index],
+                      isSelected: false,
+                      onSelectedGenre: handleSelectedGenre,
+                    ),
                     separatorBuilder: (context, _) => SizedBox(width: getHorizontalSize(8)),
                     itemCount: genres.length),
                 )
@@ -115,7 +116,7 @@ class RecommendationState extends State<Recommendation> {
                               style: ButtonStyle(
                                 backgroundColor: MaterialStateProperty.all<Color>(Colors.transparent)
                               ),
-                              onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => Salons())),
+                              onPressed: () => Navigator.pushNamed(context, '/salons'),
                               child: Icon(Icons.add_circle_sharp, color: ColorConstant.red900, size: getSize(38),))
                       )
                     ])

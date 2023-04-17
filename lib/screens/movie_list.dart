@@ -4,16 +4,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
-import 'package:night_solver/screens/home_screen.dart';
-import 'package:night_solver/screens/recommendation_screen.dart';
-import 'package:night_solver/screens/search_screen.dart';
-import 'package:night_solver/screens/settings_screen.dart';
 import 'package:night_solver/theme/app_style.dart';
 import 'package:night_solver/utils/custom_widgets.dart';
 import '../utils/color_constant.dart';
+import '../utils/constants.dart';
 import '../utils/movie_info.dart';
 import '../utils/size_utils.dart';
-import 'movie_details.dart';
 
 class MovieList extends StatefulWidget {
   @override
@@ -21,7 +17,6 @@ class MovieList extends StatefulWidget {
 }
 
 class _MovieListState extends State<MovieList> {
-  final apiKey = '9478d83ca04bd6ee25b942dd7a0ad777';
   List<dynamic> movies = [];
   final TextEditingController _controller = TextEditingController();
   final ScrollController _scrollController = ScrollController();
@@ -39,7 +34,7 @@ class _MovieListState extends State<MovieList> {
     if (moviesId != null) {
       for (String movieId in moviesId) {
         final response = await http.get(Uri.parse(
-            'https://api.themoviedb.org/3/movie/$movieId?api_key=$apiKey'));
+            'https://api.themoviedb.org/3/movie/$movieId?api_key='+Constants.theMovieDb));
 
         if (response.statusCode == 200) {
           final Map<String, dynamic> responseData = json.decode(response.body);
@@ -58,7 +53,7 @@ class _MovieListState extends State<MovieList> {
     try {
       if (value != '') {
         final url =
-            'https://api.themoviedb.org/3/search/movie?api_key=$apiKey&query=$value';
+            'https://api.themoviedb.org/3/search/movie?api_key='+Constants.theMovieDb+'&query=$value';
         final response = await http.get(Uri.parse(url));
         final responseData = json.decode(response.body);
         resetScrollPosition();
@@ -88,10 +83,10 @@ class _MovieListState extends State<MovieList> {
   }
 
   void onTabTapped(int index) {
-    if(index==0) Navigator.of(context).push(MaterialPageRoute(builder: (_) => HomeScreen()));
-    if(index==1) Navigator.of(context).push(MaterialPageRoute(builder: (_) => SearchScreen()));
-    if(index==2) Navigator.of(context).push(MaterialPageRoute(builder: (_) => Recommendation()));
-    if(index==4) Navigator.of(context).push(MaterialPageRoute(builder: (_) => SettingScreen()));
+    if (index==0) Navigator.pushNamed(context, '/');
+    if (index==1) Navigator.pushNamed(context, '/search');
+    if (index==2) Navigator.pushNamed(context, '/recommendation');
+    if (index==4) Navigator.pushNamed(context, '/settings');
   }
 
   @override
@@ -103,7 +98,7 @@ class _MovieListState extends State<MovieList> {
         forceMaterialTransparency: true,
         leading: IconButton(
           icon: Icon(Icons.arrow_back_ios_new_rounded, color: ColorConstant.red900),
-          onPressed: () => Navigator.pop(context, true),
+            onPressed: () => Navigator.of(context).pop()
         ),
         title: RichText(
             text: TextSpan(children: [

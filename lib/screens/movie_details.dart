@@ -2,8 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'dart:ui' as ui;
 import 'package:http/http.dart' as http;
 import 'package:night_solver/screens/home_screen.dart';
 import 'package:night_solver/screens/recommendation_screen.dart';
@@ -38,21 +36,11 @@ class _MovieDetailState extends State<MovieDetail> {
   final user = FirebaseAuth.instance.currentUser!;
 
   void onTabTapped(int index) {
-    if (index == 0)
-      Navigator.of(context)
-          .push(MaterialPageRoute(builder: (_) => HomeScreen()));
-    if (index == 1)
-      Navigator.of(context)
-          .push(MaterialPageRoute(builder: (_) => SearchScreen()));
-    if (index == 2)
-      Navigator.of(context)
-          .push(MaterialPageRoute(builder: (_) => Recommendation()));
-    if (index == 3)
-      Navigator.of(context)
-          .push(MaterialPageRoute(builder: (_) => MovieList()));
-    if (index == 4)
-      Navigator.of(context)
-          .push(MaterialPageRoute(builder: (_) => SettingScreen()));
+    if (index==0) Navigator.pushNamed(context, '/');
+    if (index==1) Navigator.pushNamed(context, '/search');
+    if (index==2) Navigator.pushNamed(context, '/recommendation');
+    if (index==3) Navigator.pushNamed(context, '/movieList');
+    if (index==4) Navigator.pushNamed(context, '/settings');
   }
 
   Future<List> recommended(String id) async {
