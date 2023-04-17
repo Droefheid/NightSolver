@@ -96,15 +96,16 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           )
                       )
                   ),
+                  SizedBox(height: getVerticalSize(90),),
 
               ImageIcon(
                 AssetImage("assets/logo_foreground.png"),
                 size: 100,
                 color: ColorConstant.red900,
               ),
-              Text("NightSolver", style: AppStyle.txtPoppinsBold30,),
+              //Text("NightSolver", style: AppStyle.txtPoppinsBold30,),
               
-              SizedBox(height: getVerticalSize(16),),
+              SizedBox(height: getVerticalSize(30),),
 
               Padding(
                   padding: getPadding(left: 18, top: 16),

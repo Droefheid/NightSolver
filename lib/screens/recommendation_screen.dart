@@ -7,6 +7,7 @@ import 'package:http/http.dart' as http;
 import '../theme/app_style.dart';
 import '../utils/color_constant.dart';
 import '../utils/custom_widgets.dart';
+import '../utils/genre_utils.dart';
 import '../utils/size_utils.dart';
 import 'movie_details.dart';
 
@@ -16,13 +17,40 @@ class Recommendation extends StatefulWidget {
 }
 
 class RecommendationState extends State<Recommendation> {
-
+  final List<String> _selectedGenres = ["ALL"];
   List<dynamic> movies = [];
 
-  void handleSelectedGenre(String genre, bool onSelect) {
+  void onSelectedGenre(String genre, bool isSelected) {
+    setState(() {
+      if (isSelected) {
+        if (genre == "ALL") {
+          _selectedGenres.clear();
+        } else if (_selectedGenres.contains("ALL")) {
+          _selectedGenres.remove("ALL");
+        }
+        _selectedGenres.add(genre);
+      } else {
+        _selectedGenres.remove(genre);
+      }
+    });
 
+    List<int> selectedGenreIds = _selectedGenres
+        .map((genre) => genreToId(genre))
+        .where((id) => id != -1)
+        .toList();
+
+    if (!selectedGenreIds.isEmpty && !movies.isEmpty) {
+
+        List<dynamic> filteredMovies = movies
+            .where((movie) =>
+            selectedGenreIds.any((id) => movie['genre_ids'].contains(id)))
+            .toList();
+        setState(() {
+          movies = filteredMovies;
+        });
+
+    }
   }
-
   Future<void> getData() async {
     final url = 'https://api.themoviedb.org/3/trending/movie/week?api_key=9478d83ca04bd6ee25b942dd7a0ad777';
     final response = await http.get(Uri.parse(url));
@@ -87,8 +115,8 @@ class RecommendationState extends State<Recommendation> {
                       scrollDirection: Axis.horizontal,
                     itemBuilder: (context, index) => GenreButton(
                       title: genres[index],
-                      isSelected: false,
-                      onSelectedGenre: handleSelectedGenre,
+                      onSelectedGenre: onSelectedGenre,
+                      isSelected: _selectedGenres.contains(genres[index]),
                     ),
                     separatorBuilder: (context, _) => SizedBox(width: getHorizontalSize(8)),
                     itemCount: genres.length),

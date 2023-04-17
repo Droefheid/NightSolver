@@ -66,8 +66,10 @@ class _SignInScreenState extends State<SignInScreen> {
                 size: 100,
                 color: ColorConstant.red900,
               ),
-              Text("NightSolver", style: AppStyle.txtPoppinsBold30,),
-              SizedBox(height: getVerticalSize(32),),
+              //Text("NightSolver", style: AppStyle.txtPoppinsBold30,),
+
+
+              SizedBox(height: getVerticalSize(110)),
               Align(
                   alignment: Alignment.centerLeft,
                   child: Text.rich(
