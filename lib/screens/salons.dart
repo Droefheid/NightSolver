@@ -283,9 +283,7 @@ class RoomInfo extends StatelessWidget {
             ),
           ),
           SizedBox(width: getHorizontalSize(18)),
-          Container(
-            width: getHorizontalSize(214),
-            height: getVerticalSize(141),
+          Expanded(
             child: Column(
               children: [
                 Padding(
@@ -305,7 +303,7 @@ class RoomInfo extends StatelessWidget {
                     child: Row(
                       children: [
                         Padding(
-                            padding: getPadding(left: 100, right: 16),
+                            padding: getPadding(left: 80, right: 16),
                             child: IconButton(
                                 icon: Icon(Icons.person_outline_rounded, color: ColorConstant.whiteA700),
                               onPressed: () {

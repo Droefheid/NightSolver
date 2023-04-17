@@ -168,9 +168,9 @@ class RecommendationState extends State<Recommendation> {
                       GridView.builder(
                         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                             crossAxisCount: 2,
-                            childAspectRatio: 0.65,
-                            mainAxisSpacing:getVerticalSize(2),
-                            crossAxisSpacing: getHorizontalSize(0)
+                            childAspectRatio: 0.6,
+                            mainAxisSpacing:getVerticalSize(10),
+                            crossAxisSpacing: 0
                         ),
                         itemBuilder: (context, index) => ShortVerticalCard(item: new MovieInfo(movies[index])),
                         itemCount: movies.length,
@@ -236,12 +236,11 @@ class RecommendationState extends State<Recommendation> {
     onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => MovieDetail(item: item))),
     child: Column(
       children: [
-        Container(
-            height: getVerticalSize(273),
+        Expanded(
             child: ClipRRect(
                 borderRadius: BorderRadius.circular(20),
                 child: Stack( children:[
-                  Image.network(item.urlImage, fit: BoxFit.fill, filterQuality: FilterQuality.high),
+                  AspectRatio(aspectRatio: 0.7, child: Image.network(item.urlImage, fit: BoxFit.fill, filterQuality: FilterQuality.high)),
                   Positioned(
                       right: getHorizontalSize(-1),
                       child: IconButton(onPressed: null, icon: Icon(Icons.bookmark_border, color: ColorConstant.whiteA700))
@@ -254,6 +253,7 @@ class RecommendationState extends State<Recommendation> {
             padding: getPadding(left: 10),
             child: Container(
                 width: getHorizontalSize(160),
+                height: getVerticalSize(40),
                 child: Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
