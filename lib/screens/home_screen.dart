@@ -198,7 +198,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       overflow: TextOverflow.ellipsis,
                       textAlign: TextAlign.left,
                       style: AppStyle.txtPoppinsBold20,
-                      maxLines: 2,
+                      maxLines: 1,
                     )
                 )
             ),
