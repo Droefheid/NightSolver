@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:night_solver/screens/custom_toast.dart';
 import 'package:night_solver/screens/preference_page.dart';
 import 'package:night_solver/screens/result_screen.dart';
+import 'package:night_solver/utils/size_utils.dart';
 import '../utils/movie_info.dart';
 import 'movie_details.dart';
 import 'package:night_solver/screens/search_screen.dart';
@@ -77,10 +78,10 @@ class _SalonsState extends State<Salons> {
   }
 
   void onTabTapped(int index) {
-    if (index==0) Navigator.of(context).push(MaterialPageRoute(builder: (_) => HomeScreen()));
-    if (index==1) Navigator.of(context).push(MaterialPageRoute(builder: (_) => SearchScreen()));
-    if(index==3) Navigator.of(context).push(MaterialPageRoute(builder: (_) => MovieList()));
-    if(index==4) Navigator.of(context).push(MaterialPageRoute(builder: (_) => SettingScreen()));
+    if (index==0) Navigator.pushNamed(context, '/');
+    if (index==1) Navigator.pushNamed(context, '/search');
+    if (index==3) Navigator.pushNamed(context, '/movieList');
+    if (index==4) Navigator.pushNamed(context, '/settings');
   }
 
   @override
@@ -102,10 +103,10 @@ class _SalonsState extends State<Salons> {
               backgroundColor: ColorConstant.red900,
           ),
           appBar: AppBar(
-              //forceMaterialTransparency: true,
+              backgroundColor: ColorConstant.gray900,
               leading: IconButton(
                 icon: Icon(Icons.arrow_back_ios_new_rounded, color: ColorConstant.red900),
-                onPressed: () => Navigator.pop(context, true),
+                onPressed: () => Navigator.of(context).pop(),
               ),
               title: RichText(
                   text: TextSpan(children: [
@@ -122,21 +123,22 @@ class _SalonsState extends State<Salons> {
               )
           ),
           body: Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: getPadding(all: 16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 TextField(
                   decoration: InputDecoration(
-                    icon: Icon(Icons.search, color: ColorConstant.whiteA700),
+                    prefixIcon: Icon(Icons.search, color: ColorConstant.red900),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(15)
                     ),
-                    hintStyle: AppStyle.txtPoppinsMedium18Grey,
+                    hintStyle: AppStyle.txtPoppinsMedium18GreyLight,
                     hintText: 'Search room',
                     filled: true,
                     fillColor: ColorConstant.gray90001
                   ),
+                  style: AppStyle.txtPoppinsMedium18,
                   controller: _controller,
                   onChanged: _onSearchChanged,
                 ),
@@ -145,7 +147,7 @@ class _SalonsState extends State<Salons> {
                     itemCount: salons.length,
                     itemBuilder: (context, i) {
                       return MaterialButton(
-                        child: SalonCell(salons[i]),
+                        child: RoomInfo(salon:salons[i]),
                         padding: const EdgeInsets.all(0.0),
                         onPressed: () async {
                           String salonName = salons[i].keys.first;
@@ -196,7 +198,6 @@ class _SalonsState extends State<Salons> {
                             }
                           }
                         },
-                        color: Colors.white,
                       );
                     },
                   ),
@@ -234,6 +235,10 @@ class _SalonsState extends State<Salons> {
                   label: "bookmark"
               ),
               BottomNavigationBarItem(
+                  icon: Icon(Icons.group),
+                  label: "Friends"
+              ),
+              BottomNavigationBarItem(
                   icon: Icon(Icons.settings),
                   label: "Settings"
               ),
@@ -245,6 +250,126 @@ class _SalonsState extends State<Salons> {
 }
 
 
+
+class RoomInfo extends StatelessWidget {
+
+  final dynamic salon;
+
+  RoomInfo({required this.salon});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: getHorizontalSize(381),
+      height: getVerticalSize(146),
+      child: Row(
+        children: [
+          Container(
+            width: getHorizontalSize(146),
+            height: getVerticalSize(146),
+            child: Stack(
+              children: [
+                Image.network(
+                  "https://media.istockphoto.com/id/1248991874/vector/cinema-dark-hall-auditorium-with-red-seats-white-empty-screen-realistic-mock-up-template.jpg?s=612x612&w=0&k=20&c=yOAEDLYKAxDrqNmG1et3DNHQbF4zCpwuEzFRUPIGIX4=",
+                  fit: BoxFit.fill,
+                  filterQuality: FilterQuality.high,
+                ),
+                /*Positioned(
+                    child: Icon(Icons.star_rounded, color: ColorConstant.red900)
+                )*/
+              ],
+            ),
+          ),
+          SizedBox(width: getHorizontalSize(18)),
+          Container(
+            width: getHorizontalSize(214),
+            height: getVerticalSize(141),
+            child: Column(
+              children: [
+                Padding(
+                    padding: getPadding(top: 16, bottom: 6),
+                    child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          salon.keys.toList().first,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: AppStyle.txtPoppinsBold20,
+                        )
+                    )
+                ),
+                Padding(
+                    padding: getPadding(top: 16),
+                    child: Row(
+                      children: [
+                        Padding(
+                            padding: getPadding(left: 120, right: 16),
+                            child: IconButton(
+                                icon: Icon(Icons.person_outline_rounded, color: ColorConstant.whiteA700),
+                              onPressed: () {
+                                showMembersDialog(context, salon[salon.keys.toList().first]['salon_members']);
+                              },
+                            )
+                        ),
+                        Icon(Icons.logout_sharp, color: ColorConstant.red900)
+                      ],
+                    )
+                )
+              ],
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
+  Future joinStrings(List<dynamic> list) async {
+    List resultList = [];
+    for (int i = 0; i < list.length; i++){
+      final DocumentReference friendDocRef =
+      FirebaseFirestore.instance.collection('users').doc(list[i]);
+      DocumentSnapshot snapshot = await friendDocRef.get();
+      final String friendName = snapshot['displayName'];
+      resultList.add(friendName);
+    }
+    String allStrings = resultList.join("\n");
+    return allStrings;
+  }
+
+  showMembersDialog(BuildContext context, List salonMembers) {
+    Widget okButton = MaterialButton(
+      child: Text("Ok"),
+      onPressed:  () {
+        Navigator.of(context).pop();
+      },
+    );
+    AlertDialog alert = AlertDialog(
+      title: Text("List of members"),
+      content: FutureBuilder(
+        future: joinStrings(salonMembers),
+        builder: (context, snapshot) {
+          if (snapshot.hasData &&
+              snapshot.connectionState == ConnectionState.done) {
+            return Text(
+                snapshot.data!
+            );
+          }
+          return CircularProgressIndicator();
+        },
+      ),
+      actions: [
+        okButton,
+      ],
+    );
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
+  }
+
+}
 
 class SalonCell extends StatelessWidget {
   final dynamic salon;

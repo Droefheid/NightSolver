@@ -3,6 +3,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:night_solver/utils/size_utils.dart';
+import '../theme/app_style.dart';
+import '../utils/color_constant.dart';
 import 'custom_toast.dart';
 import 'salons.dart';
 
@@ -129,6 +132,7 @@ class _NewSalonState extends State<NewSalon> {
     return GestureDetector(
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: Scaffold(
+        backgroundColor: ColorConstant.gray900,
         floatingActionButton: FloatingActionButton.extended(
             onPressed:() {
               if(salonName == ''){
@@ -138,28 +142,34 @@ class _NewSalonState extends State<NewSalon> {
                 _createSalon(context);
               }
             },
-            label: Text("Create")
+            label: Text(
+                "Create",
+                style: AppStyle.txtPoppinsMedium18Grey,
+            ),
+            backgroundColor: ColorConstant.red900,
         ),
         appBar: AppBar(
-          elevation: 0.3,
-          centerTitle: true,
-          backgroundColor: Colors.white,
-          leading: IconButton(
-            icon: Icon(Icons.arrow_back),
-            color: mainColor,
-            onPressed: () => Navigator.of(context).pop(),
-          ),
-          title: Text(
-            'Creating a new room',
-            style: TextStyle(
-              color: mainColor,
-              fontFamily: 'Arvo',
-              fontWeight: FontWeight.bold,
+            backgroundColor: ColorConstant.gray900,
+            leading: IconButton(
+              icon: Icon(Icons.arrow_back_ios_new_rounded, color: ColorConstant.red900),
+              onPressed: () => Navigator.of(context).pop(),
             ),
-          ),
+            title: RichText(
+                text: TextSpan(children: [
+                  TextSpan(
+                      text: "Create a new room",
+                      style: AppStyle.txtPoppinsBold30
+                  ),
+                  TextSpan(
+                      text: ".",
+                      style: AppStyle.txtPoppinsBold30Red
+                  ),
+                ]),
+                textAlign: TextAlign.left
+            )
         ),
         body: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: getPadding(all: 16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -168,19 +178,32 @@ class _NewSalonState extends State<NewSalon> {
                 maxLength: 30,
                 autofocus: true,
                 decoration: InputDecoration(
+                  prefixIcon: Icon(Icons.abc_rounded, color: ColorConstant.red900,),
+                  helperStyle: AppStyle.txtPoppinsRegular12,
                   hintText: "Name of the room",
+                  hintStyle: AppStyle.txtPoppinsMedium18GreyLight,
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(15)
-                  )
+                    borderRadius: BorderRadius.circular(16)
+                  ),
+                  filled: true,
+                  fillColor: ColorConstant.gray90001,
                 ),
+                style: AppStyle.txtPoppinsMedium18,
                 onChanged: _changeSalonName
               ),
-              Padding(padding: EdgeInsets.all(10.0)),
+              Padding(padding: getPadding(all: 16)),
               TextField(
-                textAlign: TextAlign.center,
                 decoration: InputDecoration(
-                  hintText: 'Search person to add',
+                  prefixIcon: Icon(Icons.person_add_alt_rounded, color: ColorConstant.red900,),
+                  hintText: 'Add a friend',
+                  hintStyle: AppStyle.txtPoppinsMedium18GreyLight,
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16)
+                  ),
+                  filled: true,
+                  fillColor: ColorConstant.gray90001,
                 ),
+                style: AppStyle.txtPoppinsMedium18,
                 controller: _controller,
                 onChanged: _onSearchChanged,
               ),

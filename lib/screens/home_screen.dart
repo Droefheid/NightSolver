@@ -1,27 +1,16 @@
-import 'dart:collection';
 import 'dart:convert';
-import 'dart:io';
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
-import 'package:night_solver/screens/NavBar.dart';
 import 'package:night_solver/screens/movie_details.dart';
-import 'package:night_solver/screens/new_salon_screen.dart';
-import 'package:night_solver/screens/preference_page.dart';
 import 'package:http/http.dart' as http;
-import 'package:night_solver/screens/recommendation_screen.dart';
-import 'package:night_solver/screens/search_screen.dart';
-import 'package:night_solver/screens/settings_screen.dart';
 import 'package:night_solver/theme/app_decoration.dart';
 import 'package:night_solver/utils/color_constant.dart';
-import 'package:night_solver/utils/image_constant.dart';
-
+import 'package:night_solver/utils/constants.dart';
 import '../theme/app_style.dart';
 import '../utils/custom_widgets.dart';
 import '../utils/movie_info.dart';
 import '../utils/size_utils.dart';
-import 'movie_list.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -35,27 +24,34 @@ class _HomeScreenState extends State<HomeScreen> {
   Icon customIcon = const Icon(Icons.search);
   Widget customSearchBar = const Text("Trending movies");
   String searchValue = "";
-  List<dynamic> movies = [];
+  List<dynamic> trending_movies = [];
+  List<dynamic> latest_movies = [];
   final controller = ScrollController();
-  int currentIndex = 0;
   void signOut(){
     FirebaseAuth.instance.signOut();
   }
 
   void onTabTapped(int index) {
-    if(index==1) Navigator.of(context).push(MaterialPageRoute(builder: (_) => SearchScreen()));
-    if (index==2) Navigator.of(context).push(MaterialPageRoute(builder: (_) => Recommendation()));
-    if(index==3) Navigator.of(context).push(MaterialPageRoute(builder: (_) => MovieList()));
-    if(index==4) Navigator.of(context).push(MaterialPageRoute(builder: (_) => SettingScreen()));
+    if (index==1) Navigator.pushNamed(context, '/friends');
+    if (index==2) Navigator.pushNamed(context, '/recommendation');
+    if (index==3) Navigator.pushNamed(context, '/movieList');
+    if (index==4) Navigator.pushNamed(context, '/settings');
   }
 
   Future<void> getData() async {
-    final url =
-        'https://api.themoviedb.org/3/trending/movie/week?api_key=9478d83ca04bd6ee25b942dd7a0ad777';
-    final response = await http.get(Uri.parse(url));
-    final Map<String, dynamic> responseData = json.decode(response.body);
+    final trending_movies_url =
+        'https://api.themoviedb.org/3/trending/movie/week?api_key='+Constants.theMovieDb;
+    final trending_movies_response = await http.get(Uri.parse(trending_movies_url));
+    final Map<String, dynamic> trending_movies_responseData = json.decode(trending_movies_response.body);
+
+    final latest_movies_url = 'https://api.themoviedb.org/3/discover/movie?api_key='+Constants.theMovieDb
+        +'&sort_by=release_date.desc&vote_count.gte=100';
+    final latest_movies_response = await http.get(Uri.parse(latest_movies_url));
+    final Map<String, dynamic> latest_movies_responseData = json.decode(latest_movies_response.body);
+
     setState(() {
-      movies = responseData['results'];
+      trending_movies = trending_movies_responseData['results'];
+      latest_movies = latest_movies_responseData['results'];
     });
   }
 
@@ -70,6 +66,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    int currentIndex = 0;
     final orientation = MediaQuery.of(context).orientation;
     return Scaffold(
         backgroundColor: ColorConstant.gray900,
@@ -102,10 +99,10 @@ class _HomeScreenState extends State<HomeScreen> {
               Container(
                   height: 300,
                   child: ListView.separated(
-                      itemBuilder: (context, index) => buildHorizontalCard(item: new MovieInfo(movies[index])),
+                      itemBuilder: (context, index) => buildHorizontalCard(item: new MovieInfo(trending_movies[index])),
                       scrollDirection: Axis.horizontal,
                       separatorBuilder: (context, _) => SizedBox(width: getHorizontalSize(16)),
-                      itemCount: movies.length
+                      itemCount: trending_movies.length
                   )
               ),
               Align(
@@ -130,9 +127,9 @@ class _HomeScreenState extends State<HomeScreen> {
               Container(
                 height: 190,
                 child: ListView.separated(
-                  itemBuilder: (context, index) => VerticalMovieCard(item: new MovieInfo(movies[index])),
+                  itemBuilder: (context, index) => VerticalMovieCard(item: new MovieInfo(latest_movies[index])),
                   separatorBuilder: (context, _) => SizedBox(height: getVerticalSize(16),),
-                  itemCount: movies.length,
+                  itemCount: latest_movies.length,
                 ),
               )
             ],

@@ -2,8 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'dart:ui' as ui;
 import 'package:http/http.dart' as http;
 import 'package:night_solver/screens/home_screen.dart';
 import 'package:night_solver/screens/recommendation_screen.dart';
@@ -38,21 +36,11 @@ class _MovieDetailState extends State<MovieDetail> {
   final user = FirebaseAuth.instance.currentUser!;
 
   void onTabTapped(int index) {
-    if (index == 0)
-      Navigator.of(context)
-          .push(MaterialPageRoute(builder: (_) => HomeScreen()));
-    if (index == 1)
-      Navigator.of(context)
-          .push(MaterialPageRoute(builder: (_) => SearchScreen()));
-    if (index == 2)
-      Navigator.of(context)
-          .push(MaterialPageRoute(builder: (_) => Recommendation()));
-    if (index == 3)
-      Navigator.of(context)
-          .push(MaterialPageRoute(builder: (_) => MovieList()));
-    if (index == 4)
-      Navigator.of(context)
-          .push(MaterialPageRoute(builder: (_) => SettingScreen()));
+    if (index==0) Navigator.pushNamed(context, '/');
+    if (index==1) Navigator.pushNamed(context, '/search');
+    if (index==2) Navigator.pushNamed(context, '/recommendation');
+    if (index==3) Navigator.pushNamed(context, '/movieList');
+    if (index==4) Navigator.pushNamed(context, '/settings');
   }
 
   Future<List> recommended(String id) async {
@@ -228,22 +216,23 @@ class _MovieDetailState extends State<MovieDetail> {
           onPressed: () => Navigator.pop(context, true),
         ),
       ),*/
-      body: Stack(
-        children: [
-          Container(
-            height: double.infinity,
-            color: ColorConstant.gray900,
-          ),
-          Container(
-            height: getVerticalSize(581),
-            width: getHorizontalSize(561),
-            child: Image.network(
-              widget.item.urlImage,
-              height: MediaQuery.of(context).size.height * 0.5,
-              fit: BoxFit.cover,
+      body: SafeArea(
+        child: Stack(
+          children: [
+            Container(
+              height: double.infinity,
+              color: ColorConstant.gray900,
             ),
-          ),
-          /*const Positioned.fill(child: DecoratedBox(decoration: BoxDecoration(
+            Container(
+              height: getVerticalSize(581),
+              width: getHorizontalSize(561),
+              child: Image.network(
+                widget.item.urlImage,
+                height: MediaQuery.of(context).size.height * 0.5,
+                fit: BoxFit.cover,
+              ),
+            ),
+            /*const Positioned.fill(child: DecoratedBox(decoration: BoxDecoration(
             gradient: LinearGradient(colors: [
               Colors.transparent,
               Color(0x111111)
@@ -253,59 +242,61 @@ class _MovieDetailState extends State<MovieDetail> {
               stops: [0.3, 0.5]
             ),
           ))),*/
-          Positioned(
-            child: Text(
-              widget.item.title,
-              style: AppStyle.txtPoppinsBold30,
-              textAlign: TextAlign.center,
-            ),
-            top: getVerticalSize(540),
-            left: getHorizontalSize(32),
-          ),
-          Positioned(
-            child: Text.rich(TextSpan(children: [
-              WidgetSpan(child: SizedBox(width: getHorizontalSize(20))),
-              TextSpan(text: widget.item.rating.toString()),
-              WidgetSpan(child: SizedBox(width: getHorizontalSize(20))),
-              WidgetSpan(
-                child: RatingBarIndicator(
-                  itemBuilder: (context, index) =>
-                      Icon(Icons.star_rounded, color: ColorConstant.red900),
-                  itemCount: 5,
-                  rating: widget.item.rating,
-                  itemSize: getSize(28),
-                  unratedColor: ColorConstant.gray700,
-                ),
-              )
-            ], style: AppStyle.txtPoppinsMedium22)),
-            top: getVerticalSize(600),
-          ),
-          Positioned(
-            child: Container(
-                height: getVerticalSize(120),
-                width: getHorizontalSize(379),
-                child: Text(widget.item.synopsis,
-                    style: AppStyle.txtPoppinsRegular13)),
-            top: getVerticalSize(660),
-            left: getHorizontalSize(16),
-          ),
-          IconButton(
-              onPressed: () => Navigator.pop(context, true),
-              icon: Icon(Icons.arrow_back_ios_new_rounded,
-                  color: ColorConstant.red900, size: 45)),
-          Positioned(
-            child: IconButton(
-              icon: Icon(
-                Icons.bookmark_border,
-                color: ColorConstant.whiteA700,
-                size: 45,
+            Positioned(
+              child: Text(
+                widget.item.title,
+                style: AppStyle.txtPoppinsBold30,
+                textAlign: TextAlign.center,
               ),
-              onPressed: () => addMovie(context),
+              top: getVerticalSize(540),
+              left: getHorizontalSize(32),
             ),
-            right: getHorizontalSize(16),
-          )
-        ],
-      ),
+            Positioned(
+              child: Text.rich(TextSpan(children: [
+                WidgetSpan(child: SizedBox(width: getHorizontalSize(20))),
+                TextSpan(text: widget.item.rating.toString()),
+                WidgetSpan(child: SizedBox(width: getHorizontalSize(20))),
+                WidgetSpan(
+                  child: RatingBarIndicator(
+                    itemBuilder: (context, index) =>
+                        Icon(Icons.star_rounded, color: ColorConstant.red900),
+                    itemCount: 5,
+                    rating: widget.item.rating,
+                    itemSize: getSize(28),
+                    unratedColor: ColorConstant.gray700,
+                  ),
+                )
+              ], style: AppStyle.txtPoppinsMedium22)),
+              top: getVerticalSize(600),
+            ),
+            Positioned(
+              child: Container(
+                  height: getVerticalSize(120),
+                  width: getHorizontalSize(379),
+                  child: Text(widget.item.synopsis,
+                      style: AppStyle.txtPoppinsRegular13)),
+              top: getVerticalSize(660),
+              left: getHorizontalSize(16),
+            ),
+            IconButton(
+                onPressed: () => Navigator.pop(context, true),
+                icon: Icon(Icons.arrow_back_ios_new_rounded,
+                    color: ColorConstant.red900, size: 45)),
+            Positioned(
+              child: IconButton(
+                icon: Icon(
+                  Icons.bookmark_border,
+                  color: ColorConstant.whiteA700,
+                  size: 45,
+                ),
+                onPressed: () => addMovie(context),
+              ),
+              right: getHorizontalSize(16),
+            )
+          ],
+        ),
+    ),
+
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: ColorConstant.gray900,
         selectedItemColor: ColorConstant.red900,
