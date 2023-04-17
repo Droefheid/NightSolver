@@ -13,7 +13,7 @@ class Providers extends StatefulWidget {
   @override
   State<Providers> createState() => _ProvidersState();
 }
-
+//TODO fais en logo
 class _ProvidersState extends State<Providers>{
   var providers = {
   "Netflix":0,
