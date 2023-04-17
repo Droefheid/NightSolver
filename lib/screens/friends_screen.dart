@@ -143,6 +143,7 @@ class _FriendsState extends State<Friends> {
     return GestureDetector(
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: Scaffold(
+        backgroundColor: ColorConstant.gray900,
         appBar: AppBar(
             backgroundColor: ColorConstant.gray900,
             leading: IconButton(
@@ -172,7 +173,7 @@ class _FriendsState extends State<Friends> {
                 controller: _addControler,
                 decoration: InputDecoration(
                   prefixIcon: new IconButton(
-                      icon: Icon(Icons.add_circle_outline),
+                      icon: Icon(Icons.add_circle_outline, color: ColorConstant.red900,),
                       onPressed: () async {
                         if (_addControler.text == user.displayName){
                           CustomToast.showToast(context, "You can't add yourself");
@@ -194,21 +195,31 @@ class _FriendsState extends State<Friends> {
                       },
                   ),
                   suffixIcon: new IconButton(
-                    icon: Icon(Icons.help),
+                    icon: Icon(Icons.help, color: ColorConstant.gray700,),
                     onPressed: () {showHelpDialog(context);}
                   ),
                   hintText: "Add a friend",
+                  hintStyle: AppStyle.txtPoppinsMedium18GreyLight,
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(15)
-                  )
+                    borderRadius: BorderRadius.circular(16)
+                  ),
+                  filled: true,
+                  fillColor: ColorConstant.gray90001
                 ),
+                style: AppStyle.txtPoppinsMedium18,
                 onChanged: null
               ),
               Padding(padding: EdgeInsets.all(10.0)),
               TextField(
-                textAlign: TextAlign.center,
                 decoration: InputDecoration(
+                  prefixIcon: Icon(Icons.person_search_rounded, color: ColorConstant.red900),
                   hintText: 'Search a friend',
+                  hintStyle: AppStyle.txtPoppinsMedium18GreyLight,
+                  filled: true,
+                  fillColor: ColorConstant.gray90001,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(16)
+                  )
                 ),
                 controller: _SearchController,
                 onChanged: _onSearchChanged,
@@ -221,7 +232,6 @@ class _FriendsState extends State<Friends> {
                       child: FriendCell(friends[i]),
                       padding: const EdgeInsets.all(0.0),
                       onPressed: null,
-                      color: Colors.white,
                     );
                   },
                 ),
@@ -364,7 +374,6 @@ class FriendCell extends StatelessWidget {
                 ),
                 decoration: new BoxDecoration(
                   borderRadius: new BorderRadius.circular(10.0),
-                  color: Colors.grey,
                   image: new DecorationImage(
                       image: new NetworkImage(
                           "https://eitrawmaterials.eu/wp-content/uploads/2016/09/person-icon.png"),
@@ -385,10 +394,7 @@ class FriendCell extends StatelessWidget {
                     children: [
                             Text(
                               friend,
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 20
-                              ),
+                              style: AppStyle.txtPoppinsBold20
                             )
                     ],
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -399,7 +405,7 @@ class FriendCell extends StatelessWidget {
               highlightColor: Colors.red,
               icon: Icon(
                 Icons.heart_broken,
-                color: Colors.black,
+                color: ColorConstant.red900,
               ),
               onPressed: () {showWarningDialog(context, friend);}
             ),
@@ -408,7 +414,7 @@ class FriendCell extends StatelessWidget {
         new Container(
           width: 300.0,
           height: 0.5,
-          color: const Color(0xD2D2E1ff),
+          color: ColorConstant.redA700,
           margin: const EdgeInsets.all(16.0),
         )
       ],
