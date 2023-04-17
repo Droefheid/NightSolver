@@ -227,8 +227,7 @@ class _SearchScreenState extends State<SearchScreen> {
             alignment: Alignment.centerLeft,
           ),
           SizedBox(height: getVerticalSize(20)),
-          Container(
-              height: getVerticalSize(462),
+          Expanded(
               child: ListView.separated(
                   itemBuilder: (context, index) => VerticalMovieCard(
                       item: new MovieInfo(searched_movies[index])),

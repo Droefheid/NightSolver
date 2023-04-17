@@ -96,9 +96,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       )
                   )
               ),
-              SizedBox(height: getVerticalSize(20)),
-              Container(
-                  height: 300,
+              Expanded(
                   child: ListView.separated(
                       itemBuilder: (context, index) => buildHorizontalCard(item: new MovieInfo(trending_movies[index])),
                       scrollDirection: Axis.horizontal,
@@ -125,8 +123,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       )
                   )
               ),
-              Container(
-                height: 190,
+              Expanded(
                 child: ListView.separated(
                   itemBuilder: (context, index) => VerticalMovieCard(item: new MovieInfo(latest_movies[index])),
                   separatorBuilder: (context, _) => SizedBox(height: getVerticalSize(16),),
@@ -193,7 +190,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 )
             ),
             Padding(
-                padding: getPadding(all: 16),
+                padding: getPadding(left: 16, right: 16),
                 child: Align(
                     alignment: Alignment.centerLeft,
                     child: Text(

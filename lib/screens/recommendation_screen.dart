@@ -163,7 +163,7 @@ class RecommendationState extends State<Recommendation> {
             Padding(
                 padding: getPadding(top: 16) ,
                 child: Container(
-                    height: getVerticalSize(589),
+                    height: getVerticalSize(569),
                     child: Stack(children: [
                       GridView.builder(
                         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -176,7 +176,7 @@ class RecommendationState extends State<Recommendation> {
                         itemCount: movies.length,
                       ),
                       Positioned(
-                          top: getVerticalSize(541),
+                          top: getVerticalSize(500),
                           left: getHorizontalSize(350),
                           child: ElevatedButton(
                               style: ButtonStyle(
