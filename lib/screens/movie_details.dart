@@ -115,22 +115,31 @@ class _MovieDetailState extends State<MovieDetail> {
     var response = await http.get(Uri.parse(url));
     if (response.statusCode == 200) {
       Map<String, dynamic> data = jsonDecode(response.body);
+      Map<String, dynamic> providers = data['results'];
+      Map<String, dynamic> filteredProviders = {};
+      providers.forEach((key, value) {
+        String link = value['link'];
+        if (link.contains('locale=BE')) {
+          filteredProviders[key] = value;
+        }
+      });
       setState(() {
-        widget.providers = data['results'];
+        widget.providers = filteredProviders;
       });
     } else {
       throw Exception('Failed to load providers');
     }
   }
 
-  Widget buildProviderList() {
+
+      Widget buildProviderList() {
     if (widget.providers.isEmpty) {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(height: 20),
           Text(
-            'No providers available',
+            'No providers available in Belgium',
             style: TextStyle(
                 fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
           ),
@@ -143,20 +152,7 @@ class _MovieDetailState extends State<MovieDetail> {
     Set<String> addedProviders = Set();
 
     widget.providers.forEach((key, value) {
-      if (value['rent'] != null && value['rent'].isNotEmpty) {
-        value['rent'].forEach((rentValue) {
-          if (rentValue['provider_name'] != null &&
-              !addedProviders.contains(rentValue['provider_name'])) {
-            addedProviders.add(rentValue['provider_name']);
-            providerWidgets.add(
-              Image.network(
-                'https://image.tmdb.org/t/p/w92${rentValue['logo_path']}',
-                width: 60,
-              ),
-            );
-          }
-        });
-      } else {
+
         if (value['flatrate'] != null && value['flatrate'].isNotEmpty) {
           value['flatrate'].forEach((flatValue) {
             if (flatValue['provider_name'] != null &&
@@ -171,7 +167,20 @@ class _MovieDetailState extends State<MovieDetail> {
             }
           });
         }
-      }
+        if (value['rent'] != null && value['rent'].isNotEmpty) {
+          value['rent'].forEach((rentValue) {
+            if (rentValue['provider_name'] != null &&
+                !addedProviders.contains(rentValue['provider_name'])) {
+              addedProviders.add(rentValue['provider_name']);
+              providerWidgets.add(
+                Image.network(
+                  'https://image.tmdb.org/t/p/w92${rentValue['logo_path']}',
+                  width: 60,
+                ),
+              );
+            }
+          });
+        }
     });
 
     return Column(
@@ -295,19 +304,31 @@ class _MovieDetailState extends State<MovieDetail> {
             Positioned(
               top: getVerticalSize(20),
               right: getHorizontalSize(16),
-              child: IconButton(
-                icon: Icon(
-                  Icons.bookmark_border,
-                  color: ColorConstant.whiteA700,
-                  size: 45,
-                ),
-                onPressed: () {
+              child: InkWell(
+                onTap: () {
                   if (widget.item.canDelete) {
-                    deleteMovie(context,widget.item.id);
+                    deleteMovie(context, widget.item.id);
                   } else {
                     addMovie(context);
                   }
                 },
+                child: Container(
+                  width: getSize(45),
+                  height: getSize(45),
+                  decoration: BoxDecoration(
+                    color: widget.item.canDelete ? Colors.red : Colors.transparent,
+                    borderRadius: BorderRadius.circular(getSize(45)),
+                    border: Border.all(
+                      color: Colors.white,
+                      width: getSize(2),
+                    ),
+                  ),
+                  child: Icon(
+                    Icons.bookmark,
+                    color: Colors.white,
+                    size: getSize(30),
+                  ),
+                ),
               ),
             ),
           ],
