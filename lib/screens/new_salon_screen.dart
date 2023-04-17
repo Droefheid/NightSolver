@@ -1,13 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:night_solver/utils/size_utils.dart';
 import '../theme/app_style.dart';
 import '../utils/color_constant.dart';
 import 'custom_toast.dart';
-import 'salons.dart';
 
 
 class NewSalon extends StatefulWidget {
@@ -19,10 +17,10 @@ class NewSalon extends StatefulWidget {
 
 class _NewSalonState extends State<NewSalon> {
   Color mainColor = const Color(0xff3C3261);
-  final TextEditingController _controller = TextEditingController();
+  final TextEditingController _friendController = TextEditingController();
+  final TextEditingController _salonController = TextEditingController();
   List<dynamic> persons = [];
   final user = FirebaseAuth.instance.currentUser!;
-  String salonName = '';
   List<String> salonMembers = [FirebaseAuth.instance.currentUser!.uid];
 
   Future<void> getData() async {
@@ -90,14 +88,8 @@ class _NewSalonState extends State<NewSalon> {
     CustomToast.showToast(context, '$friendName removed from the room');
   }
 
-  void _changeSalonName(String value) async {
-    setState(() {
-      salonName = value;
-    });
-  }
-
-
   void _createSalon(BuildContext context) async {
+    String salonName = _salonController.text;
     final snapshot = await FirebaseFirestore.instance.collection('users')
         .doc(user.uid)
         .get();
@@ -135,7 +127,7 @@ class _NewSalonState extends State<NewSalon> {
         backgroundColor: ColorConstant.gray900,
         floatingActionButton: FloatingActionButton.extended(
             onPressed:() {
-              if(salonName == ''){
+              if(_salonController.text == ''){
                 CustomToast.showToast(context, 'No room name given');
               }
               else{
@@ -189,7 +181,7 @@ class _NewSalonState extends State<NewSalon> {
                   fillColor: ColorConstant.gray90001,
                 ),
                 style: AppStyle.txtPoppinsMedium18,
-                onChanged: _changeSalonName
+                controller: _salonController,
               ),
               Padding(padding: getPadding(all: 16)),
               TextField(
@@ -204,7 +196,7 @@ class _NewSalonState extends State<NewSalon> {
                   fillColor: ColorConstant.gray90001,
                 ),
                 style: AppStyle.txtPoppinsMedium18,
-                controller: _controller,
+                controller: _friendController,
                 onChanged: _onSearchChanged,
               ),
               Expanded(
