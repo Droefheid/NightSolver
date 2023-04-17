@@ -222,7 +222,6 @@ class _NewSalonState extends State<NewSalon> {
                           removePerson(persons[i]);
                         }
                       },
-                      color: Colors.white,
                     );
                   },
                 ),
@@ -238,7 +237,6 @@ class _NewSalonState extends State<NewSalon> {
 
 class PersonCell extends StatelessWidget {
   final dynamic person;
-  Color mainColor = const Color(0xff3C3261);
   PersonCell(this.person);
 
 
@@ -272,12 +270,6 @@ class PersonCell extends StatelessWidget {
                         image: new NetworkImage(
                             "https://eitrawmaterials.eu/wp-content/uploads/2016/09/person-icon.png"),
                         fit: BoxFit.cover),
-                    boxShadow: [
-                      new BoxShadow(
-                          color: mainColor,
-                          blurRadius: 5.0,
-                          offset: new Offset(2.0, 5.0))
-                    ],
                   ),
                 ),
               ),
@@ -293,10 +285,7 @@ class PersonCell extends StatelessWidget {
                                 snapshot.connectionState == ConnectionState.done) {
                               return Text(
                                 snapshot.data!,
-                                style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 20
-                                ),
+                                style: AppStyle.txtPoppinsMedium18,
                               );
                             }
                             return CircularProgressIndicator();
@@ -309,12 +298,7 @@ class PersonCell extends StatelessWidget {
               ),
             ],
           ),
-          new Container(
-            width: 300.0,
-            height: 0.5,
-            color: const Color(0xD2D2E1ff),
-            margin: const EdgeInsets.all(16.0),
-          )
+
         ],
       ),
     );
