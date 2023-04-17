@@ -120,7 +120,7 @@ class RecommendationState extends State<Recommendation> {
       appBar: AppBar(
           backgroundColor: ColorConstant.gray900,
           leading: IconButton(
-            icon: Icon(Icons.arrow_back_ios_new_rounded, color: ColorConstant.red900),
+            icon: ImageIcon(AssetImage("assets/icons/back_arrow_red.png"), color: ColorConstant.red900,),
               onPressed: () => Navigator.of(context).pop()),
           title: RichText(
               text: TextSpan(children: [
@@ -140,7 +140,7 @@ class RecommendationState extends State<Recommendation> {
               textAlign: TextAlign.left
           ),
           actions: [
-            IconButton(onPressed: null, icon: Icon(Icons.help_outline_rounded, color: ColorConstant.red900))
+            //IconButton(onPressed: null, icon: Icon(Icons.help_outline_rounded, color: ColorConstant.red900))
           ],
       ),
         body: Column(
@@ -204,27 +204,27 @@ class RecommendationState extends State<Recommendation> {
           }),
           items: [
             BottomNavigationBarItem(
-                icon: Icon(Icons.home),
+                icon: ImageIcon(AssetImage("assets/icons/home_filled.png")),
                 label: "Home"
             ),
             BottomNavigationBarItem(
-                icon: Icon(Icons.search),
+                icon: ImageIcon(AssetImage("assets/icons/search_empty.png")),
                 label: "Search"
             ),
             BottomNavigationBarItem(
-                icon: Icon(Icons.recommend),
+                icon: ImageIcon(AssetImage("assets/icons/recomandation_filled.png")),
                 label: "Recommendation"
             ),
             BottomNavigationBarItem(
-                icon: Icon(Icons.group_rounded),
+                icon: ImageIcon(AssetImage("assets/icons/friends_filled.png")),
                 label: "Friends"
             ),
             BottomNavigationBarItem(
-                icon: Icon(Icons.bookmark),
+                icon: ImageIcon(AssetImage("assets/icons/bookmark_empty.png")),
                 label: "bookmark"
             ),
             BottomNavigationBarItem(
-                icon: Icon(Icons.settings),
+                icon: ImageIcon(AssetImage("assets/icons/settings_empty.png")),
                 label: "Settings"
             ),
           ],
@@ -243,7 +243,7 @@ class RecommendationState extends State<Recommendation> {
                   AspectRatio(aspectRatio: 0.7, child: Image.network(item.urlImage, fit: BoxFit.fill, filterQuality: FilterQuality.high)),
                   Positioned(
                       right: getHorizontalSize(-1),
-                      child: IconButton(onPressed: null, icon: Icon(Icons.bookmark_border, color: ColorConstant.whiteA700))
+                      child: IconButton(onPressed: null, icon: ImageIcon(AssetImage("assets/icons/bookmark_empty.png"), color: ColorConstant.whiteA700,))
                   )
                 ])
             )

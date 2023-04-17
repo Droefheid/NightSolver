@@ -178,8 +178,7 @@ class _SearchScreenState extends State<SearchScreen> {
         appBar: AppBar(
             backgroundColor: ColorConstant.gray900,
             leading: IconButton(
-              icon: Icon(Icons.arrow_back_ios_new_rounded,
-                  color: ColorConstant.red900),
+              icon: ImageIcon(AssetImage("assets/icons/back_arrow_red.png"), color: ColorConstant.red900,),
                 onPressed: () => Navigator.of(context).pop()),
             title: RichText(
                 text: TextSpan(children: [
@@ -194,10 +193,7 @@ class _SearchScreenState extends State<SearchScreen> {
             style: AppStyle.txtPoppinsMedium18,
             decoration: InputDecoration(
                 prefixIcon: IconButton(
-                    icon: Icon(
-                      Icons.search,
-                      color: ColorConstant.whiteA700,
-                    ),
+                    icon: ImageIcon(AssetImage("assets/icons/search_empty.png"), color: ColorConstant.whiteA700),
                     onPressed: null),
                 hintText: "Search",
                 hintStyle: AppStyle.txtPoppinsMedium18GreyLight,
@@ -248,12 +244,30 @@ class _SearchScreenState extends State<SearchScreen> {
             onTabTapped(index);
           }),
           items: [
-            BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
-            BottomNavigationBarItem(icon: Icon(Icons.search), label: "Search"),
-            BottomNavigationBarItem(icon: Icon(Icons.recommend), label: "Recommendation"),
-            BottomNavigationBarItem(icon: Icon(Icons.group_rounded), label: "Friends"),
-            BottomNavigationBarItem(icon: Icon(Icons.bookmark), label: "bookmark"),
-            BottomNavigationBarItem(icon: Icon(Icons.settings), label: "Settings"),
+            BottomNavigationBarItem(
+                icon: ImageIcon(AssetImage("assets/icons/home_empty.png")),
+                label: "Home"
+            ),
+            BottomNavigationBarItem(
+                icon: ImageIcon(AssetImage("assets/icons/search_filled.png")),
+                label: "Search"
+            ),
+            BottomNavigationBarItem(
+                icon: ImageIcon(AssetImage("assets/icons/recomandation_empty.png")),
+                label: "Recommendation"
+            ),
+            BottomNavigationBarItem(
+                icon: ImageIcon(AssetImage("assets/icons/friends_filled.png")),
+                label: "Friends"
+            ),
+            BottomNavigationBarItem(
+                icon: ImageIcon(AssetImage("assets/icons/bookmark_empty.png")),
+                label: "bookmark"
+            ),
+            BottomNavigationBarItem(
+                icon: ImageIcon(AssetImage("assets/icons/settings_empty.png")),
+                label: "Settings"
+            ),
           ],
         ));
   }

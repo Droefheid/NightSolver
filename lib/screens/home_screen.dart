@@ -147,27 +147,27 @@ class _HomeScreenState extends State<HomeScreen> {
           }),
           items: [
             BottomNavigationBarItem(
-                icon: Icon(Icons.home),
+                icon: ImageIcon(AssetImage("assets/icons/home_filled.png")),
                 label: "Home"
             ),
             BottomNavigationBarItem(
-                icon: Icon(Icons.search),
+                icon: ImageIcon(AssetImage("assets/icons/search_empty.png")),
                 label: "Search"
             ),
             BottomNavigationBarItem(
-                icon: Icon(Icons.recommend),
+                icon: ImageIcon(AssetImage("assets/icons/recomandation_empty.png")),
                 label: "Recommendation"
             ),
             BottomNavigationBarItem(
-                icon: Icon(Icons.group_rounded),
+                icon: ImageIcon(AssetImage("assets/icons/friends_filled.png")),
                 label: "Friends"
             ),
             BottomNavigationBarItem(
-                icon: Icon(Icons.bookmark),
+                icon: ImageIcon(AssetImage("assets/icons/bookmark_empty.png")),
                 label: "bookmark"
             ),
             BottomNavigationBarItem(
-                icon: Icon(Icons.settings),
+                icon: ImageIcon(AssetImage("assets/icons/settings_empty.png")),
                 label: "Settings"
             ),
           ],

@@ -106,7 +106,7 @@ class _SalonsState extends State<Salons> {
           appBar: AppBar(
               backgroundColor: ColorConstant.gray900,
               leading: IconButton(
-                icon: Icon(Icons.arrow_back_ios_new_rounded, color: ColorConstant.red900),
+                icon: ImageIcon(AssetImage("assets/icons/back_arrow_red.png"), color: ColorConstant.red900,),
                 onPressed: () => Navigator.of(context).pop(),
               ),
               title: RichText(
@@ -206,45 +206,45 @@ class _SalonsState extends State<Salons> {
               ],
             ),
           ),
-          bottomNavigationBar: BottomNavigationBar(
-            backgroundColor: ColorConstant.gray900,
-            selectedItemColor: ColorConstant.red900,
-            unselectedItemColor: ColorConstant.whiteA700,
-            showSelectedLabels: false,
-            showUnselectedLabels: false,
-            type: BottomNavigationBarType.fixed,
-            currentIndex: currentIndex,
-            onTap: (index) => setState(() {
-              currentIndex = index;
-              onTabTapped(index);
-            }),
-            items: [
-              BottomNavigationBarItem(
-                  icon: Icon(Icons.home),
-                  label: "Home"
-              ),
-              BottomNavigationBarItem(
-                  icon: Icon(Icons.search),
-                  label: "Search"
-              ),
-              BottomNavigationBarItem(
-                  icon: Icon(Icons.recommend),
-                  label: "Recommendation"
-              ),
-              BottomNavigationBarItem(
-                  icon: Icon(Icons.group_rounded),
-                  label: "Friends"
-              ),
-              BottomNavigationBarItem(
-                  icon: Icon(Icons.bookmark),
-                  label: "bookmark"
-              ),
-              BottomNavigationBarItem(
-                  icon: Icon(Icons.settings),
-                  label: "Settings"
-              ),
-            ],
-          ),
+            bottomNavigationBar: BottomNavigationBar(
+              backgroundColor: ColorConstant.gray900,
+              selectedItemColor: ColorConstant.red900,
+              unselectedItemColor: ColorConstant.whiteA700,
+              showSelectedLabels: false,
+              showUnselectedLabels: false,
+              type: BottomNavigationBarType.fixed,
+              currentIndex: currentIndex,
+              onTap: (index) => setState(() {
+                currentIndex = index;
+                onTabTapped(index);
+              }),
+              items: [
+                BottomNavigationBarItem(
+                    icon: ImageIcon(AssetImage("assets/icons/home_filled.png")),
+                    label: "Home"
+                ),
+                BottomNavigationBarItem(
+                    icon: ImageIcon(AssetImage("assets/icons/search_empty.png")),
+                    label: "Search"
+                ),
+                BottomNavigationBarItem(
+                    icon: ImageIcon(AssetImage("assets/icons/recomandation_filled_point.png")),
+                    label: "Recommendation"
+                ),
+                BottomNavigationBarItem(
+                    icon: ImageIcon(AssetImage("assets/icons/friends_filled.png")),
+                    label: "Friends"
+                ),
+                BottomNavigationBarItem(
+                    icon: ImageIcon(AssetImage("assets/icons/bookmark_empty.png")),
+                    label: "bookmark"
+                ),
+                BottomNavigationBarItem(
+                    icon: ImageIcon(AssetImage("assets/icons/settings_empty.png")),
+                    label: "Settings"
+                ),
+              ],
+            )
         )
     );
   }
@@ -305,7 +305,7 @@ class RoomInfo extends StatelessWidget {
                         Padding(
                             padding: getPadding(left: 80, right: 16),
                             child: IconButton(
-                                icon: Icon(Icons.person_outline_rounded, color: ColorConstant.whiteA700),
+                                icon: ImageIcon(AssetImage("assets/icons/person.png"), color: ColorConstant.whiteA700,),
                               onPressed: () {
                                 showMembersDialog(context, salon[salon.keys.toList().first]['salon_members']);
                               },
@@ -315,7 +315,7 @@ class RoomInfo extends StatelessWidget {
                             onPressed: () {
                               showWarningDialog(context, salon);
                             },
-                            icon:  Icon(Icons.logout_sharp, color: ColorConstant.red900)
+                            icon:  ImageIcon(AssetImage("assets/icons/quit_group_red.png"), color: ColorConstant.red900,)
                         )
                       ],
                     )
@@ -453,181 +453,4 @@ class RoomInfo extends StatelessWidget {
     );
   }
 
-}
-
-class SalonCell extends StatelessWidget {
-  final dynamic salon;
-  final Color mainColor = const Color(0xff3C3261);
-  SalonCell(this.salon);
-  final user = FirebaseAuth.instance.currentUser!;
-
-
-  void leaveSalon(dynamic salon) async {
-    String salonName = salon.keys.toList().first;
-    for (String member in salon[salon.keys.toList().first]['salon_members']){
-      final DocumentReference ownDocRef = FirebaseFirestore.instance.collection('users').doc(member);
-      ownDocRef.update({'salons.$salonName.salon_members': FieldValue.arrayRemove([user.uid])});
-      ownDocRef.update({'salons.$salonName.preferences.${user.uid}' : FieldValue.delete()});
-      ownDocRef.update({'salons.$salonName.votes.${user.uid}' : FieldValue.delete()});
-
-    }
-    final DocumentReference docRef = FirebaseFirestore.instance.collection('users').doc(user.uid);
-    docRef.update({'salons.$salonName' : FieldValue.delete()});
-  }
-  showWarningDialog(BuildContext context, dynamic salon){
-    String salonName = salon.keys.toList().first;
-    Widget cancelButton = MaterialButton(
-      child: Text("Cancel"),
-      onPressed:  () {
-        Navigator.of(context).pop();
-      },
-    );
-    Widget proceedButton = MaterialButton(
-      child: Text("Proceed"),
-      onPressed:  () async {
-        leaveSalon(salon);
-        await Navigator.of(context).push(MaterialPageRoute(builder: (_) => Salons()));
-        Navigator.pop(context, true);
-        Navigator.pop(context, true);
-      },
-    );
-    AlertDialog alert = AlertDialog(
-      title: Text("Warning"),
-      content: Text(
-        "You are about to leave the room \'$salonName\'.\n"
-        "Do you wish to proceed?"
-      ),
-      actions: [
-        cancelButton,
-        proceedButton,
-      ],
-    );
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return alert;
-      },
-    );
-  }
-
-
-  Future joinStrings(List<dynamic> list) async {
-    List resultList = [];
-    for (int i = 0; i < list.length; i++){
-      final DocumentReference friendDocRef =
-      FirebaseFirestore.instance.collection('users').doc(list[i]);
-      DocumentSnapshot snapshot = await friendDocRef.get();
-      final String friendName = snapshot['displayName'];
-      resultList.add(friendName);
-    }
-    String allStrings = resultList.join("\n");
-    return allStrings;
-  }
-
-
-  showMembersDialog(BuildContext context, List salonMembers) {
-    Widget okButton = MaterialButton(
-      child: Text("Ok"),
-      onPressed:  () {
-        Navigator.of(context).pop();
-      },
-    );
-    AlertDialog alert = AlertDialog(
-      title: Text("List of members"),
-      content: FutureBuilder(
-        future: joinStrings(salonMembers),
-        builder: (context, snapshot) {
-          if (snapshot.hasData &&
-              snapshot.connectionState == ConnectionState.done) {
-            return Text(
-              snapshot.data!
-            );
-          }
-          return CircularProgressIndicator();
-        },
-      ),
-      actions: [
-        okButton,
-      ],
-    );
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return alert;
-      },
-    );
-  }
-  @override
-  Widget build(BuildContext context) {
-    return new Column(
-      children: <Widget>[
-        new Row(
-          children: <Widget>[
-            new Padding(
-              padding: const EdgeInsets.all(0.0),
-              child: new Container(
-                margin: const EdgeInsets.all(16.0),
-                child: new Container(
-                  width: 70.0,
-                  height: 70.0,
-                ),
-                decoration: new BoxDecoration(
-                  borderRadius: new BorderRadius.circular(10.0),
-                  color: Colors.grey,
-                  image: new DecorationImage(
-                      image: new NetworkImage(
-                          'https://spng.pngfind.com/pngs/s/243-2435837_free-png-initiate-group-chat-icon-group-chat.png'),
-                      fit: BoxFit.cover),
-                  boxShadow: [
-                    new BoxShadow(
-                        color: mainColor,
-                        blurRadius: 5.0,
-                        offset: new Offset(2.0, 5.0))
-                  ],
-                ),
-              ),
-            ),
-            new Expanded(
-                child: new Container(
-                  margin: const EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 0.0),
-                  child: new Text(
-                    salon.keys.toList().first,
-                    style: TextStyle(
-                        fontSize: 20.0
-                    ),
-                  ),
-                )
-            ),
-            new Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: new Column(
-                  children: [
-                    new IconButton(
-                      highlightColor: Colors.blue,
-                      icon: Icon(Icons.person_outline_rounded),
-                      onPressed: () {
-                        showMembersDialog(context, salon[salon.keys.toList().first]['salon_members']);
-                      },
-                    ),
-                    new IconButton(
-                      highlightColor: Colors.red,
-                      icon: Icon(Icons.logout),
-                      onPressed: () {
-                        showWarningDialog(context, salon);
-                        },
-                    ),
-                  ],
-                )
-            )
-          ],
-        ),
-        new Container(
-          width: 300.0,
-          height: 0.5,
-          color: const Color(0xD2D2E1ff),
-          margin: const EdgeInsets.all(16.0),
-        )
-      ],
-    );
-  }
 }

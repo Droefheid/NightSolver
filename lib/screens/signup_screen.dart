@@ -92,7 +92,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           alignment: Alignment.topLeft,
                           child: IconButton(
                               onPressed: widget.showSignInScreen,
-                              icon: Icon(Icons.arrow_back_ios_new_rounded, color: ColorConstant.red900, size: getSize(50),)
+                              icon: ImageIcon(AssetImage("assets/icons/back_arrow_red.png"), color: ColorConstant.red900,)
                           )
                       )
                   ),

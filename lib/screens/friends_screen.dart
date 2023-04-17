@@ -97,19 +97,35 @@ class _FriendsState extends State<Friends> {
 
   showHelpDialog(BuildContext context) {
     Widget okButton = MaterialButton(
-      child: Text("Ok"),
+      child: Text("Ok", style: AppStyle.txtPoppinsMedium18Red,),
       onPressed:  () {
         Navigator.pop(context, true);
       },
     );
     AlertDialog alert = AlertDialog(
-      title: Text("Help"),
+      title: Text.rich(
+          TextSpan(children: [
+            TextSpan(
+              text:"Help",
+              style: AppStyle.txtPoppinsMedium18,
+            ),
+            TextSpan(
+                text: " .",
+                style: AppStyle.txtPoppinsMedium18Red
+            )
+          ])
+      ),
       content: Text(
-          "To add a friend, type his username in this field, then click the + icon."
+          "To add a friend, type his username in this field, then click the + icon.",
+          style: AppStyle.txtPoppinsMedium18GreyLight,
       ),
       actions: [
         okButton,
       ],
+      backgroundColor: ColorConstant.gray90001,
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16)
+      ),
     );
     showDialog(
       context: context,
@@ -147,7 +163,7 @@ class _FriendsState extends State<Friends> {
         appBar: AppBar(
             backgroundColor: ColorConstant.gray900,
             leading: IconButton(
-              icon: Icon(Icons.arrow_back_ios_new_rounded, color: ColorConstant.red900),
+              icon: ImageIcon(AssetImage("assets/icons/back_arrow_red.png"), color: ColorConstant.red900,),
               onPressed: () => Navigator.of(context).pop(),
             ),
             title: RichText(
@@ -253,27 +269,27 @@ class _FriendsState extends State<Friends> {
             }),
             items: [
               BottomNavigationBarItem(
-                  icon: Icon(Icons.home),
+                  icon: ImageIcon(AssetImage("assets/icons/home_filled.png")),
                   label: "Home"
               ),
               BottomNavigationBarItem(
-                  icon: Icon(Icons.search),
+                  icon: ImageIcon(AssetImage("assets/icons/search_empty.png")),
                   label: "Search"
               ),
               BottomNavigationBarItem(
-                  icon: Icon(Icons.recommend),
+                  icon: ImageIcon(AssetImage("assets/icons/recomandation_empty.png")),
                   label: "Recommendation"
               ),
               BottomNavigationBarItem(
-                  icon: Icon(Icons.group_rounded),
+                  icon: ImageIcon(AssetImage("assets/icons/friends_filled.png")),
                   label: "Friends"
               ),
               BottomNavigationBarItem(
-                  icon: Icon(Icons.bookmark),
+                  icon: ImageIcon(AssetImage("assets/icons/bookmark_empty.png")),
                   label: "bookmark"
               ),
               BottomNavigationBarItem(
-                  icon: Icon(Icons.settings),
+                  icon: ImageIcon(AssetImage("assets/icons/settings_empty.png")),
                   label: "Settings"
               ),
             ],
@@ -323,13 +339,13 @@ class FriendCell extends StatelessWidget {
   showWarningDialog(BuildContext context, String friend) {
 
     Widget cancelButton = MaterialButton(
-      child: Text("Cancel"),
+      child: Text("Cancel", style: AppStyle.txtPoppinsMedium18),
       onPressed:  () {
         Navigator.pop(context, true);
       },
     );
     Widget proceedButton = MaterialButton(
-      child: Text("Proceed"),
+      child: Text("Proceed", style: AppStyle.txtPoppinsMedium18Red),
       onPressed: () async {
         await removeFriend(friend);
         await Navigator.of(context).push(MaterialPageRoute(builder: (_) => Friends()));
@@ -338,14 +354,28 @@ class FriendCell extends StatelessWidget {
         },
     );
     AlertDialog alert = AlertDialog(
-      title: Text("Warning"),
+      title: Text.rich(
+        TextSpan(children: [
+          TextSpan(
+            text:"Warning",
+            style: AppStyle.txtPoppinsMedium18,
+          ),
+          TextSpan(
+              text: " !",
+              style: AppStyle.txtPoppinsMedium18Red
+          )
+        ])),
       content: Text(
       'You are about to unfriend \'$friend\'\n'
-      'Do you wish to proceed?'),
+      'Do you wish to proceed?', style: AppStyle.txtPoppinsMedium18GreyLight),
       actions: [
         cancelButton,
         proceedButton,
       ],
+      backgroundColor: ColorConstant.gray90001,
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16)
+      ),
     );
 
 

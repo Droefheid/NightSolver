@@ -35,7 +35,7 @@ class _PreferencesState extends State<Preferences> {
       appBar: AppBar(
           backgroundColor: ColorConstant.gray900,
           leading: IconButton(
-            icon: Icon(Icons.arrow_back_ios_new_rounded, color: ColorConstant.red900),
+            icon: ImageIcon(AssetImage("assets/icons/back_arrow_red.png"), color: ColorConstant.red900,),
             onPressed: () => Navigator.of(context).pop(),
           ),
           title: RichText(

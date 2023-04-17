@@ -35,7 +35,7 @@ class VerticalMovieCard extends StatelessWidget {
               Image.network(item.urlImage, fit: BoxFit.fill, filterQuality: FilterQuality.high,)),
               Positioned(
                   right: getHorizontalSize(-1),
-                  child: IconButton(onPressed: null, icon: Icon(Icons.bookmark_border, color: ColorConstant.whiteA700))
+                  child: IconButton(onPressed: null, icon: ImageIcon(AssetImage("assets/icons/bookmark_empty.png"), color: ColorConstant.whiteA700,))
               )
               
             ])

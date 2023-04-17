@@ -18,7 +18,7 @@ import 'movie_list.dart';
 
 class MovieDetail extends StatefulWidget {
   final MovieInfo item;
-  int currentIndex = 2;
+  int currentIndex = 4;
 
   var image_url = 'https://image.tmdb.org/t/p/w500/';
   var apiKey = '9478d83ca04bd6ee25b942dd7a0ad777';
@@ -347,14 +347,12 @@ class _MovieDetailState extends State<MovieDetail> {
           onTabTapped(index);
         }),
         items: [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
-          BottomNavigationBarItem(icon: Icon(Icons.search), label: "Search"),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.recommend), label: "Recommendation"),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.bookmark), label: "bookmark"),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.settings), label: "Settings"),
+          BottomNavigationBarItem(icon: ImageIcon(AssetImage("assets/icons/home_empty.png")), label: "Home"),
+          BottomNavigationBarItem(icon: ImageIcon(AssetImage("assets/icons/search_empty.png")), label: "Search"),
+          BottomNavigationBarItem(icon: ImageIcon(AssetImage("assets/icons/recomandation_empty.png")), label: "Recommendation"),
+          BottomNavigationBarItem(icon: ImageIcon(AssetImage("assets/icons/friends_filled.png")), label: "Friends"),
+          BottomNavigationBarItem(icon: ImageIcon(AssetImage("assets/icons/bookmark_filled_point.png")), label: "bookmark"),
+          BottomNavigationBarItem(icon: ImageIcon(AssetImage("assets/icons/settings_empty.png")), label: "Settings"),
         ],
       ),
     );

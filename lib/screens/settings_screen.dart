@@ -34,7 +34,7 @@ class _SettingScreenState extends State<SettingScreen> {
       appBar: AppBar(
           backgroundColor: ColorConstant.gray900,
           leading: IconButton(
-            icon: Icon(Icons.arrow_back_ios_new_rounded, color: ColorConstant.red900),
+            icon: ImageIcon(AssetImage("assets/icons/back_arrow_red.png"), color: ColorConstant.red900,),
               onPressed: () => Navigator.of(context).pop()
           ),
           title: RichText(
@@ -73,45 +73,45 @@ class _SettingScreenState extends State<SettingScreen> {
           ),
         ],
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: ColorConstant.gray900,
-        selectedItemColor: ColorConstant.red900,
-        unselectedItemColor: ColorConstant.whiteA700,
-        showSelectedLabels: false,
-        showUnselectedLabels: false,
-        type: BottomNavigationBarType.fixed,
-        currentIndex: currentIndex,
-        onTap: (index) => setState(() {
-          currentIndex = index;
-          onTabTapped(index);
-        }),
-        items: [
-          BottomNavigationBarItem(
-              icon: Icon(Icons.home),
-              label: "Home"
-          ),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.search),
-              label: "Search"
-          ),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.recommend),
-              label: "Recommendation"
-          ),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.group_rounded),
-              label: "Friends"
-          ),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.bookmark),
-              label: "bookmark"
-          ),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.settings),
-              label: "Settings"
-          ),
-        ],
-      ),
+        bottomNavigationBar: BottomNavigationBar(
+          backgroundColor: ColorConstant.gray900,
+          selectedItemColor: ColorConstant.red900,
+          unselectedItemColor: ColorConstant.whiteA700,
+          showSelectedLabels: false,
+          showUnselectedLabels: false,
+          type: BottomNavigationBarType.fixed,
+          currentIndex: currentIndex,
+          onTap: (index) => setState(() {
+            currentIndex = index;
+            onTabTapped(index);
+          }),
+          items: [
+            BottomNavigationBarItem(
+                icon: ImageIcon(AssetImage("assets/icons/home_filled.png")),
+                label: "Home"
+            ),
+            BottomNavigationBarItem(
+                icon: ImageIcon(AssetImage("assets/icons/search_empty.png")),
+                label: "Search"
+            ),
+            BottomNavigationBarItem(
+                icon: ImageIcon(AssetImage("assets/icons/recomandation_empty.png")),
+                label: "Recommendation"
+            ),
+            BottomNavigationBarItem(
+                icon: ImageIcon(AssetImage("assets/icons/friends_filled.png")),
+                label: "Friends"
+            ),
+            BottomNavigationBarItem(
+                icon: ImageIcon(AssetImage("assets/icons/bookmark_empty.png")),
+                label: "bookmark"
+            ),
+            BottomNavigationBarItem(
+                icon: ImageIcon(AssetImage("assets/icons/settings_empty.png")),
+                label: "Settings"
+            ),
+          ],
+        )
     );
   }
 }
