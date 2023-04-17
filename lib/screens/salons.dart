@@ -102,7 +102,7 @@ class _SalonsState extends State<Salons> {
               backgroundColor: ColorConstant.red900,
           ),
           appBar: AppBar(
-              //forceMaterialTransparency: true,
+              backgroundColor: ColorConstant.gray900,
               leading: IconButton(
                 icon: Icon(Icons.arrow_back_ios_new_rounded, color: ColorConstant.red900),
                 onPressed: () => Navigator.of(context).pop(),
