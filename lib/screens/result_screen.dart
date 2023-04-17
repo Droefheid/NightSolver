@@ -5,8 +5,13 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:night_solver/screens/custom_toast.dart';
+import 'package:night_solver/utils/constants.dart';
+import 'package:night_solver/utils/custom_widgets.dart';
 import 'package:night_solver/utils/movie_info.dart';
+import 'package:night_solver/utils/size_utils.dart';
 
+import '../theme/app_style.dart';
+import '../utils/color_constant.dart';
 import 'movie_details.dart';
 
 class ResultScreen extends StatefulWidget {
@@ -25,7 +30,6 @@ class ResultScreen extends StatefulWidget {
 }
 
 class ResultScreenSate extends State<ResultScreen> {
-  final apiKey = '9478d83ca04bd6ee25b942dd7a0ad777';
   Color mainColor = const Color(0xff3C3261);
   List<dynamic> movies = [];
   bool no_recommendations = false;
@@ -129,7 +133,7 @@ class ResultScreenSate extends State<ResultScreen> {
         for (var Rec in RecList) {
           //get the providers list of the recommended movie
           final movieProvider = await http.get(Uri.parse(
-              'https://api.themoviedb.org/3/movie/$Rec/watch/providers?api_key=$apiKey'));
+              'https://api.themoviedb.org/3/movie/$Rec/watch/providers?api_key='+Constants.theMovieDb));
           if (movieProvider.statusCode == 200) {
             final Map<String, dynamic> ProviderData =
                 json.decode(movieProvider.body);
@@ -147,7 +151,7 @@ class ResultScreenSate extends State<ResultScreen> {
                   if (!moviesDataTitles.contains(Rec)) {
                     moviesDataTitles.add(Rec);
                     final finalRec = await http.get(Uri.parse(
-                        'https://api.themoviedb.org/3/movie/$Rec?api_key=$apiKey'));
+                        'https://api.themoviedb.org/3/movie/$Rec?api_key='+Constants.theMovieDb));
                     if (finalRec.statusCode == 200) {
                       final Map<String, dynamic> finalRecCard =
                           json.decode(finalRec.body);
@@ -214,26 +218,34 @@ class ResultScreenSate extends State<ResultScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: ColorConstant.gray900,
       floatingActionButton: new FloatingActionButton.extended(
           onPressed: () {
             submitVotedMovie(vote);
           },
-          label: const Text("Submit vote")),
+          label: Text("Submit vote", style: AppStyle.txtPoppinsMedium18Grey,),
+        backgroundColor: ColorConstant.red900,
+      ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      appBar: AppBar(
-        elevation: 0.3,
-        centerTitle: true,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-        title: Text(
-          'Recomended Movies',
-          style: TextStyle(
-            fontFamily: 'Arvo',
-            fontWeight: FontWeight.bold,
+      appBar:  AppBar(
+          backgroundColor: ColorConstant.gray900,
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back_ios_new_rounded, color: ColorConstant.red900),
+            onPressed: () => Navigator.of(context).pop(),
           ),
-        ),
+          title: RichText(
+              text: TextSpan(children: [
+                TextSpan(
+                    text: "Recommended Movies",
+                    style: AppStyle.txtPoppinsBold30
+                ),
+                TextSpan(
+                    text: ".",
+                    style: AppStyle.txtPoppinsBold30Red
+                ),
+              ]),
+              textAlign: TextAlign.left
+          )
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -245,17 +257,15 @@ class ResultScreenSate extends State<ResultScreen> {
                   ? Center(
                 child: Text(
                   'Sorry, no recommendations are available.',
-                  style: TextStyle(
-                    fontSize: 16.0,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: AppStyle.txtPoppinsMedium18,
                 ),
               )
                   : movies.isEmpty
                   ? Center(
                 child: CircularProgressIndicator(),
               )
-                  : ListView.builder(
+                  : ListView.separated(
+                separatorBuilder: (context, _) => SizedBox(height: getVerticalSize(16)),
                 cacheExtent: 0,
                 itemCount: movies.length,
                 itemBuilder: (context, i) {
@@ -264,8 +274,10 @@ class ResultScreenSate extends State<ResultScreen> {
                         motion: const StretchMotion(),
                         children: [
                           SlidableAction(
-                              backgroundColor: Colors.red,
+                              backgroundColor: ColorConstant.gray800,
+                              borderRadius: BorderRadius.circular(16),
                               icon: Icons.favorite,
+                              foregroundColor: ColorConstant.redA700,
                               label: 'vote',
                               onPressed: (context) {
                                 changeVotedMovie(movies[i]);
@@ -274,7 +286,7 @@ class ResultScreenSate extends State<ResultScreen> {
                         ],
                       ),
                       child: MaterialButton(
-                        child: MovieCell(movies[i]),
+                        child: VerticalMovieCard(item: new MovieInfo(movies[i])),
                         padding: const EdgeInsets.all(0.0),
                         onPressed: () {
                           Navigator.push(
@@ -284,7 +296,6 @@ class ResultScreenSate extends State<ResultScreen> {
                             ),
                           );
                         },
-                        color: Colors.white,
                       )
                   );
                 },
@@ -293,82 +304,6 @@ class ResultScreenSate extends State<ResultScreen> {
           ],
         ),
       ),
-    );
-  }
-}
-
-class MovieCell extends StatelessWidget {
-  final dynamic movie;
-  Color mainColor = const Color(0xff3C3261);
-  var image_url = 'https://image.tmdb.org/t/p/w500/';
-
-  MovieCell(this.movie);
-
-  @override
-  Widget build(BuildContext context) {
-    return new Column(
-      children: <Widget>[
-        new Row(
-          children: <Widget>[
-            new Padding(
-              padding: const EdgeInsets.all(0.0),
-              child: new Container(
-                margin: const EdgeInsets.all(16.0),
-                child: new Container(
-                  width: 70.0,
-                  height: 70.0,
-                ),
-                decoration: new BoxDecoration(
-                  borderRadius: new BorderRadius.circular(10.0),
-                  color: Colors.grey,
-                  image: movie['poster_path'] != null
-                      ? new DecorationImage(
-                          image: new NetworkImage(
-                              image_url + movie['poster_path']),
-                          fit: BoxFit.cover)
-                      : null,
-                  boxShadow: [
-                    new BoxShadow(
-                        color: mainColor,
-                        blurRadius: 5.0,
-                        offset: new Offset(2.0, 5.0))
-                  ],
-                ),
-              ),
-            ),
-            new Expanded(
-                child: new Container(
-              margin: const EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 0.0),
-              child: new Column(
-                children: [
-                  new Text(
-                    movie['title'] ?? 'Title Not Found',
-                    style: new TextStyle(
-                        fontSize: 20.0,
-                        fontFamily: 'Arvo',
-                        fontWeight: FontWeight.bold,
-                        color: mainColor),
-                  ),
-                  new Padding(padding: const EdgeInsets.all(2.0)),
-                  new Text(
-                    movie['overview'] ?? 'Overview Not Found',
-                    maxLines: 3,
-                    style: new TextStyle(
-                        color: const Color(0xff8785A4), fontFamily: 'Arvo'),
-                  )
-                ],
-                crossAxisAlignment: CrossAxisAlignment.start,
-              ),
-            )),
-          ],
-        ),
-        new Container(
-          width: 300.0,
-          height: 0.5,
-          color: const Color(0xD2D2E1ff),
-          margin: const EdgeInsets.all(16.0),
-        )
-      ],
     );
   }
 }

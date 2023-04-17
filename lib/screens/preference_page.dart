@@ -4,6 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:night_solver/screens/custom_toast.dart';
 import 'package:night_solver/screens/result_screen.dart';
 
+import '../theme/app_style.dart';
+import '../utils/color_constant.dart';
+
 class Preferences extends StatefulWidget {
   const Preferences({Key? key, required this.salonName, required this.IdList, required this.providerStat}) : super(key: key);
   final salonName;
@@ -28,23 +31,26 @@ class _PreferencesState extends State<Preferences> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: ColorConstant.gray900,
       appBar: AppBar(
-        elevation: 0.3,
-        centerTitle: true,
-        backgroundColor: Colors.white,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          color: mainColor,
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-        title: Text(
-          'Select preferences',
-          style: TextStyle(
-            color: mainColor,
-            fontFamily: 'Arvo',
-            fontWeight: FontWeight.bold,
+          backgroundColor: ColorConstant.gray900,
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back_ios_new_rounded, color: ColorConstant.red900),
+            onPressed: () => Navigator.of(context).pop(),
           ),
-        ),
+          title: RichText(
+              text: TextSpan(children: [
+                TextSpan(
+                    text: "Which genres",
+                    style: AppStyle.txtPoppinsBold30
+                ),
+                TextSpan(
+                    text: "?",
+                    style: AppStyle.txtPoppinsBold30Red
+                ),
+              ]),
+              textAlign: TextAlign.left
+          )
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -53,28 +59,28 @@ class _PreferencesState extends State<Preferences> {
           children: [
             Text('Adventure',
                 textAlign: TextAlign.left,
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                style: AppStyle.txtPoppinsBold30),
             buildSideLabel("aventureValue", aventureValue),
             Text('Action',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                style: AppStyle.txtPoppinsBold30),
             buildSideLabel("actionValue", actionValue),
             Text('Comedy',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                style: AppStyle.txtPoppinsBold30),
             buildSideLabel("comedieValue", comedieValue),
             Text('Crime',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                style: AppStyle.txtPoppinsBold30),
             buildSideLabel("crimeValue", crimeValue),
             Text('Drama',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                style: AppStyle.txtPoppinsBold30),
             buildSideLabel("dramaValue", dramaValue),
             Text('Fantasy',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                style: AppStyle.txtPoppinsBold30),
             buildSideLabel("fantasyValue", fantasyValue),
             Text('Horror',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                style: AppStyle.txtPoppinsBold30),
             buildSideLabel("horrorValue", horrorValue),
             Text('Sci-Fi',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                style: AppStyle.txtPoppinsBold30),
             buildSideLabel("scifiValue", scifiValue),
             buildSubmit(),
           ],
@@ -87,10 +93,12 @@ class _PreferencesState extends State<Preferences> {
     return Row(
       children: [
         Text('Not at all',
-            style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+            style: AppStyle.txtPoppinsMedium18Red),
         Expanded(
           child: Slider(
             value: value,
+            activeColor: ColorConstant.red900,
+            inactiveColor: ColorConstant.gray700,
             min: 0,
             max: 100,
             divisions: 4,
@@ -118,7 +126,7 @@ class _PreferencesState extends State<Preferences> {
           ),
         ),
         Text('A lot',
-            style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+            style: AppStyle.txtPoppinsMedium18Red),
       ],
     );
   }
@@ -181,7 +189,15 @@ class _PreferencesState extends State<Preferences> {
                   )));}}
 ,
             child: Text('Submit',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                style: AppStyle.txtPoppinsMedium18Grey),
+            style: ButtonStyle(
+                backgroundColor: MaterialStateProperty.all<Color>(ColorConstant.redA700),
+                shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                    RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14)
+                    )
+                )
+            ),
           ),
         ),
       ],

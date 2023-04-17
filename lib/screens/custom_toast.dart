@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:night_solver/utils/color_constant.dart';
 
 class CustomToast extends StatelessWidget {
   final String message;
@@ -29,7 +30,7 @@ class CustomToast extends StatelessWidget {
         children: [
           Icon(
             iconData,
-            color: textColor,
+            color: ColorConstant.redA700,
             size: 28,
           ),
           SizedBox(width: 12),
@@ -49,8 +50,8 @@ class CustomToast extends StatelessWidget {
   }
 
   static void showToast(BuildContext context, String message,
-      {Color backgroundColor = Colors.grey,
-        Color textColor = Colors.white,
+      {Color backgroundColor = const Color(0xFF2C2B2B),
+        Color textColor = const Color(0xFFFFFFFF),
         double fontSize = 16,
         IconData iconData = Icons.local_movies}) {
     FToast fToast = FToast();

@@ -1,6 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:night_solver/screens/preference_page.dart';
+import 'package:night_solver/utils/size_utils.dart';
+
+import '../theme/app_style.dart';
+import '../utils/color_constant.dart';
 
 class Providers extends StatefulWidget {
   const Providers({Key? key,required this.IdList, required this.salonName} ) : super(key: key);
@@ -11,7 +15,6 @@ class Providers extends StatefulWidget {
 }
 //TODO fais en logo
 class _ProvidersState extends State<Providers>{
-  Color mainColor = const Color(0xff3C3261);
   var providers = {
   "Netflix":0,
   "Amazon Prime Video" : 0,
@@ -21,41 +24,55 @@ class _ProvidersState extends State<Providers>{
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        elevation: 0.3,
-        centerTitle: true,
-        backgroundColor: Colors.white,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          color: mainColor,
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-        title: Text(
-          'Movie Providers',
-          style: TextStyle(
-            color: mainColor,
-            fontFamily: 'Arvo',
-            fontWeight: FontWeight.bold,
+      backgroundColor: ColorConstant.gray900,
+      appBar:  AppBar(
+          backgroundColor: ColorConstant.gray900,
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back_ios_new_rounded, color: ColorConstant.red900),
+            onPressed: () => Navigator.of(context).pop(),
           ),
-        ),
+          title: RichText(
+              text: TextSpan(children: [
+                TextSpan(
+                    text: "Select your platform",
+                    style: AppStyle.txtPoppinsBold30
+                ),
+                TextSpan(
+                    text: ".",
+                    style: AppStyle.txtPoppinsBold30Red
+                ),
+              ]),
+              textAlign: TextAlign.left
+          )
       ),
-      body: Wrap(
-        children: [
-          ProvideroCell("Netflix"),
-          ProvideroCell("Amazon Prime Video"),
-          ProvideroCell("Disney Plus"),
-          ProvideroCell("Apple TV"),
-        ],
-      ),
-        bottomSheet: buildSubmit(),
+      body:
+          Column(children: [
+            Wrap(
+              children: [
+                ProvideroCell("Netflix"),
+                ProvideroCell("Amazon Prime Video"),
+                ProvideroCell("Disney Plus"),
+                ProvideroCell("Apple TV"),
+              ],
+            ),
+            Padding(
+                padding: getPadding(top: 400),
+                child:
+            buildSubmit())
+          ]),
     );
   }
   Widget ProvideroCell( String field){
     return Padding(
         padding: const EdgeInsets.all(4),
         child: ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            padding: EdgeInsets.all(10),
+          style: ButtonStyle(
+            backgroundColor: (providers[field]==0) ? MaterialStateProperty.all<Color>(ColorConstant.gray800) : MaterialStateProperty.all<Color>(ColorConstant.red900),
+              shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                  RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14)
+                  )
+              )
           ),
             onPressed: (){
               setState(() {
@@ -69,7 +86,7 @@ class _ProvidersState extends State<Providers>{
               },
             child: Text(
               field,
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold,color: (providers[field]==0)?Colors.black:Colors.white),
+              style: (providers[field]==0) ? AppStyle.txtPoppinsMedium18 : AppStyle.txtPoppinsMedium18Grey,
             )
         )
     );
@@ -88,8 +105,18 @@ class _ProvidersState extends State<Providers>{
               }
               Navigator.of(context).push(MaterialPageRoute(builder: (context) => Preferences(salonName: widget.salonName, IdList : widget.IdList, providerStat : providers)));
             },
-            child: Text('Next',
-                style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold)),
+          style: ButtonStyle(
+            backgroundColor: MaterialStateProperty.all<Color>(ColorConstant.redA700),
+            shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+              RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(14)
+              )
+            )
+          ),
+            child: Text(
+                'Next',
+                style: AppStyle.txtPoppinsMedium18Grey
+            ),
           ),
       ],
     );

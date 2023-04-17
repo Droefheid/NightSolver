@@ -2,6 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import '../theme/app_style.dart';
+import '../utils/color_constant.dart';
 import 'custom_toast.dart';
 
 class Friends extends StatefulWidget {
@@ -126,22 +128,41 @@ class _FriendsState extends State<Friends> {
   }
 
 
+  void onTabTapped(int index) {
+    if (index==0) Navigator.pushNamed(context, '/');
+    if (index==1) Navigator.pushNamed(context, '/search');
+    if (index==2) Navigator.pushNamed(context, '/recommendation');
+    if (index==4) Navigator.pushNamed(context, '/movieList');
+    if (index==5) Navigator.pushNamed(context, '/settings');
+  }
+
 
   @override
   Widget build(BuildContext context) {
+    int currentIndex = 3;
     return GestureDetector(
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: Scaffold(
+        backgroundColor: ColorConstant.gray900,
         appBar: AppBar(
-          elevation: 0.3,
-          centerTitle: true,
-          leading: IconButton(
-            icon: Icon(Icons.arrow_back),
-            onPressed: () => Navigator.pop(context, true)
-          ),
-          title: Text(
-            'Friends',
-          ),
+            backgroundColor: ColorConstant.gray900,
+            leading: IconButton(
+              icon: Icon(Icons.arrow_back_ios_new_rounded, color: ColorConstant.red900),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+            title: RichText(
+                text: TextSpan(children: [
+                  TextSpan(
+                      text: "Friends",
+                      style: AppStyle.txtPoppinsBold30
+                  ),
+                  TextSpan(
+                      text: ".",
+                      style: AppStyle.txtPoppinsBold30Red
+                  ),
+                ]),
+                textAlign: TextAlign.left
+            )
         ),
         body: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -152,7 +173,7 @@ class _FriendsState extends State<Friends> {
                 controller: _addControler,
                 decoration: InputDecoration(
                   prefixIcon: new IconButton(
-                      icon: Icon(Icons.add_circle_outline),
+                      icon: Icon(Icons.add_circle_outline, color: ColorConstant.red900,),
                       onPressed: () async {
                         if (_addControler.text == user.displayName){
                           CustomToast.showToast(context, "You can't add yourself");
@@ -174,21 +195,31 @@ class _FriendsState extends State<Friends> {
                       },
                   ),
                   suffixIcon: new IconButton(
-                    icon: Icon(Icons.help),
+                    icon: Icon(Icons.help, color: ColorConstant.gray700,),
                     onPressed: () {showHelpDialog(context);}
                   ),
                   hintText: "Add a friend",
+                  hintStyle: AppStyle.txtPoppinsMedium18GreyLight,
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(15)
-                  )
+                    borderRadius: BorderRadius.circular(16)
+                  ),
+                  filled: true,
+                  fillColor: ColorConstant.gray90001
                 ),
+                style: AppStyle.txtPoppinsMedium18,
                 onChanged: null
               ),
               Padding(padding: EdgeInsets.all(10.0)),
               TextField(
-                textAlign: TextAlign.center,
                 decoration: InputDecoration(
+                  prefixIcon: Icon(Icons.person_search_rounded, color: ColorConstant.red900),
                   hintText: 'Search a friend',
+                  hintStyle: AppStyle.txtPoppinsMedium18GreyLight,
+                  filled: true,
+                  fillColor: ColorConstant.gray90001,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(16)
+                  )
                 ),
                 controller: _SearchController,
                 onChanged: _onSearchChanged,
@@ -201,7 +232,6 @@ class _FriendsState extends State<Friends> {
                       child: FriendCell(friends[i]),
                       padding: const EdgeInsets.all(0.0),
                       onPressed: null,
-                      color: Colors.white,
                     );
                   },
                 ),
@@ -209,6 +239,45 @@ class _FriendsState extends State<Friends> {
             ],
           ),
         ),
+          bottomNavigationBar: BottomNavigationBar(
+            backgroundColor: ColorConstant.gray900,
+            selectedItemColor: ColorConstant.red900,
+            unselectedItemColor: ColorConstant.whiteA700,
+            showSelectedLabels: false,
+            showUnselectedLabels: false,
+            type: BottomNavigationBarType.fixed,
+            currentIndex: currentIndex,
+            onTap: (index) => setState(() {
+              currentIndex = index;
+              onTabTapped(index);
+            }),
+            items: [
+              BottomNavigationBarItem(
+                  icon: Icon(Icons.home),
+                  label: "Home"
+              ),
+              BottomNavigationBarItem(
+                  icon: Icon(Icons.search),
+                  label: "Search"
+              ),
+              BottomNavigationBarItem(
+                  icon: Icon(Icons.recommend),
+                  label: "Recommendation"
+              ),
+              BottomNavigationBarItem(
+                  icon: Icon(Icons.group_rounded),
+                  label: "Friends"
+              ),
+              BottomNavigationBarItem(
+                  icon: Icon(Icons.bookmark),
+                  label: "bookmark"
+              ),
+              BottomNavigationBarItem(
+                  icon: Icon(Icons.settings),
+                  label: "Settings"
+              ),
+            ],
+          )
       ),
     );
   }
@@ -305,7 +374,6 @@ class FriendCell extends StatelessWidget {
                 ),
                 decoration: new BoxDecoration(
                   borderRadius: new BorderRadius.circular(10.0),
-                  color: Colors.grey,
                   image: new DecorationImage(
                       image: new NetworkImage(
                           "https://eitrawmaterials.eu/wp-content/uploads/2016/09/person-icon.png"),
@@ -326,10 +394,7 @@ class FriendCell extends StatelessWidget {
                     children: [
                             Text(
                               friend,
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 20
-                              ),
+                              style: AppStyle.txtPoppinsBold20
                             )
                     ],
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -340,7 +405,7 @@ class FriendCell extends StatelessWidget {
               highlightColor: Colors.red,
               icon: Icon(
                 Icons.heart_broken,
-                color: Colors.black,
+                color: ColorConstant.red900,
               ),
               onPressed: () {showWarningDialog(context, friend);}
             ),
@@ -349,7 +414,7 @@ class FriendCell extends StatelessWidget {
         new Container(
           width: 300.0,
           height: 0.5,
-          color: const Color(0xD2D2E1ff),
+          color: ColorConstant.redA700,
           margin: const EdgeInsets.all(16.0),
         )
       ],
