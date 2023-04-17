@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:night_solver/screens/salons.dart';
@@ -16,19 +18,38 @@ class Recommendation extends StatefulWidget {
 }
 
 class RecommendationState extends State<Recommendation> {
-
+  final apiKey = '9478d83ca04bd6ee25b942dd7a0ad777';
   List<dynamic> movies = [];
-
+  final user = FirebaseAuth.instance.currentUser!;
   void handleSelectedGenre(String genre, bool onSelect) {
 
   }
 
   Future<void> getData() async {
-    final url = 'https://api.themoviedb.org/3/trending/movie/week?api_key=9478d83ca04bd6ee25b942dd7a0ad777';
-    final response = await http.get(Uri.parse(url));
-    final Map<String, dynamic> responseData = json.decode(response.body);
+    List<dynamic> Recmovie = [];
+    List<dynamic> moviesData = [];
+    List<dynamic> RecmovieIds = [];
+    final snapshot = await FirebaseFirestore.instance.collection("users").doc(user.uid).get();
+    if (snapshot.data()!['recommended'] != null) {
+      for (var item in snapshot.data()!['recommended'].entries) {
+        Recmovie.addAll(item.value);
+      }
+    }
+    for(int i=0;i<Recmovie.length;i++){
+      RecmovieIds.add(Recmovie[i]["id"]);
+    }
+    for(var movieId in RecmovieIds){
+      final url = await http.get(Uri.parse(
+          'https://api.themoviedb.org/3/movie/$movieId?api_key=$apiKey'));
+      if(url.statusCode == 200){
+        final Map<String, dynamic> finalCard =
+        json.decode(url.body);
+        moviesData.add(finalCard);
+      }
+    }
+
     setState(() {
-      movies = responseData['results'];
+      movies = moviesData;
     });
   }
 
