@@ -199,7 +199,7 @@ class _SearchScreenState extends State<SearchScreen> {
                     ),
                     onPressed: null),
                 hintText: "Search",
-                hintStyle: AppStyle.txtPoppinsMedium18Grey,
+                hintStyle: AppStyle.txtPoppinsMedium18GreyLight,
                 border:
                     OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                 filled: true,
