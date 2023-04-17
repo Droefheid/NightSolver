@@ -126,8 +126,9 @@ class _SearchScreenState extends State<SearchScreen> {
   void onTabTapped(int index) {
     if (index == 0) Navigator.pushNamed(context, '/');
     if (index==2) Navigator.pushNamed(context, '/recommendation');
-    if (index==3) Navigator.pushNamed(context, '/movieList');
-    if (index==4) Navigator.pushNamed(context, '/settings');
+    if (index==3) Navigator.pushNamed(context, '/friends');
+    if (index==4) Navigator.pushNamed(context, '/movieList');
+    if (index==5) Navigator.pushNamed(context, '/settings');
 
   }
 
@@ -250,12 +251,10 @@ class _SearchScreenState extends State<SearchScreen> {
           items: [
             BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
             BottomNavigationBarItem(icon: Icon(Icons.search), label: "Search"),
-            BottomNavigationBarItem(
-                icon: Icon(Icons.recommend), label: "Recommendation"),
-            BottomNavigationBarItem(
-                icon: Icon(Icons.bookmark), label: "bookmark"),
-            BottomNavigationBarItem(
-                icon: Icon(Icons.settings), label: "Settings"),
+            BottomNavigationBarItem(icon: Icon(Icons.recommend), label: "Recommendation"),
+            BottomNavigationBarItem(icon: Icon(Icons.group_rounded), label: "Friends"),
+            BottomNavigationBarItem(icon: Icon(Icons.bookmark), label: "bookmark"),
+            BottomNavigationBarItem(icon: Icon(Icons.settings), label: "Settings"),
           ],
         ));
   }

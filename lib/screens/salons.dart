@@ -80,8 +80,10 @@ class _SalonsState extends State<Salons> {
   void onTabTapped(int index) {
     if (index==0) Navigator.pushNamed(context, '/');
     if (index==1) Navigator.pushNamed(context, '/search');
-    if (index==3) Navigator.pushNamed(context, '/movieList');
-    if (index==4) Navigator.pushNamed(context, '/settings');
+    if (index==2) Navigator.pushNamed(context, '/recommendation');
+    if (index==3) Navigator.pushNamed(context, '/friends');
+    if (index==4) Navigator.pushNamed(context, '/movieList');
+    if (index==5) Navigator.pushNamed(context, '/settings');
   }
 
   @override
@@ -229,6 +231,10 @@ class _SalonsState extends State<Salons> {
               BottomNavigationBarItem(
                   icon: Icon(Icons.recommend),
                   label: "Recommendation"
+              ),
+              BottomNavigationBarItem(
+                  icon: Icon(Icons.group_rounded),
+                  label: "Friends"
               ),
               BottomNavigationBarItem(
                   icon: Icon(Icons.bookmark),

@@ -86,12 +86,13 @@ class _MovieListState extends State<MovieList> {
     if (index==0) Navigator.pushNamed(context, '/');
     if (index==1) Navigator.pushNamed(context, '/search');
     if (index==2) Navigator.pushNamed(context, '/recommendation');
-    if (index==4) Navigator.pushNamed(context, '/settings');
+    if (index==3) Navigator.pushNamed(context, '/friends');
+    if (index==5) Navigator.pushNamed(context, '/settings');
   }
 
   @override
   Widget build(BuildContext context) {
-    int currentIndex = 3;
+    int currentIndex = 4;
     return Scaffold(
       backgroundColor: ColorConstant.gray900,
       appBar: AppBar(
@@ -145,6 +146,10 @@ class _MovieListState extends State<MovieList> {
     BottomNavigationBarItem(
     icon: Icon(Icons.recommend),
     label: "Recommendation"
+    ),
+    BottomNavigationBarItem(
+        icon: Icon(Icons.group_rounded),
+        label: "Friends"
     ),
     BottomNavigationBarItem(
     icon: Icon(Icons.bookmark),

@@ -22,12 +22,13 @@ class _SettingScreenState extends State<SettingScreen> {
     if (index==0) Navigator.pushNamed(context, '/');
     if (index==1) Navigator.pushNamed(context, '/search');
     if (index==2) Navigator.pushNamed(context, '/recommendation');
-    if (index==3) Navigator.pushNamed(context, '/movieList');
+    if (index==3) Navigator.pushNamed(context, '/friends');
+    if (index==4) Navigator.pushNamed(context, '/movieList');
   }
 
   @override
   Widget build(BuildContext context) {
-    int currentIndex = 4;
+    int currentIndex = 5;
     return Scaffold(
       backgroundColor: ColorConstant.gray900,
       appBar: AppBar(
@@ -96,6 +97,10 @@ class _SettingScreenState extends State<SettingScreen> {
           BottomNavigationBarItem(
               icon: Icon(Icons.recommend),
               label: "Recommendation"
+          ),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.group_rounded),
+              label: "Friends"
           ),
           BottomNavigationBarItem(
               icon: Icon(Icons.bookmark),
