@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
@@ -41,21 +42,60 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> getData() async {
     final trending_movies_url =
-        'https://api.themoviedb.org/3/trending/movie/week?api_key='+Constants.theMovieDb;
-    final trending_movies_response = await http.get(Uri.parse(trending_movies_url));
-    final Map<String, dynamic> trending_movies_responseData = json.decode(trending_movies_response.body);
+        'https://api.themoviedb.org/3/trending/movie/week?api_key=' +
+            Constants.theMovieDb;
+    final trending_movies_response =
+    await http.get(Uri.parse(trending_movies_url));
+    final Map<String, dynamic> trending_movies_responseData =
+    json.decode(trending_movies_response.body);
 
-    final latest_movies_url = 'https://api.themoviedb.org/3/discover/movie?api_key='+Constants.theMovieDb
-        +'&sort_by=release_date.desc&vote_count.gte=100';
-    final latest_movies_response = await http.get(Uri.parse(latest_movies_url));
-    final Map<String, dynamic> latest_movies_responseData = json.decode(latest_movies_response.body);
+    final user = FirebaseAuth.instance.currentUser!;
+    final snapshot = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user.uid)
+        .get();
+    List<dynamic>? moviesId = snapshot.data()!['movies_id'];
+
+    List<dynamic> latest_movies_data = [];
+
+    if (moviesId != null) {
+      for (String movieId in moviesId) {
+        final response = await http.get(Uri.parse(
+            'https://api.themoviedb.org/3/movie/$movieId?api_key=' +
+                Constants.theMovieDb));
+
+        if (response.statusCode == 200) {
+          final Map<String, dynamic> responseData = json.decode(response.body);
+          responseData['can_delete'] = true;
+          latest_movies_data.add(responseData);
+        }
+      }
+    }
+
+    final latest_movies_url =
+        'https://api.themoviedb.org/3/discover/movie?api_key=' +
+            Constants.theMovieDb +
+            '&sort_by=release_date.desc&vote_count.gte=100';
+    final latest_movies_response =
+    await http.get(Uri.parse(latest_movies_url));
+    final Map<String, dynamic> latest_movies_responseData =
+    json.decode(latest_movies_response.body);
+
+    // Replace movies in latest_movies list with the ones fetched from Firebase database
+    for (int i = 0; i < latest_movies_responseData['results'].length; i++) {
+      final movie = latest_movies_responseData['results'][i];
+      final index =
+      latest_movies_data.indexWhere((m) => m['id'] == movie['id']);
+      if (index != -1) {
+        latest_movies_responseData['results'][i] = latest_movies_data[index];
+      }
+    }
 
     setState(() {
       trending_movies = trending_movies_responseData['results'];
       latest_movies = latest_movies_responseData['results'];
     });
   }
-
 
   @override
   void initState() {
