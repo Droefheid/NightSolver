@@ -80,7 +80,6 @@ class _SalonsState extends State<Salons> {
   void onTabTapped(int index) {
     if (index==0) Navigator.pushNamed(context, '/');
     if (index==1) Navigator.pushNamed(context, '/search');
-    if (index==2) Navigator.pushNamed(context, '/recommendation');
     if (index==3) Navigator.pushNamed(context, '/friends');
     if (index==4) Navigator.pushNamed(context, '/movieList');
     if (index==5) Navigator.pushNamed(context, '/settings');
@@ -150,7 +149,7 @@ class _SalonsState extends State<Salons> {
                     itemBuilder: (context, i) {
                       return MaterialButton(
                         child: RoomInfo(salon:salons[i]),
-                        padding: const EdgeInsets.all(0.0),
+                        padding: getPadding(top: 16, bottom: 16),
                         onPressed: () async {
                           String salonName = salons[i].keys.first;
                           var members = salons[i].values.first['salon_members'];
@@ -256,6 +255,7 @@ class _SalonsState extends State<Salons> {
 class RoomInfo extends StatelessWidget {
 
   final dynamic salon;
+  final user = FirebaseAuth.instance.currentUser!;
 
   RoomInfo({required this.salon});
 
@@ -305,7 +305,7 @@ class RoomInfo extends StatelessWidget {
                     child: Row(
                       children: [
                         Padding(
-                            padding: getPadding(left: 120, right: 16),
+                            padding: getPadding(left: 100, right: 16),
                             child: IconButton(
                                 icon: Icon(Icons.person_outline_rounded, color: ColorConstant.whiteA700),
                               onPressed: () {
@@ -313,7 +313,12 @@ class RoomInfo extends StatelessWidget {
                               },
                             )
                         ),
-                        Icon(Icons.logout_sharp, color: ColorConstant.red900)
+                        IconButton(
+                            onPressed: () {
+                              showWarningDialog(context, salon);
+                            },
+                            icon:  Icon(Icons.logout_sharp, color: ColorConstant.red900)
+                        )
                       ],
                     )
                 )
@@ -338,22 +343,85 @@ class RoomInfo extends StatelessWidget {
     return allStrings;
   }
 
+  void leaveSalon(dynamic salon) async {
+    String salonName = salon.keys.toList().first;
+    for (String member in salon[salon.keys.toList().first]['salon_members']){
+      final DocumentReference ownDocRef = FirebaseFirestore.instance.collection('users').doc(member);
+      ownDocRef.update({'salons.$salonName.salon_members': FieldValue.arrayRemove([user.uid])});
+      ownDocRef.update({'salons.$salonName.preferences.${user.uid}' : FieldValue.delete()});
+      ownDocRef.update({'salons.$salonName.votes.${user.uid}' : FieldValue.delete()});
+
+    }
+    final DocumentReference docRef = FirebaseFirestore.instance.collection('users').doc(user.uid);
+    docRef.update({'salons.$salonName' : FieldValue.delete()});
+  }
+
+  showWarningDialog(BuildContext context, dynamic salon){
+    String salonName = salon.keys.toList().first;
+    Widget cancelButton = MaterialButton(
+      child: Text("Cancel"),
+      onPressed:  () {
+        Navigator.of(context).pop();
+      },
+    );
+    Widget proceedButton = MaterialButton(
+      child: Text("Proceed"),
+      onPressed:  () async {
+        leaveSalon(salon);
+        await Navigator.of(context).push(MaterialPageRoute(builder: (_) => Salons()));
+        Navigator.pop(context, true);
+        Navigator.pop(context, true);
+      },
+    );
+    AlertDialog alert = AlertDialog(
+      title: Text("Warning"),
+      content: Text(
+          "You are about to leave the room \'$salonName\'.\n"
+              "Do you wish to proceed?"
+      ),
+      actions: [
+        cancelButton,
+        proceedButton,
+      ],
+    );
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
+  }
+
   showMembersDialog(BuildContext context, List salonMembers) {
     Widget okButton = MaterialButton(
-      child: Text("Ok"),
+      child: Text("Ok", style: AppStyle.txtPoppinsMedium18Red),
       onPressed:  () {
         Navigator.of(context).pop();
       },
     );
     AlertDialog alert = AlertDialog(
-      title: Text("List of members"),
+      backgroundColor: ColorConstant.gray90001,
+      title: Text.rich(
+        TextSpan(children: [
+          TextSpan(
+            text: "Members",
+            style: AppStyle.txtPoppinsBold20
+          ),
+          TextSpan(
+            text: ".",
+            style: AppStyle.txtPoppinsBold20Red
+          )
+        ]
+        )
+      ),
       content: FutureBuilder(
         future: joinStrings(salonMembers),
         builder: (context, snapshot) {
           if (snapshot.hasData &&
               snapshot.connectionState == ConnectionState.done) {
             return Text(
-                snapshot.data!
+                snapshot.data!,
+              style: AppStyle.txtPoppinsMedium18,
             );
           }
           return CircularProgressIndicator();
