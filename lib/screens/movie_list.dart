@@ -4,17 +4,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
-import 'package:night_solver/screens/home_screen.dart';
-import 'package:night_solver/screens/recommendation_screen.dart';
-import 'package:night_solver/screens/search_screen.dart';
-import 'package:night_solver/screens/settings_screen.dart';
 import 'package:night_solver/theme/app_style.dart';
 import 'package:night_solver/utils/custom_widgets.dart';
 import '../utils/color_constant.dart';
 import '../utils/constants.dart';
 import '../utils/movie_info.dart';
 import '../utils/size_utils.dart';
-import 'movie_details.dart';
 
 class MovieList extends StatefulWidget {
   @override
@@ -88,10 +83,10 @@ class _MovieListState extends State<MovieList> {
   }
 
   void onTabTapped(int index) {
-    if(index==0) Navigator.of(context).push(MaterialPageRoute(builder: (_) => HomeScreen()));
-    if(index==1) Navigator.of(context).push(MaterialPageRoute(builder: (_) => SearchScreen()));
-    if(index==2) Navigator.of(context).push(MaterialPageRoute(builder: (_) => Recommendation()));
-    if(index==4) Navigator.of(context).push(MaterialPageRoute(builder: (_) => SettingScreen()));
+    if (index==0) Navigator.pushNamed(context, '/');
+    if (index==1) Navigator.pushNamed(context, '/search');
+    if (index==2) Navigator.pushNamed(context, '/recommendation');
+    if (index==4) Navigator.pushNamed(context, '/settings');
   }
 
   @override
@@ -103,7 +98,7 @@ class _MovieListState extends State<MovieList> {
         //forceMaterialTransparency: true,
         leading: IconButton(
           icon: Icon(Icons.arrow_back_ios_new_rounded, color: ColorConstant.red900),
-          onPressed: () => Navigator.pop(context, true),
+            onPressed: () => Navigator.of(context).pop()
         ),
         title: RichText(
             text: TextSpan(children: [

@@ -1,12 +1,7 @@
 import 'dart:convert';
-
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
-import 'package:night_solver/screens/home_screen.dart';
-import 'package:night_solver/screens/recommendation_screen.dart';
-import 'package:night_solver/screens/settings_screen.dart';
-
 import '../theme/app_style.dart';
 import '../utils/color_constant.dart';
 import '../utils/constants.dart';
@@ -14,7 +9,6 @@ import '../utils/custom_widgets.dart';
 import '../utils/genre_utils.dart';
 import '../utils/movie_info.dart';
 import '../utils/size_utils.dart';
-import 'movie_list.dart';
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({Key? key}) : super(key: key);
@@ -130,18 +124,11 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   void onTabTapped(int index) {
-    if (index == 0)
-      Navigator.of(context)
-          .push(MaterialPageRoute(builder: (_) => HomeScreen()));
-    if (index == 2)
-      Navigator.of(context)
-          .push(MaterialPageRoute(builder: (_) => Recommendation()));
-    if (index == 3)
-      Navigator.of(context)
-          .push(MaterialPageRoute(builder: (_) => MovieList()));
-    if (index == 4)
-      Navigator.of(context)
-          .push(MaterialPageRoute(builder: (_) => SettingScreen()));
+    if (index == 0) Navigator.pushNamed(context, '/');
+    if (index==2) Navigator.pushNamed(context, '/recommendation');
+    if (index==3) Navigator.pushNamed(context, '/movieList');
+    if (index==4) Navigator.pushNamed(context, '/settings');
+
   }
 
   void onSelectedGenre(String genre, bool isSelected) {
@@ -192,8 +179,7 @@ class _SearchScreenState extends State<SearchScreen> {
             leading: IconButton(
               icon: Icon(Icons.arrow_back_ios_new_rounded,
                   color: ColorConstant.red900),
-              onPressed: () => Navigator.pop(context, true),
-            ),
+                onPressed: () => Navigator.of(context).pop()),
             title: RichText(
                 text: TextSpan(children: [
                   TextSpan(text: "Search", style: AppStyle.txtPoppinsBold30),

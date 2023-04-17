@@ -2,13 +2,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_settings_screens/flutter_settings_screens.dart';
-import 'package:night_solver/screens/home_screen.dart';
-import 'package:night_solver/screens/recommendation_screen.dart';
-import 'package:night_solver/screens/search_screen.dart';
-
 import '../theme/app_style.dart';
 import '../utils/color_constant.dart';
-import 'movie_list.dart';
 
 class SettingScreen extends StatefulWidget {
   const SettingScreen({Key? key}) : super(key: key);
@@ -24,10 +19,10 @@ class _SettingScreenState extends State<SettingScreen> {
   }
 
   void onTabTapped(int index) {
-    if(index==0) Navigator.of(context).push(MaterialPageRoute(builder: (_) => HomeScreen()));
-    if(index==1) Navigator.of(context).push(MaterialPageRoute(builder: (_) => SearchScreen()));
-    if(index==2) Navigator.of(context).push(MaterialPageRoute(builder: (_) => Recommendation()));
-    if(index==3) Navigator.of(context).push(MaterialPageRoute(builder: (_) => MovieList()));
+    if (index==0) Navigator.pushNamed(context, '/');
+    if (index==1) Navigator.pushNamed(context, '/search');
+    if (index==2) Navigator.pushNamed(context, '/recommendation');
+    if (index==3) Navigator.pushNamed(context, '/movieList');
   }
 
   @override
@@ -39,7 +34,7 @@ class _SettingScreenState extends State<SettingScreen> {
           //forceMaterialTransparency: true,
           leading: IconButton(
             icon: Icon(Icons.arrow_back_ios_new_rounded, color: ColorConstant.red900),
-            onPressed: () => Navigator.pop(context, true),
+              onPressed: () => Navigator.of(context).pop()
           ),
           title: RichText(
               text: TextSpan(children: [
@@ -61,10 +56,9 @@ class _SettingScreenState extends State<SettingScreen> {
               title: "Logout",
               titleTextStyle: AppStyle.txtPoppinsRegular16Bluegray400,
               leading: Icon(Icons.logout_rounded, color: ColorConstant.red900),
-              onTap: () => {
-                FirebaseAuth.instance.signOut(),
-                Navigator.of(context).pop()
-                //TODO
+              onTap: () {
+                FirebaseAuth.instance.signOut();
+                Navigator.of(context).popUntil((route) => route.isFirst);
                 }
               ,
           ),

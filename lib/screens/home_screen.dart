@@ -1,22 +1,16 @@
 import 'dart:convert';
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:night_solver/screens/movie_details.dart';
 import 'package:http/http.dart' as http;
-import 'package:night_solver/screens/recommendation_screen.dart';
-import 'package:night_solver/screens/search_screen.dart';
-import 'package:night_solver/screens/settings_screen.dart';
 import 'package:night_solver/theme/app_decoration.dart';
 import 'package:night_solver/utils/color_constant.dart';
 import 'package:night_solver/utils/constants.dart';
-
 import '../theme/app_style.dart';
 import '../utils/custom_widgets.dart';
 import '../utils/movie_info.dart';
 import '../utils/size_utils.dart';
-import 'movie_list.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -33,16 +27,15 @@ class _HomeScreenState extends State<HomeScreen> {
   List<dynamic> trending_movies = [];
   List<dynamic> latest_movies = [];
   final controller = ScrollController();
-  int currentIndex = 0;
   void signOut(){
     FirebaseAuth.instance.signOut();
   }
 
   void onTabTapped(int index) {
-    if(index==1) Navigator.of(context).push(MaterialPageRoute(builder: (_) => SearchScreen()));
-    if (index==2) Navigator.of(context).push(MaterialPageRoute(builder: (_) => Recommendation()));
-    if(index==3) Navigator.of(context).push(MaterialPageRoute(builder: (_) => MovieList()));
-    if(index==4) Navigator.of(context).push(MaterialPageRoute(builder: (_) => SettingScreen()));
+    if (index==1) Navigator.pushNamed(context, '/search');
+    if (index==2) Navigator.pushNamed(context, '/recommendation');
+    if (index==3) Navigator.pushNamed(context, '/movieList');
+    if (index==4) Navigator.pushNamed(context, '/settings');
   }
 
   Future<void> getData() async {
@@ -73,6 +66,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    int currentIndex = 0;
     final orientation = MediaQuery.of(context).orientation;
     return Scaffold(
         backgroundColor: ColorConstant.gray900,

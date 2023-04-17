@@ -77,10 +77,10 @@ class _SalonsState extends State<Salons> {
   }
 
   void onTabTapped(int index) {
-    if (index==0) Navigator.of(context).push(MaterialPageRoute(builder: (_) => HomeScreen()));
-    if (index==1) Navigator.of(context).push(MaterialPageRoute(builder: (_) => SearchScreen()));
-    if(index==3) Navigator.of(context).push(MaterialPageRoute(builder: (_) => MovieList()));
-    if(index==4) Navigator.of(context).push(MaterialPageRoute(builder: (_) => SettingScreen()));
+    if (index==0) Navigator.pushNamed(context, '/');
+    if (index==1) Navigator.pushNamed(context, '/search');
+    if (index==3) Navigator.pushNamed(context, '/movieList');
+    if (index==4) Navigator.pushNamed(context, '/settings');
   }
 
   @override
@@ -105,7 +105,7 @@ class _SalonsState extends State<Salons> {
               //forceMaterialTransparency: true,
               leading: IconButton(
                 icon: Icon(Icons.arrow_back_ios_new_rounded, color: ColorConstant.red900),
-                onPressed: () => Navigator.pop(context, true),
+                onPressed: () => Navigator.of(context).pop(),
               ),
               title: RichText(
                   text: TextSpan(children: [
