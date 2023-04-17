@@ -8,6 +8,7 @@ class MovieInfo {
   late String synopsis;
   late String id;
   late List<dynamic>? genres;
+  late bool canDelete;
   MovieInfo(dynamic movie) {
     // TODO CHECK null values
     this.title = movie["title"] == null || movie["title"] == "" ? "No title found": movie["title"];
@@ -15,6 +16,7 @@ class MovieInfo {
     this.rating = movie["vote_average"] == null ? 0 : CustomRound(movie["vote_average"]/2);
     this.synopsis = movie["overview"] == null || movie["overview"] == "" ? "No synopsis" : movie["overview"];
     this.genres = movie["genres"];
+    this.canDelete = movie['can_delete'] == true;
     this.id = movie["id"] == null ? "-1" : movie["id"].toString();
   }
 }

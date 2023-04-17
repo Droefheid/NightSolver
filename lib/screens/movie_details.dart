@@ -24,6 +24,7 @@ class MovieDetail extends StatefulWidget {
   var apiKey = '9478d83ca04bd6ee25b942dd7a0ad777';
   Map<String, dynamic> providers = {};
 
+
   MovieDetail({super.key, required this.item});
 
   @override
@@ -114,22 +115,31 @@ class _MovieDetailState extends State<MovieDetail> {
     var response = await http.get(Uri.parse(url));
     if (response.statusCode == 200) {
       Map<String, dynamic> data = jsonDecode(response.body);
+      Map<String, dynamic> providers = data['results'];
+      Map<String, dynamic> filteredProviders = {};
+      providers.forEach((key, value) {
+        String link = value['link'];
+        if (link.contains('locale=BE')) {
+          filteredProviders[key] = value;
+        }
+      });
       setState(() {
-        widget.providers = data['results'];
+        widget.providers = filteredProviders;
       });
     } else {
       throw Exception('Failed to load providers');
     }
   }
 
-  Widget buildProviderList() {
+
+      Widget buildProviderList() {
     if (widget.providers.isEmpty) {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(height: 20),
           Text(
-            'No providers available',
+            'No providers available in Belgium',
             style: TextStyle(
                 fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
           ),
@@ -142,20 +152,7 @@ class _MovieDetailState extends State<MovieDetail> {
     Set<String> addedProviders = Set();
 
     widget.providers.forEach((key, value) {
-      if (value['rent'] != null && value['rent'].isNotEmpty) {
-        value['rent'].forEach((rentValue) {
-          if (rentValue['provider_name'] != null &&
-              !addedProviders.contains(rentValue['provider_name'])) {
-            addedProviders.add(rentValue['provider_name']);
-            providerWidgets.add(
-              Image.network(
-                'https://image.tmdb.org/t/p/w92${rentValue['logo_path']}',
-                width: 60,
-              ),
-            );
-          }
-        });
-      } else {
+
         if (value['flatrate'] != null && value['flatrate'].isNotEmpty) {
           value['flatrate'].forEach((flatValue) {
             if (flatValue['provider_name'] != null &&
@@ -170,7 +167,20 @@ class _MovieDetailState extends State<MovieDetail> {
             }
           });
         }
-      }
+        if (value['rent'] != null && value['rent'].isNotEmpty) {
+          value['rent'].forEach((rentValue) {
+            if (rentValue['provider_name'] != null &&
+                !addedProviders.contains(rentValue['provider_name'])) {
+              addedProviders.add(rentValue['provider_name']);
+              providerWidgets.add(
+                Image.network(
+                  'https://image.tmdb.org/t/p/w92${rentValue['logo_path']}',
+                  width: 60,
+                ),
+              );
+            }
+          });
+        }
     });
 
     return Column(
@@ -208,14 +218,7 @@ class _MovieDetailState extends State<MovieDetail> {
 
   @override
   Widget build(BuildContext context) {
-    return new Scaffold(
-      /*appBar: new AppBar(
-        forceMaterialTransparency: true,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios_new_rounded, color: ColorConstant.red900),
-          onPressed: () => Navigator.pop(context, true),
-        ),
-      ),*/
+    return Scaffold(
       body: SafeArea(
         child: Stack(
           children: [
@@ -223,80 +226,114 @@ class _MovieDetailState extends State<MovieDetail> {
               height: double.infinity,
               color: ColorConstant.gray900,
             ),
-            Container(
-              height: getVerticalSize(581),
-              width: getHorizontalSize(561),
-              child: Image.network(
-                widget.item.urlImage,
-                height: MediaQuery.of(context).size.height * 0.5,
-                fit: BoxFit.cover,
-              ),
-            ),
-            /*const Positioned.fill(child: DecoratedBox(decoration: BoxDecoration(
-            gradient: LinearGradient(colors: [
-              Colors.transparent,
-              Color(0x111111)
-            ],
-            begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              stops: [0.3, 0.5]
-            ),
-          ))),*/
-            Positioned(
-              child: Text(
-                widget.item.title,
-                style: AppStyle.txtPoppinsBold30,
-                textAlign: TextAlign.center,
-              ),
-              top: getVerticalSize(540),
-              left: getHorizontalSize(32),
-            ),
-            Positioned(
-              child: Text.rich(TextSpan(children: [
-                WidgetSpan(child: SizedBox(width: getHorizontalSize(20))),
-                TextSpan(text: widget.item.rating.toString()),
-                WidgetSpan(child: SizedBox(width: getHorizontalSize(20))),
-                WidgetSpan(
-                  child: RatingBarIndicator(
-                    itemBuilder: (context, index) =>
-                        Icon(Icons.star_rounded, color: ColorConstant.red900),
-                    itemCount: 5,
-                    rating: widget.item.rating,
-                    itemSize: getSize(28),
-                    unratedColor: ColorConstant.gray700,
+            SingleChildScrollView(
+              child: Column(
+                children: [
+                  Container(
+                    height: getVerticalSize(500),
+                    width: getHorizontalSize(561),
+                    child: Image.network(
+                      widget.item.urlImage,
+                      height: MediaQuery.of(context).size.height * 0.3,
+                      fit: BoxFit.cover,
+                    ),
                   ),
-                )
-              ], style: AppStyle.txtPoppinsMedium22)),
-              top: getVerticalSize(600),
+                  SizedBox(height: getVerticalSize(20)),
+                  Text(
+                    widget.item.title,
+                    style: AppStyle.txtPoppinsBold30,
+                    textAlign: TextAlign.center,
+                  ),
+                  SizedBox(height: getVerticalSize(20)),
+                  Text.rich(TextSpan(children: [
+                    WidgetSpan(child: SizedBox(width: getHorizontalSize(20))),
+                    TextSpan(text: widget.item.rating.toString()),
+                    WidgetSpan(child: SizedBox(width: getHorizontalSize(20))),
+                    WidgetSpan(
+                      child: RatingBarIndicator(
+                        itemBuilder: (context, index) =>
+                            Icon(Icons.star_rounded, color: ColorConstant.red900),
+                        itemCount: 5,
+                        rating: widget.item.rating,
+                        itemSize: getSize(28),
+                        unratedColor: ColorConstant.gray700,
+                      ),
+                    )
+                  ], style: AppStyle.txtPoppinsMedium22)),
+                  SizedBox(height: getVerticalSize(20)),
+                  buildProviderList(),
+                  SizedBox(height: getVerticalSize(20)),
+                  Container(
+                    width: getHorizontalSize(379),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                      color: ColorConstant.gray800,
+                    ),
+                    padding: EdgeInsets.all(getSize(16)),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Synopsis",
+                          style: AppStyle.txtPoppinsBold20,
+                        ),
+                        SizedBox(height: getVerticalSize(10)),
+                        Text(
+                          widget.item.synopsis,
+                          style: AppStyle.txtPoppinsRegular13,
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: getVerticalSize(20)),
+                ],
+              ),
             ),
             Positioned(
-              child: Container(
-                  height: getVerticalSize(120),
-                  width: getHorizontalSize(379),
-                  child: Text(widget.item.synopsis,
-                      style: AppStyle.txtPoppinsRegular13)),
-              top: getVerticalSize(660),
+              top: getVerticalSize(20),
               left: getHorizontalSize(16),
-            ),
-            IconButton(
-                onPressed: () => Navigator.pop(context, true),
-                icon: Icon(Icons.arrow_back_ios_new_rounded,
-                    color: ColorConstant.red900, size: 45)),
-            Positioned(
               child: IconButton(
                 icon: Icon(
-                  Icons.bookmark_border,
-                  color: ColorConstant.whiteA700,
+                  Icons.arrow_back_ios_new_rounded,
+                  color: ColorConstant.red900,
                   size: 45,
                 ),
-                onPressed: () => addMovie(context),
+                onPressed: () => Navigator.pop(context, true),
               ),
+            ),
+            Positioned(
+              top: getVerticalSize(20),
               right: getHorizontalSize(16),
-            )
+              child: InkWell(
+                onTap: () {
+                  if (widget.item.canDelete) {
+                    deleteMovie(context, widget.item.id);
+                  } else {
+                    addMovie(context);
+                  }
+                },
+                child: Container(
+                  width: getSize(45),
+                  height: getSize(45),
+                  decoration: BoxDecoration(
+                    color: widget.item.canDelete ? Colors.red : Colors.transparent,
+                    borderRadius: BorderRadius.circular(getSize(45)),
+                    border: Border.all(
+                      color: Colors.white,
+                      width: getSize(2),
+                    ),
+                  ),
+                  child: Icon(
+                    Icons.bookmark,
+                    color: Colors.white,
+                    size: getSize(30),
+                  ),
+                ),
+              ),
+            ),
           ],
         ),
-    ),
-
+      ),
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: ColorConstant.gray900,
         selectedItemColor: ColorConstant.red900,
