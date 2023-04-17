@@ -235,10 +235,6 @@ class _SalonsState extends State<Salons> {
                   label: "bookmark"
               ),
               BottomNavigationBarItem(
-                  icon: Icon(Icons.group),
-                  label: "Friends"
-              ),
-              BottomNavigationBarItem(
                   icon: Icon(Icons.settings),
                   label: "Settings"
               ),
