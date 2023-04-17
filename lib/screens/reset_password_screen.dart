@@ -64,9 +64,9 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                 size: 100,
                 color: ColorConstant.red900,
               ),
-              Text("NightSolver", style: AppStyle.txtPoppinsBold30),
+              //Text("NightSolver", style: AppStyle.txtPoppinsBold30),
 
-              SizedBox(height: getVerticalSize(50),),
+              SizedBox(height: getVerticalSize(70),),
 
               Padding(
                   padding: getPadding(left: 18, top: 16),

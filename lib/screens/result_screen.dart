@@ -5,6 +5,7 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:night_solver/screens/custom_toast.dart';
+import 'package:night_solver/utils/constants.dart';
 import 'package:night_solver/utils/movie_info.dart';
 
 import 'movie_details.dart';
@@ -25,7 +26,6 @@ class ResultScreen extends StatefulWidget {
 }
 
 class ResultScreenSate extends State<ResultScreen> {
-  final apiKey = '9478d83ca04bd6ee25b942dd7a0ad777';
   Color mainColor = const Color(0xff3C3261);
   List<dynamic> movies = [];
   bool no_recommendations = false;
@@ -129,7 +129,7 @@ class ResultScreenSate extends State<ResultScreen> {
         for (var Rec in RecList) {
           //get the providers list of the recommended movie
           final movieProvider = await http.get(Uri.parse(
-              'https://api.themoviedb.org/3/movie/$Rec/watch/providers?api_key=$apiKey'));
+              'https://api.themoviedb.org/3/movie/$Rec/watch/providers?api_key='+Constants.theMovieDb));
           if (movieProvider.statusCode == 200) {
             final Map<String, dynamic> ProviderData =
                 json.decode(movieProvider.body);
@@ -147,7 +147,7 @@ class ResultScreenSate extends State<ResultScreen> {
                   if (!moviesDataTitles.contains(Rec)) {
                     moviesDataTitles.add(Rec);
                     final finalRec = await http.get(Uri.parse(
-                        'https://api.themoviedb.org/3/movie/$Rec?api_key=$apiKey'));
+                        'https://api.themoviedb.org/3/movie/$Rec?api_key='+Constants.theMovieDb));
                     if (finalRec.statusCode == 200) {
                       final Map<String, dynamic> finalRecCard =
                           json.decode(finalRec.body);
