@@ -88,7 +88,7 @@ class VerticalMovieCard extends StatelessWidget {
                   ),
                   Container(
                       height: getVerticalSize(100),
-                      width: getHorizontalSize(180),
+                      width: getHorizontalSize(161),
                       child: Text(
                           item.synopsis,
                           style: AppStyle.txtPoppinsRegular13,
