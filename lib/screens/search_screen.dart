@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
@@ -69,8 +71,40 @@ class _SearchScreenState extends State<SearchScreen> {
         final response = await http.get(Uri.parse(url));
         final responseData = json.decode(response.body);
         if (responseData['results'] != null) {
+          final user = FirebaseAuth.instance.currentUser!;
+          final snapshot = await FirebaseFirestore.instance
+              .collection('users')
+              .doc(user.uid)
+              .get();
+          List<dynamic>? moviesId = snapshot.data()!['movies_id'];
+
+          List<dynamic> filteredMoviesData = [];
+
+          for (var movie in responseData['results']) {
+            if (moviesId != null && moviesId.contains(movie['id'].toString())) {
+              final response = await http.get(Uri.parse(
+                  'https://api.themoviedb.org/3/movie/${movie['id']}?api_key=' +
+                      Constants.theMovieDb));
+
+              if (response.statusCode == 200) {
+                final Map<String, dynamic> movieData = json.decode(response.body);
+                movieData['can_delete'] = true;
+                filteredMoviesData.add(movieData);
+              }
+            } else {
+              final response = await http.get(Uri.parse(
+                  'https://api.themoviedb.org/3/movie/${movie['id']}?api_key=' +
+                      Constants.theMovieDb));
+
+              if (response.statusCode == 200) {
+                final Map<String, dynamic> movieData = json.decode(response.body);
+                movieData['can_delete'] = false;
+                filteredMoviesData.add(movieData);
+              }
+            }
+          }
           setState(() {
-            searched_movies = responseData['results'];
+            searched_movies = filteredMoviesData;
             nb_movies = searched_movies.length;
           });
         } else {
@@ -97,8 +131,33 @@ class _SearchScreenState extends State<SearchScreen> {
         final response = await http.get(Uri.parse(url));
         final responseData = json.decode(response.body);
         if (responseData['results'] != null) {
+          final user = FirebaseAuth.instance.currentUser!;
+          final snapshot = await FirebaseFirestore.instance
+              .collection('users')
+              .doc(user.uid)
+              .get();
+          List<dynamic>? moviesId = snapshot.data()!['movies_id'];
+
+          List<dynamic> searchedMoviesData = [];
+
+          for (var movie in responseData['results']) {
+            if (moviesId != null && moviesId.contains(movie['id'].toString())) {
+              final response = await http.get(Uri.parse(
+                  'https://api.themoviedb.org/3/movie/${movie['id']}?api_key=' + Constants.theMovieDb));
+
+              if (response.statusCode == 200) {
+                final Map<String, dynamic> movieData = json.decode(response.body);
+                movieData['can_delete'] = true;
+                searchedMoviesData.add(movieData);
+              }
+            } else {
+              movie['can_delete'] = false;
+              searchedMoviesData.add(movie);
+            }
+          }
+
           setState(() {
-            searched_movies = responseData['results'];
+            searched_movies = searchedMoviesData;
             nb_movies = searched_movies.length;
           });
         } else {
@@ -112,16 +171,39 @@ class _SearchScreenState extends State<SearchScreen> {
     }
   }
 
+
   Future<void> getData() async {
-    final url =
-        'https://api.themoviedb.org/3/trending/movie/week?api_key=9478d83ca04bd6ee25b942dd7a0ad777';
+    final url = 'https://api.themoviedb.org/3/trending/movie/week?api_key=${Constants.theMovieDb}';
     final response = await http.get(Uri.parse(url));
     final Map<String, dynamic> responseData = json.decode(response.body);
+
+    final user = FirebaseAuth.instance.currentUser!;
+    final snapshot = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user.uid)
+        .get();
+    List<dynamic>? moviesId = snapshot.data()!['movies_id'];
+
+    if (moviesId != null) {
+      for (int i = 0; i < responseData['results'].length; i++) {
+        final movie = responseData['results'][i];
+        if (moviesId.contains(movie['id'].toString())) {
+          final response = await http.get(Uri.parse(
+              'https://api.themoviedb.org/3/movie/${movie['id']}?api_key=${Constants.theMovieDb}'));
+          if (response.statusCode == 200) {
+            final Map<String, dynamic> movieData = json.decode(response.body);
+            movieData['can_delete'] = true;
+            responseData['results'][i] = movieData;
+          }
+        }
+      }
+    }
     setState(() {
       searched_movies = responseData['results'];
       nb_movies = searched_movies.length;
     });
   }
+
 
   void onTabTapped(int index) {
     if (index == 0) Navigator.pushNamed(context, '/');
