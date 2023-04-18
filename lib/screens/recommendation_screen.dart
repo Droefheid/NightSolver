@@ -74,11 +74,13 @@ class RecommendationState extends State<Recommendation> {
     List<dynamic> moviesData = [];
     List<dynamic> RecmovieIds = [];
     final snapshot = await FirebaseFirestore.instance.collection("users").doc(user.uid).get();
+    print(snapshot.data()!['recommended']);
     if (snapshot.data()!['recommended'] != null) {
       for (var item in snapshot.data()!['recommended'].entries) {
         Recmovie.addAll(item.value);
       }
     }
+    print(Recmovie);
     for(int i=0;i<Recmovie.length;i++){
       RecmovieIds.add(Recmovie[i]["id"]);
     }
@@ -90,7 +92,7 @@ class RecommendationState extends State<Recommendation> {
         moviesData.add(finalCard);
       }
     }
-
+    print(moviesData);
     setState(() {
       movies = moviesData;
     });
