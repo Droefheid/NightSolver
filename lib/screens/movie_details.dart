@@ -95,19 +95,19 @@ class _MovieDetailState extends State<MovieDetail> {
 
   Future deleteMovie(BuildContext context, String movieId) async {
     final user = FirebaseAuth.instance.currentUser!;
-    final DocumentReference docRef =
-        FirebaseFirestore.instance.collection('users').doc(user.uid);
+    final DocumentReference docRef = FirebaseFirestore.instance.collection('users').doc(user.uid);
+    // Remove movie from user's watched list and recommended list
     docRef.update({
       'movies_id': FieldValue.arrayRemove([movieId]),
-    });
-    docRef.update({
       'recommended': FieldValue.arrayRemove([movieId]),
     });
     CustomToast.showToast(context, 'Movie removed from watched list');
-    // Navigate back to the previous screen
+    // Navigate back to the movie list page
     FocusScope.of(context).unfocus();
-    Navigator.pop(context, true);
+    Navigator.pop(context);
+    Navigator.pushNamed(context, '/movieList');
   }
+
 
   Future<void> getWatchProviders() async {
     var url =
@@ -315,17 +315,9 @@ class _MovieDetailState extends State<MovieDetail> {
                 child: Container(
                   width: getSize(45),
                   height: getSize(45),
-                  decoration: BoxDecoration(
-                    color: widget.item.canDelete ? Colors.red : Colors.transparent,
-                    borderRadius: BorderRadius.circular(getSize(45)),
-                    border: Border.all(
-                      color: Colors.white,
-                      width: getSize(2),
-                    ),
-                  ),
-                  child: Icon(
-                    Icons.bookmark,
-                    color: Colors.white,
+                  child: ImageIcon(
+                    AssetImage(widget.item.canDelete ? "assets/icons/bookmark_filled.png" : "assets/icons/bookmark_empty.png"),
+                    color: widget.item.canDelete ? ColorConstant.red900 : ColorConstant.whiteA700,
                     size: getSize(30),
                   ),
                 ),
