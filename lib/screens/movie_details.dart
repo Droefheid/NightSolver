@@ -47,22 +47,18 @@ class _MovieDetailState extends State<MovieDetail> {
 
   Future<List> recommended(String id) async {
     List<dynamic> RecList = [];
-    final result = await http.get(Uri.parse(
-        'https://api.themoviedb.org/3/movie/$id/recommendations?api_key=$apiKey&language=en-US&page=1'));
+    final result = await http.get(Uri.parse('https://api.themoviedb.org/3/movie/$id/recommendations?api_key=$apiKey&language=en-US&page=1'));
     if (result.statusCode == 200) {
       final Map<String, dynamic> resultData = json.decode(result.body);
       ////check if the movie recommended is not in the seen movies list
-      final snapshot = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(user.uid)
-          .get();
-      for (int i = 0; i < resultData['results'].length; i++) {
-        if (snapshot.data()!['movies_id'] != null) {
-          if (!(snapshot
-              .data()!['movies_id']
-              .contains(resultData["results"][i]["id"].toString()))) {
-            if (resultData['results'][i]['genre_ids'].length != 0) {
-              final recommended = {
+      final snapshot = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
+      for(int i=0;i<resultData['results'].length;i++){
+        print('RES');
+        if(snapshot.data()!['movies_id'] != null){
+          if(!(snapshot.data()!['movies_id'].contains(resultData["results"][i]["id"]))){
+            if(resultData['results'][i]['genre_ids'].length != 0){
+              final recommended =
+              {
                 'id': resultData["results"][i]["id"].toString(),
                 'genre': resultData['results'][i]['genre_ids'][0].toString()
               };
@@ -72,20 +68,24 @@ class _MovieDetailState extends State<MovieDetail> {
         }
       }
     }
+    print(RecList);
     return RecList;
   }
+
+
 
   Future addMovie(BuildContext context) async {
     final user = FirebaseAuth.instance.currentUser!;
     final DocumentReference docRef =
         FirebaseFirestore.instance.collection('users').doc(user.uid);
     print(widget.item.id);
-    List<dynamic> recommendedMovies = await recommended(widget.item.id);
+    List<dynamic> recommendedMovies = await recommended(widget.item.id.toString());
+    final snapshot = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
     docRef.set({
       'recommended': {
-        widget.item.id: recommendedMovies,
+        widget.item.id.toString(): recommendedMovies,
       },
-      'movies_id': FieldValue.arrayUnion([widget.item.id]),
+      'movies_id': FieldValue.arrayUnion([widget.item.id.toString()]),
     }, SetOptions(merge: true));
 
     CustomToast.showToast(context, 'Movie added to watched list');
