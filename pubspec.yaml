@@ -44,6 +44,7 @@ dependencies:
   flutter_rating_bar: ^4.0.1
   flutter_settings_screens: ^0.3.3-null-safety+2
   flutter_slidable: ^2.0.0
+  firebase_crashlytics: ^3.1.1
 
 dev_dependencies:
   flutter_test:
