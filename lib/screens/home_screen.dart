@@ -81,7 +81,6 @@ class _HomeScreenState extends State<HomeScreen> {
     final Map<String, dynamic> latest_movies_responseData =
     json.decode(latest_movies_response.body);
 
-    // Replace movies in latest_movies list with the ones fetched from Firebase database
     for (int i = 0; i < latest_movies_responseData['results'].length; i++) {
       final movie = latest_movies_responseData['results'][i];
       final index =
