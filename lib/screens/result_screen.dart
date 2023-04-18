@@ -285,7 +285,9 @@ class ResultScreenSate extends State<ResultScreen> {
                           )
                         ],
                       ),
-                      child: MaterialButton(
+                      child: Container(
+
+                          child : MaterialButton(
                         child: VerticalMovieCard(item: new MovieInfo(movies[i])),
                         padding: const EdgeInsets.all(0.0),
                         onPressed: () {
@@ -296,6 +298,7 @@ class ResultScreenSate extends State<ResultScreen> {
                             ),
                           );
                         },
+                      )
                       )
                   );
                 },

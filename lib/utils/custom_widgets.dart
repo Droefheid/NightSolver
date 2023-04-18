@@ -30,7 +30,7 @@ class VerticalMovieCard extends StatelessWidget {
                 child: Stack( children:[
                   Container(
                       height: getVerticalSize(273),
-                      width: getHorizontalSize(182),
+                      width: getHorizontalSize(163),
                       child:
                       Image.network(item.urlImage, fit: BoxFit.fill, filterQuality: FilterQuality.high,)),
                   Positioned(

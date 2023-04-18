@@ -53,7 +53,6 @@ class _MovieDetailState extends State<MovieDetail> {
       ////check if the movie recommended is not in the seen movies list
       final snapshot = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
       for(int i=0;i<resultData['results'].length;i++){
-        print('RES');
         if(snapshot.data()!['movies_id'] != null){
           if(!(snapshot.data()!['movies_id'].contains(resultData["results"][i]["id"]))){
             if(resultData['results'][i]['genre_ids'].length != 0){
@@ -68,7 +67,6 @@ class _MovieDetailState extends State<MovieDetail> {
         }
       }
     }
-    print(RecList);
     return RecList;
   }
 
@@ -78,7 +76,6 @@ class _MovieDetailState extends State<MovieDetail> {
     final user = FirebaseAuth.instance.currentUser!;
     final DocumentReference docRef =
         FirebaseFirestore.instance.collection('users').doc(user.uid);
-    print(widget.item.id);
     List<dynamic> recommendedMovies = await recommended(widget.item.id.toString());
     final snapshot = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
     docRef.set({
