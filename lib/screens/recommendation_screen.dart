@@ -175,9 +175,7 @@ class RecommendationState extends State<Recommendation> {
                 )),
             Padding(
                 padding: getPadding(top: 16),
-                child: (movies.isEmpty
-                    ? Center(child: CircularProgressIndicator())
-                    : Container(
+                child:  Container(
                         height: getVerticalSize(569),
                         child: Stack(children: [
                           GridView.builder(
@@ -190,21 +188,23 @@ class RecommendationState extends State<Recommendation> {
                             itemBuilder: (context, index) => ShortVerticalCard(
                                 item: new MovieInfo(movies[index])),
                             itemCount: movies.length,
-                          )
-                        ])))),
-            Positioned(
-                top: getVerticalSize(500),
-                left: getHorizontalSize(350),
-                child: ElevatedButton(
-                    style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all<Color>(
-                            Colors.transparent)),
-                    onPressed: () => Navigator.pushNamed(context, '/salons'),
-                    child: Icon(
-                      Icons.add_circle_sharp,
-                      color: ColorConstant.red900,
-                      size: getSize(38),
-                    ))),
+                          ),
+                          Positioned(
+                              top: getVerticalSize(500),
+                              left: getHorizontalSize(350),
+                              child: ElevatedButton(
+                                  style: ButtonStyle(
+                                      backgroundColor:
+                                          MaterialStateProperty.all<Color>(
+                                              Colors.transparent)),
+                                  onPressed: () =>
+                                      Navigator.pushNamed(context, '/salons'),
+                                  child: Icon(
+                                    Icons.add_circle_sharp,
+                                    color: ColorConstant.red900,
+                                    size: getSize(38),
+                                  )))
+                        ]))),
           ],
         ),
         bottomNavigationBar: BottomNavigationBar(
