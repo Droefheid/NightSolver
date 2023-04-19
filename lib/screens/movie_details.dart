@@ -40,28 +40,24 @@ class _MovieDetailState extends State<MovieDetail> {
     if (index==0) Navigator.pushNamed(context, '/');
     if (index==1) Navigator.pushNamed(context, '/search');
     if (index==2) Navigator.pushNamed(context, '/recommendation');
-    if (index==3) Navigator.pushNamed(context, '/movieList');
-    if (index==4) Navigator.pushNamed(context, '/settings');
+    if (index==3) Navigator.pushNamed(context, '/friends');
+    if (index==4) Navigator.pushNamed(context, '/movieList');
+    if (index==5) Navigator.pushNamed(context, '/settings');
   }
 
   Future<List> recommended(String id) async {
     List<dynamic> RecList = [];
-    final result = await http.get(Uri.parse(
-        'https://api.themoviedb.org/3/movie/$id/recommendations?api_key=$apiKey&language=en-US&page=1'));
+    final result = await http.get(Uri.parse('https://api.themoviedb.org/3/movie/$id/recommendations?api_key=$apiKey&language=en-US&page=1'));
     if (result.statusCode == 200) {
       final Map<String, dynamic> resultData = json.decode(result.body);
       ////check if the movie recommended is not in the seen movies list
-      final snapshot = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(user.uid)
-          .get();
-      for (int i = 0; i < resultData['results'].length; i++) {
-        if (snapshot.data()!['movies_id'] != null) {
-          if (!(snapshot
-              .data()!['movies_id']
-              .contains(resultData["results"][i]["id"].toString()))) {
-            if (resultData['results'][i]['genre_ids'].length != 0) {
-              final recommended = {
+      final snapshot = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
+      for(int i=0;i<resultData['results'].length;i++){
+        if(snapshot.data()!['movies_id'] != null){
+          if(!(snapshot.data()!['movies_id'].contains(resultData["results"][i]["id"]))){
+            if(resultData['results'][i]['genre_ids'].length != 0){
+              final recommended =
+              {
                 'id': resultData["results"][i]["id"].toString(),
                 'genre': resultData['results'][i]['genre_ids'][0].toString()
               };
@@ -74,17 +70,19 @@ class _MovieDetailState extends State<MovieDetail> {
     return RecList;
   }
 
+
+
   Future addMovie(BuildContext context) async {
     final user = FirebaseAuth.instance.currentUser!;
     final DocumentReference docRef =
         FirebaseFirestore.instance.collection('users').doc(user.uid);
-    print(widget.item.id);
-    List<dynamic> recommendedMovies = await recommended(widget.item.id);
+    List<dynamic> recommendedMovies = await recommended(widget.item.id.toString());
+    final snapshot = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
     docRef.set({
       'recommended': {
-        widget.item.id: recommendedMovies,
+        widget.item.id.toString(): recommendedMovies,
       },
-      'movies_id': FieldValue.arrayUnion([widget.item.id]),
+      'movies_id': FieldValue.arrayUnion([widget.item.id.toString()]),
     }, SetOptions(merge: true));
 
     CustomToast.showToast(context, 'Movie added to watched list');
@@ -95,19 +93,19 @@ class _MovieDetailState extends State<MovieDetail> {
 
   Future deleteMovie(BuildContext context, String movieId) async {
     final user = FirebaseAuth.instance.currentUser!;
-    final DocumentReference docRef =
-        FirebaseFirestore.instance.collection('users').doc(user.uid);
+    final DocumentReference docRef = FirebaseFirestore.instance.collection('users').doc(user.uid);
+    // Remove movie from user's watched list and recommended list
     docRef.update({
       'movies_id': FieldValue.arrayRemove([movieId]),
-    });
-    docRef.update({
       'recommended': FieldValue.arrayRemove([movieId]),
     });
     CustomToast.showToast(context, 'Movie removed from watched list');
-    // Navigate back to the previous screen
+    // Navigate back to the movie list page
     FocusScope.of(context).unfocus();
-    Navigator.pop(context, true);
+    Navigator.pop(context);
+    Navigator.pushNamed(context, '/movieList');
   }
+
 
   Future<void> getWatchProviders() async {
     var url =
@@ -315,17 +313,9 @@ class _MovieDetailState extends State<MovieDetail> {
                 child: Container(
                   width: getSize(45),
                   height: getSize(45),
-                  decoration: BoxDecoration(
-                    color: widget.item.canDelete ? Colors.red : Colors.transparent,
-                    borderRadius: BorderRadius.circular(getSize(45)),
-                    border: Border.all(
-                      color: Colors.white,
-                      width: getSize(2),
-                    ),
-                  ),
-                  child: Icon(
-                    Icons.bookmark,
-                    color: Colors.white,
+                  child: ImageIcon(
+                    AssetImage(widget.item.canDelete ? "assets/icons/bookmark_filled.png" : "assets/icons/bookmark_empty.png"),
+                    color: widget.item.canDelete ? ColorConstant.red900 : ColorConstant.whiteA700,
                     size: getSize(30),
                   ),
                 ),
