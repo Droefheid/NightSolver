@@ -79,28 +79,28 @@ class _SearchScreenState extends State<SearchScreen> {
           List<dynamic>? moviesId = snapshot.data()!['movies_id'];
 
           List<dynamic> filteredMoviesData = [];
+          List<Future<Map<String, dynamic>>> futures = [];
 
           for (var movie in responseData['results']) {
+            futures.add(http.get(Uri.parse(
+                'https://api.themoviedb.org/3/movie/${movie['id']}?api_key=' +
+                    Constants.theMovieDb))
+                .then((response) => jsonDecode(response.body)));
+          }
+
+          List<Map<String, dynamic>> responses = await Future.wait(futures);
+
+          for (int i = 0; i < responses.length; i++) {
+            var response = responses[i];
+            var movie = responseData['results'][i];
             if (moviesId != null && moviesId.contains(movie['id'].toString())) {
-              final response = await http.get(Uri.parse(
-                  'https://api.themoviedb.org/3/movie/${movie['id']}?api_key=' +
-                      Constants.theMovieDb));
-
-              if (response.statusCode == 200) {
-                final Map<String, dynamic> movieData = json.decode(response.body);
-                movieData['can_delete'] = true;
-                filteredMoviesData.add(movieData);
-              }
+              final Map<String, dynamic> movieData = response;
+              movieData['can_delete'] = true;
+              filteredMoviesData.add(movieData);
             } else {
-              final response = await http.get(Uri.parse(
-                  'https://api.themoviedb.org/3/movie/${movie['id']}?api_key=' +
-                      Constants.theMovieDb));
-
-              if (response.statusCode == 200) {
-                final Map<String, dynamic> movieData = json.decode(response.body);
-                movieData['can_delete'] = false;
-                filteredMoviesData.add(movieData);
-              }
+              final Map<String, dynamic> movieData = response;
+              movieData['can_delete'] = false;
+              filteredMoviesData.add(movieData);
             }
           }
           setState(() {
@@ -118,6 +118,7 @@ class _SearchScreenState extends State<SearchScreen> {
       }
     }
   }
+
 
   void _onSearchChanged(String value) async {
     try {
