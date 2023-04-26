@@ -306,6 +306,12 @@ class _SearchScreenState extends State<SearchScreen> {
             alignment: Alignment.centerLeft,
           ),
           SizedBox(height: getVerticalSize(20)),
+          searched_movies.isEmpty
+              ? Center(
+            child: CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(ColorConstant.red900),
+            ),
+          ) :
           Expanded(
               child: ListView.separated(
                   itemBuilder: (context, index) => VerticalMovieCard(

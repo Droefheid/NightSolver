@@ -48,13 +48,17 @@ class _HomeScreenState extends State<HomeScreen> {
     await http.get(Uri.parse(trending_movies_url));
     final Map<String, dynamic> trending_movies_responseData =
     json.decode(trending_movies_response.body);
-
     final user = FirebaseAuth.instance.currentUser!;
+
     final snapshot = await FirebaseFirestore.instance
         .collection('users')
         .doc(user.uid)
         .get();
-    List<dynamic>? moviesId = snapshot.data()!['movies_id'];
+
+    List<dynamic>? moviesId = null;
+    if(snapshot.data() != null){
+      moviesId = snapshot.data()!['movies_id'];
+    }
 
     List<dynamic> latest_movies_data = [];
 
