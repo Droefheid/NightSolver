@@ -44,7 +44,7 @@ class _SearchScreenState extends State<SearchScreen> {
   ];
   List<dynamic> searched_movies = [];
   final List<String> _selectedGenres = ["ALL"];
-
+  bool no_result = false;
   int nb_movies = 0;
   final TextEditingController _controller = TextEditingController();
 
@@ -240,11 +240,13 @@ class _SearchScreenState extends State<SearchScreen> {
       } else {
         List<dynamic> filteredMovies = searched_movies
             .where((movie) =>
-                selectedGenreIds.any((id) => movie['genre_ids'].contains(id)))
+                selectedGenreIds.every((id) => movie['genre_ids'].contains(id)))
             .toList();
+
         setState(() {
           searched_movies = filteredMovies;
           nb_movies = filteredMovies.length;
+          no_result = filteredMovies.isEmpty;
         });
       }
     } else {
@@ -306,7 +308,14 @@ class _SearchScreenState extends State<SearchScreen> {
             alignment: Alignment.centerLeft,
           ),
           SizedBox(height: getVerticalSize(20)),
-          searched_movies.isEmpty
+          searched_movies.isEmpty && no_result
+              ? Center(
+            child: Text(
+              'Sorry, no results are available.  Try to select fewer genres.',
+              style: AppStyle.txtPoppinsMedium18,
+            ),
+          )
+              : searched_movies.isEmpty
               ? Center(
             child: CircularProgressIndicator(
               valueColor: AlwaysStoppedAnimation<Color>(ColorConstant.red900),

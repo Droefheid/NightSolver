@@ -22,6 +22,8 @@ class Recommendation extends StatefulWidget {
 class RecommendationState extends State<Recommendation> {
   final List<String> _selectedGenres = ["ALL"];
   List<dynamic> movies = [];
+  List<dynamic> movies_to_filter = [];
+
   final user = FirebaseAuth.instance.currentUser!;
   bool no_recommendations = false;
 
@@ -41,25 +43,19 @@ class RecommendationState extends State<Recommendation> {
         }
       }
     });
-
     List<int> selectedGenreIds = _selectedGenres
         .map((genre) => genreToId(genre))
         .where((id) => id != -1)
         .toList();
 
-    if (!selectedGenreIds.isEmpty && !movies.isEmpty) {
-      List<dynamic> filteredMovies = movies.where((movie) {
+    if (!selectedGenreIds.isEmpty && !movies.isEmpty && !movies_to_filter.isEmpty) {
+      List<dynamic> filteredMovies = movies_to_filter.where((movie) {
         List<dynamic> genres = movie['genres'];
-        for (int i = 0; i < genres.length; i++) {
-          if (selectedGenreIds.contains(genres[i]['id'])) {
-            return true;
-          }
-        }
-        return false;
+        return selectedGenreIds.every((id) => genres.any((genre) => genre['id'] == id));
       }).toList();
-
       setState(() {
         movies = filteredMovies;
+        no_recommendations = movies.isEmpty;
       });
     } else {
       getData();
@@ -92,15 +88,11 @@ class RecommendationState extends State<Recommendation> {
       }
     }
 
-    if (moviesData.isEmpty) {
-      setState(() {
-        no_recommendations = true;
-      });
-    } else {
-      setState(() {
-        movies = moviesData;
-      });
-    }
+    setState(() {
+      movies = moviesData;
+      movies_to_filter = moviesData;
+      no_recommendations = movies.isEmpty;
+    });
   }
 
   @override
