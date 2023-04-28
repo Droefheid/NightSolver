@@ -141,9 +141,9 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               Expanded(
                   child: ListView.separated(
-                      itemBuilder: (context, index) => buildHorizontalCard(item: new MovieInfo(trending_movies[index])),
+                      itemBuilder: (context, index) => ShortVerticalCard(context: context ,item: new MovieInfo(trending_movies[index])),
                       scrollDirection: Axis.horizontal,
-                      separatorBuilder: (context, _) => SizedBox(width: getHorizontalSize(16)),
+                      separatorBuilder: (context, _) => SizedBox(width: getHorizontalSize(6)),
                       itemCount: trending_movies.length
                   )
               ),

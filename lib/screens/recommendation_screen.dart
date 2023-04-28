@@ -159,7 +159,7 @@ class RecommendationState extends State<Recommendation> {
         body: Column(
           children: [
             Padding(
-                padding: getPadding(left: 16),
+                padding: getPadding(left: 16, bottom: 16),
                 child: Container(
                   height: getVerticalSize(45),
                   child: ListView.separated(
@@ -173,35 +173,29 @@ class RecommendationState extends State<Recommendation> {
                           SizedBox(width: getHorizontalSize(8)),
                       itemCount: genres.length),
                 )),
-            Padding(
-                padding: getPadding(top: 16),
-                child: movies.isEmpty && no_recommendations
-                    ? Center(
-                  child: Text(
-                    'Sorry, no recommendations are available.',
-                    style: AppStyle.txtPoppinsMedium18,
-                  ),
+            movies.isEmpty && no_recommendations ?
+            Center(child:
+              Text(
+                'Sorry, no recommendations are available.',
+                style: AppStyle.txtPoppinsMedium18,
+              ),
+            ) : movies.isEmpty ?
+            Center(
+              child: CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(ColorConstant.red900),
+              ),
+            ) :
+            Expanded(
+                child: GridView.builder(
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      childAspectRatio: 0.6,
+                      mainAxisSpacing: getVerticalSize(10),
+                      crossAxisSpacing: 0),
+                  itemBuilder: (context, index) => ShortVerticalCard(context: context, item: new MovieInfo(movies[index])),
+                  itemCount: movies.length,
                 )
-                    : movies.isEmpty
-                    ? Center(
-                  child: CircularProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation<Color>(ColorConstant.red900),
-                  ),
-                ) :
-                Container(
-                    height: getVerticalSize(569),
-                    child:
-                      GridView.builder(
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
-                            childAspectRatio: 0.6,
-                            mainAxisSpacing: getVerticalSize(10),
-                            crossAxisSpacing: 0),
-                        itemBuilder: (context, index) => ShortVerticalCard(
-                            item: new MovieInfo(movies[index])),
-                        itemCount: movies.length,
-                      )
-                    )),
+            )
           ],
         ),
         bottomNavigationBar: BottomNavigationBar(
@@ -240,57 +234,4 @@ class RecommendationState extends State<Recommendation> {
         ));
   }
 
-  Widget ShortVerticalCard({required MovieInfo item}) => InkWell(
-      onTap: () => Navigator.of(context)
-          .push(MaterialPageRoute(builder: (_) => MovieDetail(item: item))),
-      child: Column(
-        children: [
-          Expanded(
-              child: ClipRRect(
-                  borderRadius: BorderRadius.circular(20),
-                  child: Stack(children: [
-                    AspectRatio(
-                        aspectRatio: 0.7,
-                        child: Image.network(item.urlImage,
-                            fit: BoxFit.fill,
-                            filterQuality: FilterQuality.high)),
-                    Positioned(
-                        right: getHorizontalSize(-1),
-                        child: IconButton(
-                            onPressed: null,
-                            icon: ImageIcon(
-                              AssetImage("assets/icons/bookmark_empty.png"),
-                              color: ColorConstant.whiteA700,
-                            )))
-                  ]))),
-          SizedBox(
-            height: getVerticalSize(16),
-          ),
-          Padding(
-              padding: getPadding(left: 10),
-              child: Container(
-                  width: getHorizontalSize(160),
-                  height: getVerticalSize(40),
-                  child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        item.title,
-                        style: AppStyle.txtPoppinsSemiBold18,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      )))),
-          Padding(
-              padding: getPadding(left: 27),
-              child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text.rich(TextSpan(children: [
-                    TextSpan(text: item.rating.toString()),
-                    WidgetSpan(
-                        child: Icon(
-                      Icons.star_rounded,
-                      color: ColorConstant.red900,
-                    ))
-                  ], style: AppStyle.txtPoppinsMedium18))))
-        ],
-      ));
 }

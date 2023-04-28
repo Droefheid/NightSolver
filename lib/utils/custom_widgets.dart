@@ -347,3 +347,71 @@ class _GenreButtonState extends State<GenreButton> {
     ));
   }
 }
+
+class ShortVerticalCard extends StatelessWidget {
+  const ShortVerticalCard({
+    super.key,
+    required this.context,
+    required this.item,
+  });
+
+  final BuildContext context;
+  final MovieInfo item;
+
+  @override
+  Widget build(BuildContext context) => InkWell(
+      onTap: () => Navigator.of(context)
+          .push(MaterialPageRoute(builder: (_) => MovieDetail(item: item))),
+      child: Column(
+        children: [
+          Expanded(
+              child: ClipRRect(
+                  borderRadius: BorderRadius.circular(20),
+                  child: Stack(children: [
+                    AspectRatio(
+                        aspectRatio: 0.7,
+                        child: Image.network(item.urlImage,
+                            fit: BoxFit.fill,
+                            filterQuality: FilterQuality.high)),
+                    Positioned(
+                        right: getHorizontalSize(-1),
+                        child: IconButton(
+                            onPressed: null,
+                            icon: ImageIcon(
+                              AssetImage("assets/icons/bookmark_empty.png"),
+                              color: ColorConstant.whiteA700,
+                            )))
+                  ]))),
+          SizedBox(
+            height: getVerticalSize(16),
+          ),
+          Container(
+              width: getHorizontalSize(150),
+              height: getVerticalSize(40),
+              child: Padding(padding: getPadding(left: 2), child:
+          Align(alignment: Alignment.centerLeft,
+                      child: Text(
+                        item.title,
+                        style: AppStyle.txtPoppinsSemiBold18,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      )))),
+          Align( alignment: Alignment.center,
+              child: Text.rich(
+                  TextSpan(children: [
+                    TextSpan(text: item.rating.toString()),
+                    WidgetSpan(child: SizedBox(width: getHorizontalSize(8),)),
+                    WidgetSpan(
+                        child: Icon(
+                          Icons.star_rounded,
+                          color: ColorConstant.red900,
+                        )
+                    )
+                  ],
+                  style: AppStyle.txtPoppinsMedium18,
+                  ),
+              )
+          )
+        ],
+      ));
+}
