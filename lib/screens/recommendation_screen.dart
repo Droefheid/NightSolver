@@ -22,7 +22,10 @@ class Recommendation extends StatefulWidget {
 class RecommendationState extends State<Recommendation> {
   final List<String> _selectedGenres = ["ALL"];
   List<dynamic> movies = [];
+  List<dynamic> movies_to_filter = [];
+
   final user = FirebaseAuth.instance.currentUser!;
+  bool no_recommendations = false;
 
   void onSelectedGenre(String genre, bool isSelected) {
     setState(() {
@@ -40,25 +43,19 @@ class RecommendationState extends State<Recommendation> {
         }
       }
     });
-
     List<int> selectedGenreIds = _selectedGenres
         .map((genre) => genreToId(genre))
         .where((id) => id != -1)
         .toList();
 
-    if (!selectedGenreIds.isEmpty && !movies.isEmpty) {
-      List<dynamic> filteredMovies = movies.where((movie) {
+    if (!selectedGenreIds.isEmpty && !movies.isEmpty && !movies_to_filter.isEmpty) {
+      List<dynamic> filteredMovies = movies_to_filter.where((movie) {
         List<dynamic> genres = movie['genres'];
-        for (int i = 0; i < genres.length; i++) {
-          if (selectedGenreIds.contains(genres[i]['id'])) {
-            return true;
-          }
-        }
-        return false;
+        return selectedGenreIds.every((id) => genres.any((genre) => genre['id'] == id));
       }).toList();
-
       setState(() {
         movies = filteredMovies;
+        no_recommendations = movies.isEmpty;
       });
     } else {
       getData();
@@ -73,7 +70,7 @@ class RecommendationState extends State<Recommendation> {
         .collection("users")
         .doc(user.uid)
         .get();
-    if (snapshot.data()!['recommended'] != null) {
+    if (snapshot.data()!['recommended'] != null && !snapshot.data()!['recommended'].isEmpty) {
       for (var item in snapshot.data()!['recommended'].entries) {
         Recmovie.addAll(item.value);
       }
@@ -90,8 +87,11 @@ class RecommendationState extends State<Recommendation> {
         moviesData.add(finalCard);
       }
     }
+
     setState(() {
       movies = moviesData;
+      movies_to_filter = moviesData;
+      no_recommendations = movies.isEmpty;
     });
   }
 
@@ -114,7 +114,7 @@ class RecommendationState extends State<Recommendation> {
   Widget build(BuildContext context) {
     final List<String> genres = [
       "ALL",
-      " ACTION",
+      "ACTION",
       "ADVENTURE",
       "ANIMATION",
       "COMEDY",
@@ -175,36 +175,54 @@ class RecommendationState extends State<Recommendation> {
                 )),
             Padding(
                 padding: getPadding(top: 16),
-                child:  Container(
-                        height: getVerticalSize(569),
-                        child: Stack(children: [
-                          GridView.builder(
-                            gridDelegate:
-                                SliverGridDelegateWithFixedCrossAxisCount(
-                                    crossAxisCount: 2,
-                                    childAspectRatio: 0.6,
-                                    mainAxisSpacing: getVerticalSize(10),
-                                    crossAxisSpacing: 0),
-                            itemBuilder: (context, index) => ShortVerticalCard(
-                                item: new MovieInfo(movies[index])),
-                            itemCount: movies.length,
-                          ),
-                          Positioned(
-                              top: getVerticalSize(500),
-                              left: getHorizontalSize(350),
-                              child: ElevatedButton(
-                                  style: ButtonStyle(
-                                      backgroundColor:
-                                          MaterialStateProperty.all<Color>(
-                                              Colors.transparent)),
-                                  onPressed: () =>
-                                      Navigator.pushNamed(context, '/salons'),
-                                  child: Icon(
-                                    Icons.add_circle_sharp,
-                                    color: ColorConstant.red900,
-                                    size: getSize(38),
-                                  )))
-                        ]))),
+                child: movies.isEmpty && no_recommendations
+                    ? Center(
+                  child: Text(
+                    'Sorry, no recommendations are available.',
+                    style: AppStyle.txtPoppinsMedium18,
+                  ),
+                )
+                    : movies.isEmpty
+                    ? Center(
+                  child: CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(ColorConstant.red900),
+                  ),
+                ) :
+                Container(
+                    height: getVerticalSize(569),
+                    child: Stack(children: [
+                      GridView.builder(
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            childAspectRatio: 0.6,
+                            mainAxisSpacing: getVerticalSize(10),
+                            crossAxisSpacing: 0),
+                        itemBuilder: (context, index) => ShortVerticalCard(
+                            item: new MovieInfo(movies[index])),
+                        itemCount: movies.length,
+                      )
+                    ]))),
+            Expanded(
+              child: Align(
+                alignment: Alignment.bottomRight,
+                child: Transform.translate(
+                  offset: Offset(10, -10),
+                  child: ElevatedButton(
+                    style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.all<Color>(
+                            Colors.transparent
+                        )
+                    ),
+                    onPressed: () => Navigator.pushNamed(context, '/salons'),
+                    child: Icon(
+                      Icons.add_circle_sharp,
+                      color: ColorConstant.red900,
+                      size: getSize(38),
+                    ),
+                  ),
+                ),
+              ),
+            ),
           ],
         ),
         bottomNavigationBar: BottomNavigationBar(

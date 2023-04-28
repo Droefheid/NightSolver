@@ -44,7 +44,7 @@ class _SearchScreenState extends State<SearchScreen> {
   ];
   List<dynamic> searched_movies = [];
   final List<String> _selectedGenres = ["ALL"];
-
+  bool no_result = false;
   int nb_movies = 0;
   final TextEditingController _controller = TextEditingController();
 
@@ -79,28 +79,28 @@ class _SearchScreenState extends State<SearchScreen> {
           List<dynamic>? moviesId = snapshot.data()!['movies_id'];
 
           List<dynamic> filteredMoviesData = [];
+          List<Future<Map<String, dynamic>>> futures = [];
 
           for (var movie in responseData['results']) {
+            futures.add(http.get(Uri.parse(
+                'https://api.themoviedb.org/3/movie/${movie['id']}?api_key=' +
+                    Constants.theMovieDb))
+                .then((response) => jsonDecode(response.body)));
+          }
+
+          List<Map<String, dynamic>> responses = await Future.wait(futures);
+
+          for (int i = 0; i < responses.length; i++) {
+            var response = responses[i];
+            var movie = responseData['results'][i];
             if (moviesId != null && moviesId.contains(movie['id'].toString())) {
-              final response = await http.get(Uri.parse(
-                  'https://api.themoviedb.org/3/movie/${movie['id']}?api_key=' +
-                      Constants.theMovieDb));
-
-              if (response.statusCode == 200) {
-                final Map<String, dynamic> movieData = json.decode(response.body);
-                movieData['can_delete'] = true;
-                filteredMoviesData.add(movieData);
-              }
+              final Map<String, dynamic> movieData = response;
+              movieData['can_delete'] = true;
+              filteredMoviesData.add(movieData);
             } else {
-              final response = await http.get(Uri.parse(
-                  'https://api.themoviedb.org/3/movie/${movie['id']}?api_key=' +
-                      Constants.theMovieDb));
-
-              if (response.statusCode == 200) {
-                final Map<String, dynamic> movieData = json.decode(response.body);
-                movieData['can_delete'] = false;
-                filteredMoviesData.add(movieData);
-              }
+              final Map<String, dynamic> movieData = response;
+              movieData['can_delete'] = false;
+              filteredMoviesData.add(movieData);
             }
           }
           setState(() {
@@ -118,6 +118,7 @@ class _SearchScreenState extends State<SearchScreen> {
       }
     }
   }
+
 
   void _onSearchChanged(String value) async {
     try {
@@ -239,11 +240,13 @@ class _SearchScreenState extends State<SearchScreen> {
       } else {
         List<dynamic> filteredMovies = searched_movies
             .where((movie) =>
-                selectedGenreIds.any((id) => movie['genre_ids'].contains(id)))
+                selectedGenreIds.every((id) => movie['genre_ids'].contains(id)))
             .toList();
+
         setState(() {
           searched_movies = filteredMovies;
           nb_movies = filteredMovies.length;
+          no_result = filteredMovies.isEmpty;
         });
       }
     } else {
@@ -305,6 +308,19 @@ class _SearchScreenState extends State<SearchScreen> {
             alignment: Alignment.centerLeft,
           ),
           SizedBox(height: getVerticalSize(20)),
+          searched_movies.isEmpty && no_result
+              ? Center(
+            child: Text(
+              'Sorry, no results are available.  Try to select fewer genres.',
+              style: AppStyle.txtPoppinsMedium18,
+            ),
+          )
+              : searched_movies.isEmpty
+              ? Center(
+            child: CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(ColorConstant.red900),
+            ),
+          ) :
           Expanded(
               child: ListView.separated(
                   itemBuilder: (context, index) => VerticalMovieCard(

@@ -280,7 +280,9 @@ class PersonCell extends StatelessWidget {
                                 style: AppStyle.txtPoppinsMedium18,
                               );
                             }
-                            return CircularProgressIndicator();
+                            return CircularProgressIndicator(
+                              valueColor: AlwaysStoppedAnimation<Color>(ColorConstant.red900),
+                            );
                           },
                         )
                       ],
