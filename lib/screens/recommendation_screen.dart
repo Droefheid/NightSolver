@@ -22,8 +22,10 @@ class Recommendation extends StatefulWidget {
 class RecommendationState extends State<Recommendation> {
   final List<String> _selectedGenres = ["ALL"];
   List<dynamic> movies = [];
-  final user = FirebaseAuth.instance.currentUser!;
+  List<dynamic> movies_to_filter = [];
 
+  final user = FirebaseAuth.instance.currentUser!;
+  bool no_recommendations = false;
 
   void onSelectedGenre(String genre, bool isSelected) {
     setState(() {
@@ -36,65 +38,60 @@ class RecommendationState extends State<Recommendation> {
         _selectedGenres.add(genre);
       } else {
         _selectedGenres.remove(genre);
-        if(_selectedGenres.isEmpty){
+        if (_selectedGenres.isEmpty) {
           _selectedGenres.add("ALL");
         }
       }
     });
-
     List<int> selectedGenreIds = _selectedGenres
         .map((genre) => genreToId(genre))
         .where((id) => id != -1)
         .toList();
 
-    if (!selectedGenreIds.isEmpty && !movies.isEmpty) {
-
-
-        List<dynamic> filteredMovies = movies.where((movie) {
-          List<dynamic> genres = movie['genres'];
-          for (int i = 0; i < genres.length; i++) {
-            if (selectedGenreIds.contains(genres[i]['id'])) {
-              return true;
-            }
-          }
-          return false;
-        }).toList();
-
-        setState(() {
-          movies = filteredMovies;
-        });
-    }else{
+    if (!selectedGenreIds.isEmpty && !movies.isEmpty && !movies_to_filter.isEmpty) {
+      List<dynamic> filteredMovies = movies_to_filter.where((movie) {
+        List<dynamic> genres = movie['genres'];
+        return selectedGenreIds.every((id) => genres.any((genre) => genre['id'] == id));
+      }).toList();
+      setState(() {
+        movies = filteredMovies;
+        no_recommendations = movies.isEmpty;
+      });
+    } else {
       getData();
     }
   }
-
 
   Future<void> getData() async {
     List<dynamic> Recmovie = [];
     List<dynamic> moviesData = [];
     List<dynamic> RecmovieIds = [];
-    final snapshot = await FirebaseFirestore.instance.collection("users").doc(user.uid).get();
-    print(snapshot.data()!['recommended']);
-    if (snapshot.data()!['recommended'] != null) {
+    final snapshot = await FirebaseFirestore.instance
+        .collection("users")
+        .doc(user.uid)
+        .get();
+    if (snapshot.data()!['recommended'] != null && !snapshot.data()!['recommended'].isEmpty) {
       for (var item in snapshot.data()!['recommended'].entries) {
         Recmovie.addAll(item.value);
       }
     }
-    print(Recmovie);
-    for(int i=0;i<Recmovie.length;i++){
+    for (int i = 0; i < Recmovie.length; i++) {
       RecmovieIds.add(Recmovie[i]["id"]);
     }
-    for(var movieId in RecmovieIds){
+    for (var movieId in RecmovieIds) {
       final response = await http.get(Uri.parse(
-          'https://api.themoviedb.org/3/movie/$movieId?api_key='+Constants.theMovieDb));
-      if(response.statusCode == 200){
+          'https://api.themoviedb.org/3/movie/$movieId?api_key=' +
+              Constants.theMovieDb));
+      if (response.statusCode == 200) {
         final Map<String, dynamic> finalCard = json.decode(response.body);
         moviesData.add(finalCard);
       }
     }
-    print(moviesData);
+
     setState(() {
       movies = moviesData;
+      movies_to_filter = moviesData;
+      no_recommendations = movies.isEmpty;
     });
   }
 
@@ -105,46 +102,60 @@ class RecommendationState extends State<Recommendation> {
   }
 
   void onTabTapped(int index) {
-    if (index==0) Navigator.pushNamed(context, '/');
-    if (index==1) Navigator.pushNamed(context, '/search');
-    if (index==2) Navigator.pushNamed(context, '/recommendation');
-    if (index==3) Navigator.pushNamed(context, '/friends');
-    if (index==4) Navigator.pushNamed(context, '/movieList');
-    if (index==5) Navigator.pushNamed(context, '/settings');
+    if (index == 0) Navigator.pushNamed(context, '/');
+    if (index == 1) Navigator.pushNamed(context, '/search');
+    if (index == 2) Navigator.pushNamed(context, '/recommendation');
+    if (index == 3) Navigator.pushNamed(context, '/friends');
+    if (index == 4) Navigator.pushNamed(context, '/movieList');
+    if (index == 5) Navigator.pushNamed(context, '/settings');
   }
 
   @override
   Widget build(BuildContext context) {
-    final List<String> genres = ["ALL"," ACTION", "ADVENTURE", "ANIMATION", "COMEDY", "CRIME", "DOCUMENTARY", "DRAMA", "FAMILY", "FANTASY", "HISTORY", "HORROR", "MUSIC", "MYSTERY", "ROMANCE", "SCIENCE FICTION", "THRILLER", "TV MOVIE", "WAR", "WESTERN"];
+    final List<String> genres = [
+      "ALL",
+      "ACTION",
+      "ADVENTURE",
+      "ANIMATION",
+      "COMEDY",
+      "CRIME",
+      "DOCUMENTARY",
+      "DRAMA",
+      "FAMILY",
+      "FANTASY",
+      "HISTORY",
+      "HORROR",
+      "MUSIC",
+      "MYSTERY",
+      "ROMANCE",
+      "SCIENCE FICTION",
+      "THRILLER",
+      "TV MOVIE",
+      "WAR",
+      "WESTERN"
+    ];
     int currentIndex = 2;
     return Scaffold(
-      backgroundColor: ColorConstant.gray900,
-      appBar: AppBar(
+        backgroundColor: ColorConstant.gray900,
+        appBar: AppBar(
           backgroundColor: ColorConstant.gray900,
           leading: IconButton(
-            icon: ImageIcon(AssetImage("assets/icons/back_arrow_red.png"), color: ColorConstant.red900,),
+              icon: ImageIcon(
+                AssetImage("assets/icons/back_arrow_red.png"),
+                color: ColorConstant.red900,
+              ),
               onPressed: () => Navigator.of(context).pop()),
           title: RichText(
               text: TextSpan(children: [
-                TextSpan(
-                    text: "Movies For ",
-                    style: AppStyle.txtPoppinsBold30
-                ),
-                TextSpan(
-                  text: "You",
-                  style: AppStyle.txtPoppinsItalic30red
-                ),
-                TextSpan(
-                    text: ".",
-                    style: AppStyle.txtPoppinsBold30Red
-                )
+                TextSpan(text: "Movies For ", style: AppStyle.txtPoppinsBold30),
+                TextSpan(text: "You", style: AppStyle.txtPoppinsItalic30red),
+                TextSpan(text: ".", style: AppStyle.txtPoppinsBold30Red)
               ]),
-              textAlign: TextAlign.left
-          ),
+              textAlign: TextAlign.left),
           actions: [
             //IconButton(onPressed: null, icon: Icon(Icons.help_outline_rounded, color: ColorConstant.red900))
           ],
-      ),
+        ),
         body: Column(
           children: [
             Padding(
@@ -153,42 +164,64 @@ class RecommendationState extends State<Recommendation> {
                   height: getVerticalSize(45),
                   child: ListView.separated(
                       scrollDirection: Axis.horizontal,
-                    itemBuilder: (context, index) => GenreButton(
-                      title: genres[index],
-                      onSelectedGenre: onSelectedGenre,
-                      isSelected: _selectedGenres.contains(genres[index]),
-                    ),
-                    separatorBuilder: (context, _) => SizedBox(width: getHorizontalSize(8)),
-                    itemCount: genres.length),
-                )
-            ),
+                      itemBuilder: (context, index) => GenreButton(
+                            title: genres[index],
+                            onSelectedGenre: onSelectedGenre,
+                            isSelected: _selectedGenres.contains(genres[index]),
+                          ),
+                      separatorBuilder: (context, _) =>
+                          SizedBox(width: getHorizontalSize(8)),
+                      itemCount: genres.length),
+                )),
             Padding(
-                padding: getPadding(top: 16) ,
-                child: Container(
+                padding: getPadding(top: 16),
+                child: movies.isEmpty && no_recommendations
+                    ? Center(
+                  child: Text(
+                    'Sorry, no recommendations are available.',
+                    style: AppStyle.txtPoppinsMedium18,
+                  ),
+                )
+                    : movies.isEmpty
+                    ? Center(
+                  child: CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(ColorConstant.red900),
+                  ),
+                ) :
+                Container(
                     height: getVerticalSize(569),
                     child: Stack(children: [
                       GridView.builder(
                         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                             crossAxisCount: 2,
                             childAspectRatio: 0.6,
-                            mainAxisSpacing:getVerticalSize(10),
-                            crossAxisSpacing: 0
-                        ),
-                        itemBuilder: (context, index) => ShortVerticalCard(item: new MovieInfo(movies[index])),
+                            mainAxisSpacing: getVerticalSize(10),
+                            crossAxisSpacing: 0),
+                        itemBuilder: (context, index) => ShortVerticalCard(
+                            item: new MovieInfo(movies[index])),
                         itemCount: movies.length,
-                      ),
-                      Positioned(
-                          top: getVerticalSize(500),
-                          left: getHorizontalSize(350),
-                          child: ElevatedButton(
-                              style: ButtonStyle(
-                                backgroundColor: MaterialStateProperty.all<Color>(Colors.transparent)
-                              ),
-                              onPressed: () => Navigator.pushNamed(context, '/salons'),
-                              child: Icon(Icons.add_circle_sharp, color: ColorConstant.red900, size: getSize(38),))
                       )
-                    ])
-                )
+                    ]))),
+            Expanded(
+              child: Align(
+                alignment: Alignment.bottomRight,
+                child: Transform.translate(
+                  offset: Offset(10, -10),
+                  child: ElevatedButton(
+                    style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.all<Color>(
+                            Colors.transparent
+                        )
+                    ),
+                    onPressed: () => Navigator.pushNamed(context, '/salons'),
+                    child: Icon(
+                      Icons.add_circle_sharp,
+                      color: ColorConstant.red900,
+                      size: getSize(38),
+                    ),
+                  ),
+                ),
+              ),
             ),
           ],
         ),
@@ -207,83 +240,78 @@ class RecommendationState extends State<Recommendation> {
           items: [
             BottomNavigationBarItem(
                 icon: ImageIcon(AssetImage("assets/icons/home_filled.png")),
-                label: "Home"
-            ),
+                label: "Home"),
             BottomNavigationBarItem(
                 icon: ImageIcon(AssetImage("assets/icons/search_empty.png")),
-                label: "Search"
-            ),
+                label: "Search"),
             BottomNavigationBarItem(
-                icon: ImageIcon(AssetImage("assets/icons/recomandation_filled.png")),
-                label: "Recommendation"
-            ),
+                icon: ImageIcon(
+                    AssetImage("assets/icons/recomandation_filled.png")),
+                label: "Recommendation"),
             BottomNavigationBarItem(
                 icon: ImageIcon(AssetImage("assets/icons/friends_filled.png")),
-                label: "Friends"
-            ),
+                label: "Friends"),
             BottomNavigationBarItem(
                 icon: ImageIcon(AssetImage("assets/icons/bookmark_empty.png")),
-                label: "bookmark"
-            ),
+                label: "bookmark"),
             BottomNavigationBarItem(
                 icon: ImageIcon(AssetImage("assets/icons/settings_empty.png")),
-                label: "Settings"
-            ),
+                label: "Settings"),
           ],
-        )
-    );
+        ));
   }
 
   Widget ShortVerticalCard({required MovieInfo item}) => InkWell(
-    onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => MovieDetail(item: item))),
-    child: Column(
-      children: [
-        Expanded(
-            child: ClipRRect(
-                borderRadius: BorderRadius.circular(20),
-                child: Stack( children:[
-                  AspectRatio(aspectRatio: 0.7, child: Image.network(item.urlImage, fit: BoxFit.fill, filterQuality: FilterQuality.high)),
-                  Positioned(
-                      right: getHorizontalSize(-1),
-                      child: IconButton(onPressed: null, icon: ImageIcon(AssetImage("assets/icons/bookmark_empty.png"), color: ColorConstant.whiteA700,))
-                  )
-                ])
-            )
-        ),
-        SizedBox(height: getVerticalSize(16),),
-        Padding(
-            padding: getPadding(left: 10),
-            child: Container(
-                width: getHorizontalSize(160),
-                height: getVerticalSize(40),
-                child: Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      item.title,
-                    style: AppStyle.txtPoppinsSemiBold18,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    )
-                )
-            )
-        ),
-        Padding(
-            padding: getPadding(left: 27),
-            child: Align(
-                alignment: Alignment.centerLeft,
-                child: Text.rich(
-                    TextSpan(
-                        children: [
-                          TextSpan(text: item.rating.toString()),
-                          WidgetSpan(child: Icon(Icons.star_rounded, color: ColorConstant.red900,))
-                        ],
-                      style: AppStyle.txtPoppinsMedium18
-                    )
-                )
-            )
-        )
-      ],
-    )
-  );
-
+      onTap: () => Navigator.of(context)
+          .push(MaterialPageRoute(builder: (_) => MovieDetail(item: item))),
+      child: Column(
+        children: [
+          Expanded(
+              child: ClipRRect(
+                  borderRadius: BorderRadius.circular(20),
+                  child: Stack(children: [
+                    AspectRatio(
+                        aspectRatio: 0.7,
+                        child: Image.network(item.urlImage,
+                            fit: BoxFit.fill,
+                            filterQuality: FilterQuality.high)),
+                    Positioned(
+                        right: getHorizontalSize(-1),
+                        child: IconButton(
+                            onPressed: null,
+                            icon: ImageIcon(
+                              AssetImage("assets/icons/bookmark_empty.png"),
+                              color: ColorConstant.whiteA700,
+                            )))
+                  ]))),
+          SizedBox(
+            height: getVerticalSize(16),
+          ),
+          Padding(
+              padding: getPadding(left: 10),
+              child: Container(
+                  width: getHorizontalSize(160),
+                  height: getVerticalSize(40),
+                  child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        item.title,
+                        style: AppStyle.txtPoppinsSemiBold18,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      )))),
+          Padding(
+              padding: getPadding(left: 27),
+              child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text.rich(TextSpan(children: [
+                    TextSpan(text: item.rating.toString()),
+                    WidgetSpan(
+                        child: Icon(
+                      Icons.star_rounded,
+                      color: ColorConstant.red900,
+                    ))
+                  ], style: AppStyle.txtPoppinsMedium18))))
+        ],
+      ));
 }

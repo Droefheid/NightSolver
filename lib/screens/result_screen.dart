@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:night_solver/screens/custom_toast.dart';
@@ -31,9 +30,9 @@ class ResultScreen extends StatefulWidget {
 
 class ResultScreenSate extends State<ResultScreen> {
   Color mainColor = const Color(0xff3C3261);
+  final user = FirebaseAuth.instance.currentUser!;
   List<dynamic> movies = [];
   bool no_recommendations = false;
-  int vote = 0;
   double aventure = 0;
   double action = 0;
   double comedie = 0;
@@ -44,19 +43,19 @@ class ResultScreenSate extends State<ResultScreen> {
   double scifi = 0;
 
   Future<void> getData() async {
-    var RecommendedList = [];
-    var SeenMovies = [];
-    var RecommendedMoviesAlreadySavedInFirestore = [];
+    var recommendedList = [];
+    var seenMovies = [];
+    var recommendedMoviesAlreadySavedInFirestore = [];
 
     for (String id in widget.IdList) {
       final snapshot =
           await FirebaseFirestore.instance.collection('users').doc(id).get();
       if (snapshot.data()!['movies_id'] != null) {
-        SeenMovies.addAll(snapshot.data()!['movies_id']);
+        seenMovies.addAll(snapshot.data()!['movies_id']);
       }
       if (snapshot.data()!['recommended'] != null) {
         for (var item in snapshot.data()!['recommended'].entries) {
-          RecommendedList.addAll(item.value);
+          recommendedList.addAll(item.value);
         }
       }
 
@@ -74,7 +73,7 @@ class ResultScreenSate extends State<ResultScreen> {
       var data =
           snapshot.data()!['salons'][widget.salonName]['recommended_movies'];
       if (data != null) {
-        RecommendedMoviesAlreadySavedInFirestore.addAll(data);
+        recommendedMoviesAlreadySavedInFirestore.addAll(data);
       }
 
       int numberOfMembers = widget.IdList.length;
@@ -117,15 +116,15 @@ class ResultScreenSate extends State<ResultScreen> {
         Genres.add('878');
       }
 
-      if (RecommendedMoviesAlreadySavedInFirestore.isEmpty) {
-        if (!RecommendedList.isEmpty) {
+      if (recommendedMoviesAlreadySavedInFirestore.isEmpty) {
+        if (!recommendedList.isEmpty) {
           //get a list of recommend movies based on seen movies
-          for (int i = 0; i < RecommendedList.length; i++) {
+          for (int i = 0; i < recommendedList.length; i++) {
             //check if the movie recommended has the same genre as set in the preferences
-            if (Genres.contains(RecommendedList[i]["genre"])) {
+            if (Genres.contains(recommendedList[i]["genre"])) {
               //check if the movie recommended is not in the seen movies list
-              if (!SeenMovies.contains(RecommendedList[i]["id"])) {
-                RecList.add(RecommendedList[i]["id"]);
+              if (!seenMovies.contains(recommendedList[i]["id"])) {
+                RecList.add(recommendedList[i]["id"]);
               }
             }
           }
@@ -133,7 +132,8 @@ class ResultScreenSate extends State<ResultScreen> {
         for (var Rec in RecList) {
           //get the providers list of the recommended movie
           final movieProvider = await http.get(Uri.parse(
-              'https://api.themoviedb.org/3/movie/$Rec/watch/providers?api_key='+Constants.theMovieDb));
+              'https://api.themoviedb.org/3/movie/$Rec/watch/providers?api_key=' +
+                  Constants.theMovieDb));
           if (movieProvider.statusCode == 200) {
             final Map<String, dynamic> ProviderData =
                 json.decode(movieProvider.body);
@@ -151,7 +151,8 @@ class ResultScreenSate extends State<ResultScreen> {
                   if (!moviesDataTitles.contains(Rec)) {
                     moviesDataTitles.add(Rec);
                     final finalRec = await http.get(Uri.parse(
-                        'https://api.themoviedb.org/3/movie/$Rec?api_key='+Constants.theMovieDb));
+                        'https://api.themoviedb.org/3/movie/$Rec?api_key=' +
+                            Constants.theMovieDb));
                     if (finalRec.statusCode == 200) {
                       final Map<String, dynamic> finalRecCard =
                           json.decode(finalRec.body);
@@ -164,16 +165,17 @@ class ResultScreenSate extends State<ResultScreen> {
             }
           }
         }
-
-        for (String member in widget.IdList) {
-          FirebaseFirestore.instance.collection('users').doc(member).set({
-            'salons': {
-              widget.salonName: {'recommended_movies': moviesData}
-            }
-          }, SetOptions(merge: true));
+        if (!moviesData.isEmpty) {
+          for (String member in widget.IdList) {
+            FirebaseFirestore.instance.collection('users').doc(member).set({
+              'salons': {
+                widget.salonName: {'recommended_movies': moviesData}
+              }
+            }, SetOptions(merge: true));
+          }
         }
       } else {
-        moviesData = RecommendedMoviesAlreadySavedInFirestore;
+        moviesData = recommendedMoviesAlreadySavedInFirestore;
       }
 
       if (moviesData.isEmpty) {
@@ -194,59 +196,44 @@ class ResultScreenSate extends State<ResultScreen> {
     getData();
   }
 
-  void changeVotedMovie(movie) {
-    setState(() {
-      vote = movie['id'];
-    });
-    CustomToast.showToast(context, 'your current vote is: ${movie['title']}');
-  }
-
-  void submitVotedMovie(movieID) {
-    final user = FirebaseAuth.instance.currentUser!;
-    for (String member in widget.IdList) {
-      FirebaseFirestore.instance.collection('users').doc(member).set({
-        'salons': {
-          widget.salonName: {
-            'votes': {user.uid: movieID}
-          }
-        }
-      }, SetOptions(merge: true));
-    }
-    Navigator.popUntil(context, ModalRoute.withName('/'));
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: ColorConstant.gray900,
       floatingActionButton: new FloatingActionButton.extended(
-          onPressed: () {
-            submitVotedMovie(vote);
-          },
-          label: Text("Submit vote", style: AppStyle.txtPoppinsMedium18Grey,),
+        onPressed: () async {
+          final snapshot = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
+          if(snapshot.data()!['salons'][widget.salonName]['votes'][user.uid] == null
+            || snapshot.data()!['salons'][widget.salonName]['votes'][user.uid].length == 0){
+            CustomToast.showToast(context, 'You need to vote for at least one movie');
+          }
+          else Navigator.popUntil(context, ModalRoute.withName('/salons'));
+        },
+        label: Text(
+          "Submit vote",
+          style: AppStyle.txtPoppinsMedium18Grey,
+        ),
         backgroundColor: ColorConstant.red900,
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      appBar:  AppBar(
+      appBar: AppBar(
           backgroundColor: ColorConstant.gray900,
           leading: IconButton(
-            icon: ImageIcon(AssetImage("assets/icons/back_arrow_red.png"), color: ColorConstant.red900,),
+            icon: ImageIcon(
+              AssetImage("assets/icons/back_arrow_red.png"),
+              color: ColorConstant.red900,
+            ),
             onPressed: () => Navigator.of(context).pop(),
           ),
           title: RichText(
               text: TextSpan(children: [
                 TextSpan(
                     text: "Recommended Movies",
-                    style: AppStyle.txtPoppinsBold30
-                ),
-                TextSpan(
-                    text: ".",
-                    style: AppStyle.txtPoppinsBold30Red
-                ),
+                    style: AppStyle.txtPoppinsBold30),
+                TextSpan(text: ".", style: AppStyle.txtPoppinsBold30Red),
               ]),
-              textAlign: TextAlign.left
-          )
-      ),
+              textAlign: TextAlign.left)),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -255,51 +242,43 @@ class ResultScreenSate extends State<ResultScreen> {
             Expanded(
               child: movies.isEmpty && no_recommendations
                   ? Center(
-                child: Text(
-                  'Sorry, no recommendations are available.',
-                  style: AppStyle.txtPoppinsMedium18,
-                ),
-              )
-                  : movies.isEmpty
-                  ? Center(
-                child: CircularProgressIndicator(),
-              )
-                  : ListView.separated(
-                separatorBuilder: (context, _) => SizedBox(height: getVerticalSize(16)),
-                cacheExtent: 0,
-                itemCount: movies.length,
-                itemBuilder: (context, i) {
-                  return Slidable(
-                      startActionPane: ActionPane(
-                        motion: const StretchMotion(),
-                        children: [
-                          SlidableAction(
-                              backgroundColor: ColorConstant.gray800,
-                              borderRadius: BorderRadius.circular(16),
-                              icon: Icons.favorite,
-                              foregroundColor: ColorConstant.redA700,
-                              label: 'vote',
-                              onPressed: (context) {
-                                changeVotedMovie(movies[i]);
-                              }
-                          )
-                        ],
+                      child: Text(
+                        'Sorry, no recommendations are available.',
+                        style: AppStyle.txtPoppinsMedium18,
                       ),
-                      child: MaterialButton(
-                        child: VerticalMovieCard(item: new MovieInfo(movies[i])),
-                        padding: const EdgeInsets.all(0.0),
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => MovieDetail(item: new MovieInfo(movies[i])),
-                            ),
-                          );
-                        },
-                      )
-                  );
-                },
-              ),
+                    )
+                  : movies.isEmpty
+                      ? Center(
+                          child: CircularProgressIndicator(
+                            valueColor: AlwaysStoppedAnimation<Color>(ColorConstant.red900),
+                          ),
+                        )
+                      : ListView.separated(
+                          separatorBuilder: (context, _) =>
+                              SizedBox(height: getVerticalSize(16)),
+                          cacheExtent: 0,
+                          itemCount: movies.length,
+                          itemBuilder: (context, i) {
+                            return Container(
+                                child: MaterialButton(
+                                  child: VerticalMovieCardWithLikeButton(
+                                      item: new MovieInfo(movies[i]),
+                                      salonName: widget.salonName,
+                                      IdList: widget.IdList),
+                                  padding: const EdgeInsets.all(0.0),
+                                  onPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => MovieDetail(
+                                            item: new MovieInfo(movies[i])),
+                                      ),
+                                    );
+                                  },
+                                )
+                            );
+                          },
+                        ),
             ),
           ],
         ),

@@ -307,8 +307,6 @@ class FriendCell extends StatelessWidget {
 
   Future<String> getFriendName(String friendId) async{
 
-
-    print(friendId);
     final DocumentReference friendDocRef =
     FirebaseFirestore.instance.collection('users').doc(friendId);
     DocumentSnapshot snapshot = await friendDocRef.get();
