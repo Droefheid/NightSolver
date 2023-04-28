@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:night_solver/auth/main_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:night_solver/screens/friends_screen.dart';
+import 'package:night_solver/screens/home_app.dart';
 import 'package:night_solver/screens/movie_list.dart';
 import 'package:night_solver/screens/recommendation_screen.dart';
 import 'package:night_solver/screens/salons.dart';
@@ -41,17 +42,9 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       initialRoute: '/',
-      routes: {
-        '/' : (context) => MainScreen(),
-        '/search' : (context) => SearchScreen(),
-        '/movieList' : (context) => MovieList(),
-        '/recommendation' : (context) => Recommendation(),
-        '/friends' : (context) => Friends(),
-        '/settings' : (context) => SettingScreen(),
-        '/salons' : (context) => Salons()
-      },
       title: 'Night Solver',
       theme: ThemeData.light(),
+      home: const HomeApp(),
     );
   }
 }
