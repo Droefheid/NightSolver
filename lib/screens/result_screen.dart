@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:night_solver/screens/custom_toast.dart';
@@ -31,9 +30,9 @@ class ResultScreen extends StatefulWidget {
 
 class ResultScreenSate extends State<ResultScreen> {
   Color mainColor = const Color(0xff3C3261);
+  final user = FirebaseAuth.instance.currentUser!;
   List<dynamic> movies = [];
   bool no_recommendations = false;
-  int vote = 0;
   double aventure = 0;
   double action = 0;
   double comedie = 0;
@@ -197,34 +196,19 @@ class ResultScreenSate extends State<ResultScreen> {
     getData();
   }
 
-  void changeVotedMovie(movie) {
-    setState(() {
-      vote = movie['id'];
-    });
-    CustomToast.showToast(context, 'your current vote is: ${movie['title']}');
-  }
-
-  void submitVotedMovie(movieID) {
-    final user = FirebaseAuth.instance.currentUser!;
-    for (String member in widget.IdList) {
-      FirebaseFirestore.instance.collection('users').doc(member).set({
-        'salons': {
-          widget.salonName: {
-            'votes': {user.uid: movieID}
-          }
-        }
-      }, SetOptions(merge: true));
-    }
-    Navigator.popUntil(context, ModalRoute.withName('/'));
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: ColorConstant.gray900,
       floatingActionButton: new FloatingActionButton.extended(
-        onPressed: () {
-          submitVotedMovie(vote);
+        onPressed: () async {
+          final snapshot = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
+          if(snapshot.data()!['salons'][widget.salonName]['votes'][user.uid] == null
+            || snapshot.data()!['salons'][widget.salonName]['votes'][user.uid].length == 0){
+            CustomToast.showToast(context, 'You need to vote for at least one movie');
+          }
+          else Navigator.popUntil(context, ModalRoute.withName('/salons'));
         },
         label: Text(
           "Submit vote",
@@ -275,25 +259,12 @@ class ResultScreenSate extends State<ResultScreen> {
                           cacheExtent: 0,
                           itemCount: movies.length,
                           itemBuilder: (context, i) {
-                            return Slidable(
-                                startActionPane: ActionPane(
-                                  motion: const StretchMotion(),
-                                  children: [
-                                    SlidableAction(
-                                        backgroundColor: ColorConstant.gray800,
-                                        borderRadius: BorderRadius.circular(16),
-                                        icon: Icons.favorite,
-                                        foregroundColor: ColorConstant.redA700,
-                                        label: 'vote',
-                                        onPressed: (context) {
-                                          changeVotedMovie(movies[i]);
-                                        })
-                                  ],
-                                ),
-                                child: Container(
-                                    child: MaterialButton(
-                                  child: VerticalMovieCard(
-                                      item: new MovieInfo(movies[i])),
+                            return Container(
+                                child: MaterialButton(
+                                  child: VerticalMovieCardWithLikeButton(
+                                      item: new MovieInfo(movies[i]),
+                                      salonName: widget.salonName,
+                                      IdList: widget.IdList),
                                   padding: const EdgeInsets.all(0.0),
                                   onPressed: () {
                                     Navigator.push(
@@ -304,7 +275,8 @@ class ResultScreenSate extends State<ResultScreen> {
                                       ),
                                     );
                                   },
-                                )));
+                                )
+                            );
                           },
                         ),
             ),

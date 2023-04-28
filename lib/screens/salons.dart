@@ -9,13 +9,9 @@ import 'package:night_solver/screens/result_screen.dart';
 import 'package:night_solver/utils/size_utils.dart';
 import '../utils/movie_info.dart';
 import 'movie_details.dart';
-import 'package:night_solver/screens/search_screen.dart';
-import 'package:night_solver/screens/settings_screen.dart';
 import 'package:night_solver/screens/watch_providers.dart';
 import '../theme/app_style.dart';
 import '../utils/color_constant.dart';
-import 'home_screen.dart';
-import 'movie_list.dart';
 import 'new_salon_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:http/http.dart' as http;
@@ -151,6 +147,7 @@ class _SalonsState extends State<Salons> {
                         child: RoomInfo(salon:salons[i]),
                         padding: getPadding(top: 16, bottom: 16),
                         onPressed: () async {
+                          await getData();
                           String salonName = salons[i].keys.first;
                           var members = salons[i].values.first['salon_members'];
                           var votes = salons[i].values.first['votes'];
@@ -161,8 +158,10 @@ class _SalonsState extends State<Salons> {
                                   ? current
                                   : mostFrequent
                               );
-                              final result = await http.get(Uri.parse('https://api.themoviedb.org/3/movie/$mostFrequent?api_key=$apiKey'));
+                              final result = await http.get(Uri.parse('https://api.themoviedb.org/3/movie/${mostFrequent[0]}?api_key=$apiKey'));
                               if (result.statusCode == 200) {
+                                print(mostFrequent);
+
                                 final Map<String, dynamic> resultData = json.decode(result.body);
                                 CustomToast.showToast(context, 'Everyone has voted. This is the most voted movie');
                                 Navigator.of(context).push(MaterialPageRoute(builder: (_) => MovieDetail(item: new MovieInfo(resultData))));
