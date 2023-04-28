@@ -76,6 +76,7 @@ class _SalonsState extends State<Salons> {
   void onTabTapped(int index) {
     if (index==0) Navigator.pushNamed(context, '/');
     if (index==1) Navigator.pushNamed(context, '/search');
+    if (index==2) Navigator.pushNamed(context, '/recommendation');
     if (index==3) Navigator.pushNamed(context, '/friends');
     if (index==4) Navigator.pushNamed(context, '/movieList');
     if (index==5) Navigator.pushNamed(context, '/settings');
@@ -108,7 +109,7 @@ class _SalonsState extends State<Salons> {
               title: RichText(
                   text: TextSpan(children: [
                     TextSpan(
-                        text: "Rooms",
+                        text: "Friends Movie Picker",
                         style: AppStyle.txtPoppinsBold30
                     ),
                     TextSpan(
@@ -139,6 +140,23 @@ class _SalonsState extends State<Salons> {
                   controller: _controller,
                   onChanged: _onSearchChanged,
                 ),
+                Padding(padding: getPadding(top: 10, left: 4) , child:
+                InkWell(
+                  onTap: () => Navigator.pushNamed(context, '/recommendation'),
+                  child: RichText(
+                    text: TextSpan( children: [
+                      TextSpan(
+                        text: "Find a movie just for ",
+                        style: AppStyle.txtPoppinsMedium18
+                      ),
+                      TextSpan(
+                        text: "me.",
+                        style: AppStyle.txtPoppinsItalicMedium18Red
+                      )
+                    ]
+                    ),
+                  ),
+                )),
                 Expanded(
                   child: ListView.builder(
                     itemCount: salons.length,
@@ -227,7 +245,7 @@ class _SalonsState extends State<Salons> {
                     label: "Search"
                 ),
                 BottomNavigationBarItem(
-                    icon: ImageIcon(AssetImage("assets/icons/recomandation_filled_point.png")),
+                    icon: ImageIcon(AssetImage("assets/icons/recomandation_filled.png")),
                     label: "Recommendation"
                 ),
                 BottomNavigationBarItem(

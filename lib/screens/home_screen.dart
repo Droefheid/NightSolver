@@ -34,7 +34,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void onTabTapped(int index) {
     if (index==1) Navigator.pushNamed(context, '/search');
-    if (index==2) Navigator.pushNamed(context, '/recommendation');
+    if (index==2) Navigator.pushNamed(context, '/salons');
     if (index==3) Navigator.pushNamed(context, '/friends');
     if (index==4) Navigator.pushNamed(context, '/movieList');
     if (index==5) Navigator.pushNamed(context, '/settings');

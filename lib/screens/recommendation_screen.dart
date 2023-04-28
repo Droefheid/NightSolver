@@ -190,7 +190,7 @@ class RecommendationState extends State<Recommendation> {
                 ) :
                 Container(
                     height: getVerticalSize(569),
-                    child: Stack(children: [
+                    child:
                       GridView.builder(
                         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                             crossAxisCount: 2,
@@ -201,28 +201,7 @@ class RecommendationState extends State<Recommendation> {
                             item: new MovieInfo(movies[index])),
                         itemCount: movies.length,
                       )
-                    ]))),
-            Expanded(
-              child: Align(
-                alignment: Alignment.bottomRight,
-                child: Transform.translate(
-                  offset: Offset(10, -10),
-                  child: ElevatedButton(
-                    style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all<Color>(
-                            Colors.transparent
-                        )
-                    ),
-                    onPressed: () => Navigator.pushNamed(context, '/salons'),
-                    child: Icon(
-                      Icons.add_circle_sharp,
-                      color: ColorConstant.red900,
-                      size: getSize(38),
-                    ),
-                  ),
-                ),
-              ),
-            ),
+                    )),
           ],
         ),
         bottomNavigationBar: BottomNavigationBar(
@@ -246,7 +225,7 @@ class RecommendationState extends State<Recommendation> {
                 label: "Search"),
             BottomNavigationBarItem(
                 icon: ImageIcon(
-                    AssetImage("assets/icons/recomandation_filled.png")),
+                    AssetImage("assets/icons/recomandation_filled_point.png")),
                 label: "Recommendation"),
             BottomNavigationBarItem(
                 icon: ImageIcon(AssetImage("assets/icons/friends_filled.png")),
