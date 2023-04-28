@@ -35,13 +35,17 @@ class CustomToast extends StatelessWidget {
           ),
           SizedBox(width: 12),
           Expanded(
-              child:Text(
-                message,
-                style: TextStyle(
-                  color: textColor,
-                  fontSize: fontSize,
+              child: Center(
+                child: Text(
+                  message,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: textColor,
+                    fontSize: fontSize,
+                  ),
                 ),
-              ),
+
+              )
           )
 
         ],
