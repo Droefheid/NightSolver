@@ -2,93 +2,89 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:night_solver/screens/preference_page.dart';
 import 'package:night_solver/utils/size_utils.dart';
-
 import '../theme/app_style.dart';
 import '../utils/color_constant.dart';
-
 class Providers extends StatefulWidget {
-  const Providers({Key? key,required this.IdList, required this.salonName} ) : super(key: key);
+  const Providers({Key? key, required this.IdList, required this.salonName})
+      : super(key: key);
   final IdList;
   final salonName;
-  @override
   State<Providers> createState() => _ProvidersState();
 }
-//TODO fais en logo
-class _ProvidersState extends State<Providers>{
-  var providers = {
-  "Netflix":0,
-  "Amazon Prime Video" : 0,
-  "Disney Plus" : 0,
-  "Apple TV":0,
+class _ProvidersState extends State<Providers> {
+  // Define provider logos
+  Map<String, String> providerLogos = {
+    "Netflix": "assets/netflix.png",
+    "Amazon Prime Video": "assets/amazon.png",
+    "Disney Plus": "assets/disney.png",
+    "Apple TV": "assets/apple.png",
   };
+
+  // Define provider selections
+  Map<String, bool> providerSelections = {
+    "Netflix": false,
+    "Amazon Prime Video": false,
+    "Disney Plus": false,
+    "Apple TV": false,
+  };
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: ColorConstant.gray900,
-      appBar:  AppBar(
-          backgroundColor: ColorConstant.gray900,
-          leading: IconButton(
-            icon: ImageIcon(AssetImage("assets/icons/back_arrow_red.png"), color: ColorConstant.red900,),
-            onPressed: () => Navigator.of(context).pop(),
+      appBar: AppBar(
+        backgroundColor: ColorConstant.gray900,
+        leading: IconButton(
+          icon: ImageIcon(
+            AssetImage("assets/icons/back_arrow_red.png"),
+            color: ColorConstant.red900,
           ),
-          title: RichText(
-              text: TextSpan(children: [
-                TextSpan(
-                    text: "Select your platform",
-                    style: AppStyle.txtPoppinsBold30
-                ),
-                TextSpan(
-                    text: ".",
-                    style: AppStyle.txtPoppinsBold30Red
-                ),
-              ]),
-              textAlign: TextAlign.left
-          )
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+        title: RichText(
+          text: TextSpan(
+            children: [
+              TextSpan(
+                text: "Select your platform",
+                style: AppStyle.txtPoppinsBold30,
+              ),
+              TextSpan(text: ".", style: AppStyle.txtPoppinsBold30Red),
+            ],
+          ),
+          textAlign: TextAlign.left,
+        ),
       ),
-      body:
-          Column(children: [
-            Wrap(
-              children: [
-                ProvideroCell("Netflix"),
-                ProvideroCell("Amazon Prime Video"),
-                ProvideroCell("Disney Plus"),
-                ProvideroCell("Apple TV"),
-              ],
-            ),
-            Padding(
-                padding: getPadding(top: 400),
-                child:
-            buildSubmit())
-          ]),
-    );
-  }
-  Widget ProvideroCell( String field){
-    return Padding(
-        padding: const EdgeInsets.all(4),
-        child: ElevatedButton(
-          style: ButtonStyle(
-            backgroundColor: (providers[field]==0) ? MaterialStateProperty.all<Color>(ColorConstant.gray800) : MaterialStateProperty.all<Color>(ColorConstant.red900),
-              shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                  RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14)
-                  )
-              )
-          ),
-            onPressed: (){
+      body: GridView.count(
+        crossAxisCount: 2,
+        childAspectRatio: 1.5,
+        children: providerLogos.keys.map((providerName) {
+          return GestureDetector(
+            onTap: () {
               setState(() {
-                if(providers[field]==0){
-                  providers[field]=1;
-                }else{
-                  providers[field]=0;
-                }
-              }
-              );
-              },
-            child: Text(
-              field,
-              style: (providers[field]==0) ? AppStyle.txtPoppinsMedium18 : AppStyle.txtPoppinsMedium18Grey,
-            )
-        )
+                providerSelections[providerName] =
+                !providerSelections[providerName]!;
+              });
+            },
+            child: Container(
+              margin: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: providerSelections[providerName]!
+                    ? ColorConstant.red900
+                    : ColorConstant.gray800,
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: Center(
+                child: Image.asset(
+                  providerLogos[providerName]!,
+                  fit: BoxFit.contain,
+                  height: 100,
+                ),
+              ),
+            ),
+          );
+        }).toList(),
+      ),
+      bottomNavigationBar: buildSubmit(),
     );
   }
   Widget buildSubmit() {
@@ -96,28 +92,28 @@ class _ProvidersState extends State<Providers>{
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         ElevatedButton(
-            onPressed: () {
-              for (String member in widget.IdList){
-                FirebaseFirestore.instance
-                    .collection('users')
-                    .doc(member)
-                    .set({'salons' : {widget.salonName : {'providers' : providers}}}, SetOptions(merge : true));
-              }
-              Navigator.of(context).push(MaterialPageRoute(builder: (context) => Preferences(salonName: widget.salonName, IdList : widget.IdList, providerStat : providers)));
-            },
+          onPressed: () {
+            for (String member in widget.IdList) {
+              FirebaseFirestore.instance.collection('users').doc(member).set({
+                'salons': {
+                  widget.salonName: {'providers': providerSelections}
+                }
+              }, SetOptions(merge: true));
+            }
+            Navigator.of(context).push(MaterialPageRoute(
+                builder: (context) => Preferences(
+                    salonName: widget.salonName,
+                    IdList: widget.IdList,
+                    providerStat: providerSelections)));
+          },
           style: ButtonStyle(
-            backgroundColor: MaterialStateProperty.all<Color>(ColorConstant.redA700),
-            shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-              RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(14)
-              )
-            )
-          ),
-            child: Text(
-                'Next',
-                style: AppStyle.txtPoppinsMedium18Grey
-            ),
-          ),
+              backgroundColor:
+                  MaterialStateProperty.all<Color>(ColorConstant.redA700),
+              shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                  RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14)))),
+          child: Text('Next', style: AppStyle.txtPoppinsMedium18Grey),
+        ),
       ],
     );
   }

@@ -94,16 +94,16 @@ class _MovieDetailState extends State<MovieDetail> {
   Future deleteMovie(BuildContext context, String movieId) async {
     final user = FirebaseAuth.instance.currentUser!;
     final DocumentReference docRef = FirebaseFirestore.instance.collection('users').doc(user.uid);
+
     // Remove movie from user's watched list and recommended list
     docRef.update({
       'movies_id': FieldValue.arrayRemove([movieId]),
       'recommended': FieldValue.arrayRemove([movieId]),
     });
+
     CustomToast.showToast(context, 'Movie removed from watched list');
-    // Navigate back to the movie list page
     FocusScope.of(context).unfocus();
     Navigator.pop(context);
-    Navigator.pushNamed(context, '/movieList');
   }
 
 
