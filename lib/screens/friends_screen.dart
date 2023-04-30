@@ -242,6 +242,7 @@ class _FriendsState extends State<Friends> {
                     borderRadius: BorderRadius.circular(16)
                   )
                 ),
+                style: AppStyle.txtPoppinsMedium18,
                 controller: _SearchController,
                 onChanged: _onSearchChanged,
               ),
