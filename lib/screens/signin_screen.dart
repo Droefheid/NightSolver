@@ -94,10 +94,15 @@ class _SignInScreenState extends State<SignInScreen> {
                   padding: getPadding(all: 16),
                   child: TextField(
                       controller: _emailController,
+                      cursorColor: ColorConstant.red900,
                       decoration: InputDecoration(
                         prefixIcon: Icon(Icons.email_rounded, color: ColorConstant.red900),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(16)
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: ColorConstant.red900),
+                            borderRadius: BorderRadius.circular(16)
                         ),
                         hintText: 'Email',
                         hintStyle: AppStyle.txtPoppinsMedium18GreyLight,
@@ -113,10 +118,15 @@ class _SignInScreenState extends State<SignInScreen> {
                   padding: getPadding(all: 16),
                   child: TextField(
                     controller: _passwordController,
+                    cursorColor: ColorConstant.red900,
                     decoration: InputDecoration(
                       prefixIcon: Icon(Icons.lock_rounded, color: ColorConstant.red900),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16)
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: ColorConstant.red900),
+                          borderRadius: BorderRadius.circular(16)
                       ),
                       hintText: 'Password',
                       hintStyle: AppStyle.txtPoppinsMedium18GreyLight,

@@ -86,9 +86,14 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                   padding: getPadding(all: 16),
                   child: TextField(
                       controller: _emailController,
+                      cursorColor: ColorConstant.red900,
                       decoration: InputDecoration(
                         prefixIcon: Icon(Icons.email_rounded, color: ColorConstant.red900),
                         border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(16)
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: ColorConstant.red900),
                             borderRadius: BorderRadius.circular(16)
                         ),
                         hintText: 'Enter your email address',

@@ -54,6 +54,7 @@ class _SettingScreenState extends State<SettingScreen> {
       body: Column(
         children: [
           TextField(
+              readOnly: true,
               onTap: () => {
                 FirebaseAuth.instance.signOut(),
                 Navigator.of(context).popUntil((route) => route.isFirst)

@@ -126,10 +126,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   padding: getPadding(all: 16),
                   child: TextField(
                       controller: _usernameController,
+                      cursorColor: ColorConstant.red900,
                       decoration: InputDecoration(
                         prefixIcon: Icon(Icons.person_2_rounded, color: ColorConstant.red900),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(16)
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: ColorConstant.red900),
+                            borderRadius: BorderRadius.circular(16)
                         ),
                         hintText: 'Username',
                         hintStyle: AppStyle.txtPoppinsMedium18GreyLight,
@@ -145,10 +150,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   padding: getPadding(bottom: 16, left: 16, right: 16),
                   child: TextField(
                       controller: _emailController,
+                      cursorColor: ColorConstant.red900,
                       decoration: InputDecoration(
                         prefixIcon: Icon(Icons.email_rounded, color: ColorConstant.red900),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(16)
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: ColorConstant.red900),
+                            borderRadius: BorderRadius.circular(16)
                         ),
                         hintText: 'Email',
                         hintStyle: AppStyle.txtPoppinsMedium18GreyLight,
@@ -165,9 +175,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   padding: getPadding(bottom: 16, left: 16, right: 16),
                   child: TextField(
                     controller: _passwordController,
+                    cursorColor: ColorConstant.red900,
                     decoration: InputDecoration(
                       prefixIcon: Icon(Icons.lock_rounded, color: ColorConstant.red900),
                       border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16)
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: ColorConstant.red900),
                           borderRadius: BorderRadius.circular(16)
                       ),
                       hintText: 'Password',
@@ -184,9 +199,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   padding: getPadding(bottom: 16, left: 16, right: 16),
                   child: TextField(
                     controller: _confirmPasswordController,
+                    cursorColor: ColorConstant.red900,
                     decoration: InputDecoration(
                       prefixIcon: Icon(Icons.lock_rounded, color: ColorConstant.red900),
                       border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16)
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: ColorConstant.red900),
                           borderRadius: BorderRadius.circular(16)
                       ),
                       hintText: 'Confirm Password',
