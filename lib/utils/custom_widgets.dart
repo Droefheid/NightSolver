@@ -31,7 +31,8 @@ class VerticalMovieCard extends StatelessWidget {
             ClipRRect(
                 borderRadius: BorderRadius.circular(20),
                 child: Stack( children:[
-                  Image.network(item.urlImage, fit: BoxFit.fill, filterQuality: FilterQuality.high,),
+                  AspectRatio(aspectRatio: 3/4, child:
+                  Image.network(item.urlImage, fit: BoxFit.fill, filterQuality: FilterQuality.high,)),
                   Positioned(
                     right: getHorizontalSize(-1),
                     child: Container(
@@ -50,7 +51,7 @@ class VerticalMovieCard extends StatelessWidget {
                   ),
                 ])
             ),
-            Padding(padding: getMargin(left: 16),
+            Expanded(
                 child: Column(
                     children: [
                       Container(
@@ -71,8 +72,9 @@ class VerticalMovieCard extends StatelessWidget {
                           child: Text.rich(
                               TextSpan(
                                   children: [
+                                    WidgetSpan(child: SizedBox(width: getHorizontalSize(22))),
                                     TextSpan( text: item.rating.toString()),
-                                    WidgetSpan(child: SizedBox(width: getHorizontalSize(20))),
+                                    WidgetSpan(child: SizedBox(width: getHorizontalSize(2))),
                                     WidgetSpan(child: RatingBarIndicator(
                                       itemBuilder: (context, index) => Icon(Icons.star_rounded, color: ColorConstant.red900),
                                       itemCount: 5,
@@ -92,7 +94,7 @@ class VerticalMovieCard extends StatelessWidget {
                         width: getHorizontalSize(161),
                         alignment: Alignment.centerLeft,
                         child: Text(
-                          item.genres == [] ? "No genres found" : GetGenresNames(item.genres),
+                          GetGenresNames(item.genres),
                           style: AppStyle.txtPoppinsRegular14,
                           overflow: TextOverflow.ellipsis,
                         ),

@@ -323,10 +323,11 @@ class _SearchScreenState extends State<SearchScreen> {
           ) :
           Expanded(
               child: ListView.separated(
+                  shrinkWrap: true,
                   itemBuilder: (context, index) => VerticalMovieCard(
                       item: new MovieInfo(searched_movies[index])),
                   separatorBuilder: (context, _) =>
-                      SizedBox(height: getVerticalSize(16)),
+                      SizedBox(height: getVerticalSize(6)),
                   itemCount: searched_movies.length)),
         ]),
         bottomNavigationBar: BottomNavigationBar(

@@ -133,5 +133,5 @@ String GetGenresNames(List<dynamic> genres) {
   for (int i = 0; i < genres.length; i++) {
     genresNames += genres[i]["name"] + ", ";
   }
-  return genresNames.substring(0, genresNames.length-1);
+  return genresNames.substring(0, genresNames.length-2);
 }
