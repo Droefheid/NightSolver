@@ -136,10 +136,11 @@ class _FriendsState extends State<Friends> {
   }
 
   Future getFriendName(String friendId) async {
-      final DocumentReference friendDocRef =
-      FirebaseFirestore.instance.collection('users').doc(friendId);
-      DocumentSnapshot snapshot = await friendDocRef.get();
-      final String friendName = snapshot['displayName'];
+    final snapshot = await FirebaseFirestore.instance.collection('users')
+        .doc(friendId)
+        .get();
+    if (snapshot.data()!['displayName'] == null) return '';
+    final String friendName = snapshot['displayName'];
     return friendName;
   }
 
@@ -200,10 +201,14 @@ class _FriendsState extends State<Friends> {
                           bool foundUser = false;
                           for(String friendId in allUsers){
                             String friendName = await getFriendName(friendId);
-                            if (_addControler.text == friendName){
-                              addFriend(friendId);
-                              foundUser = true;
-                              CustomToast.showToast(context, '$friendName added as a friend');
+                            if (friendName != ''){
+                              if (_addControler.text == friendName) {
+                                addFriend(friendId);
+                                foundUser = true;
+                                CustomToast.showToast(
+                                    context, '$friendName added as a friend');
+                                break;
+                              }
                             }
                           }
                           if (!foundUser) CustomToast.showToast(context, 'No user found');
