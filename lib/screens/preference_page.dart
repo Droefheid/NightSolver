@@ -178,7 +178,8 @@ class _PreferencesState extends State<Preferences> {
                   final String friendName = snapshot['displayName'];
                   names.add(friendName);
                 }
-                CustomToast.showToast(context, 'waiting for $names to set their preferences');
+                String showNames = names.length > 2 ? '${names.sublist(0, names.length - 1).join(", ")} and ${names.last}' : names.join(' and ');
+                CustomToast.showToast(context, 'waiting for $showNames to set their preferences');
               }
               else{
                 Navigator.of(context).push(MaterialPageRoute(

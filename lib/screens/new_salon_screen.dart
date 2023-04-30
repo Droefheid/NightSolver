@@ -187,7 +187,7 @@ class _NewSalonState extends State<NewSalon> {
               TextField(
                 decoration: InputDecoration(
                   prefixIcon: Icon(Icons.person_add_alt_rounded, color: ColorConstant.red900,),
-                  hintText: 'Add a friend',
+                  hintText: 'Search a friend to add',
                   hintStyle: AppStyle.txtPoppinsMedium18GreyLight,
                   border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(16)
@@ -204,7 +204,7 @@ class _NewSalonState extends State<NewSalon> {
                   itemCount: persons.length,
                   itemBuilder: (context, i) {
                     return MaterialButton(
-                      child: PersonCell(persons[i]),
+                      child: PersonCell(person: persons[i], salonMembers: salonMembers),
                       padding: const EdgeInsets.all(0.0),
                       onPressed: () async {
                         if (!salonMembers.contains(persons[i])){
@@ -213,6 +213,7 @@ class _NewSalonState extends State<NewSalon> {
                         else{
                           removePerson(persons[i]);
                         }
+                        print(persons[i]);
                       },
                     );
                   },
@@ -227,10 +228,20 @@ class _NewSalonState extends State<NewSalon> {
 }
 
 
-class PersonCell extends StatelessWidget {
+class PersonCell extends StatefulWidget {
+  const PersonCell(
+      {Key? key,
+      required this.person,
+      required this.salonMembers})
+      : super(key: key);
   final dynamic person;
-  PersonCell(this.person);
+  final List salonMembers;
 
+  @override
+  State<PersonCell> createState() => _PersonCellState();
+}
+
+class _PersonCellState extends State<PersonCell> {
 
   Future<String> getFriendName(String friendId) async{
     final DocumentReference friendDocRef =
@@ -238,7 +249,6 @@ class PersonCell extends StatelessWidget {
     DocumentSnapshot snapshot = await friendDocRef.get();
     return snapshot['displayName'];
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -268,28 +278,40 @@ class PersonCell extends StatelessWidget {
               new Expanded(
                   child: new Container(
                     margin: const EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 0.0),
-                    child: new Column(
-                      children: [
-                        FutureBuilder(
-                          future: getFriendName(person),
+                    child: new FutureBuilder(
+                          future: getFriendName(widget.person),
                           builder: (context, snapshot) {
                             if (snapshot.hasData &&
                                 snapshot.connectionState == ConnectionState.done) {
-                              return Text(
-                                snapshot.data!,
-                                style: AppStyle.txtPoppinsMedium18,
-                              );
+                              return widget.salonMembers.contains(widget.person)
+                                  ? Row(
+                                    children: [
+                                      Expanded(
+                                        child: Text(
+                                          snapshot.data!,
+                                          style: AppStyle.txtPoppinsMedium18,
+                                        )
+                                      ),
+                                      Icon(
+                                        Icons.done,
+                                        color: ColorConstant.whiteA700,
+                                      )
+                                    ],
+                                  )
+                                  : Expanded(
+                                    child: Text(
+                                      snapshot.data!,
+                                      style: AppStyle.txtPoppinsMedium18,
+                                    )
+                                  );
                             }
                             return CircularProgressIndicator(
                               valueColor: AlwaysStoppedAnimation<Color>(ColorConstant.red900),
                             );
                           },
-                        )
-                      ],
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                        ),
                     ),
                   )
-              ),
             ],
           ),
 
@@ -298,3 +320,4 @@ class PersonCell extends StatelessWidget {
     );
   }
 }
+

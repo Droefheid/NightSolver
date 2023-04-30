@@ -188,15 +188,16 @@ class _SalonsState extends State<Salons> {
 
                             else if(votes.keys.contains(user.uid)){
                               List waitingForId = members.where((element) => !votes.keys.contains(element)).toList();
-                              List waitingForNames = [];
+                              List names = [];
                               for (int i = 0; i < waitingForId.length; i++){
                                 final DocumentReference friendDocRef =
                                 FirebaseFirestore.instance.collection('users').doc(waitingForId[i]);
                                 DocumentSnapshot snapshot = await friendDocRef.get();
                                 final String friendName = snapshot['displayName'];
-                                waitingForNames.add(friendName);
+                                names.add(friendName);
                               }
-                              CustomToast.showToast(context, 'waiting for $waitingForNames to vote for their movie');
+                              String showNames = names.length > 2 ? '${names.sublist(0, names.length - 1).join(", ")} and ${names.last}' : names.join(' and ');
+                              CustomToast.showToast(context, 'waiting for $showNames to vote for their movie');
                             }
                             else{
                               Navigator.of(context).push(MaterialPageRoute(builder: (_) => ResultScreen(salonName: salonName, IdList: members, providers: salons[i].values.first['providers'])));
