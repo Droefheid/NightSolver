@@ -276,6 +276,7 @@ class _SearchScreenState extends State<SearchScreen> {
             controller: _controller,
             onChanged: _onSearchChanged,
             style: AppStyle.txtPoppinsMedium18,
+            cursorColor: ColorConstant.red900,
             decoration: InputDecoration(
                 prefixIcon: IconButton(
                     icon: ImageIcon(AssetImage("assets/icons/search_empty.png"), color: ColorConstant.whiteA700),
@@ -285,6 +286,10 @@ class _SearchScreenState extends State<SearchScreen> {
                 border:
                     OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                 filled: true,
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: ColorConstant.red900),
+                  borderRadius: BorderRadius.circular(10)
+                ),
                 fillColor: ColorConstant.gray90001),
           ),
           SizedBox(height: getVerticalSize(16)),

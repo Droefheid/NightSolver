@@ -188,6 +188,7 @@ class _FriendsState extends State<Friends> {
             children: [
               TextFormField(
                 controller: _addControler,
+                cursorColor: ColorConstant.red900,
                 decoration: InputDecoration(
                   prefixIcon: new IconButton(
                       icon: Icon(Icons.add_circle_outline, color: ColorConstant.red900,),
@@ -224,6 +225,10 @@ class _FriendsState extends State<Friends> {
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(16)
                   ),
+                  focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: ColorConstant.red900),
+                      borderRadius: BorderRadius.circular(16)
+                  ),
                   filled: true,
                   fillColor: ColorConstant.gray90001
                 ),
@@ -232,6 +237,7 @@ class _FriendsState extends State<Friends> {
               ),
               Padding(padding: EdgeInsets.all(10.0)),
               TextField(
+                cursorColor: ColorConstant.red900,
                 decoration: InputDecoration(
                   prefixIcon: Icon(Icons.person_search_rounded, color: ColorConstant.red900),
                   hintText: 'Search a friend',
@@ -240,7 +246,11 @@ class _FriendsState extends State<Friends> {
                   fillColor: ColorConstant.gray90001,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(16)
-                  )
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: ColorConstant.red900),
+                      borderRadius: BorderRadius.circular(16)
+                  ),
                 ),
                 style: AppStyle.txtPoppinsMedium18,
                 controller: _SearchController,

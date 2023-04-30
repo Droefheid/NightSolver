@@ -126,10 +126,15 @@ class _SalonsState extends State<Salons> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 TextField(
+                  cursorColor: ColorConstant.red900,
                   decoration: InputDecoration(
                     prefixIcon: Icon(Icons.search, color: ColorConstant.red900),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(15)
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: ColorConstant.red900),
+                        borderRadius: BorderRadius.circular(15)
                     ),
                     hintStyle: AppStyle.txtPoppinsMedium18GreyLight,
                     hintText: 'Search room',

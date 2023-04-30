@@ -169,6 +169,7 @@ class _NewSalonState extends State<NewSalon> {
                 maxLengthEnforcement: MaxLengthEnforcement.enforced,
                 maxLength: 30,
                 autofocus: true,
+                cursorColor: ColorConstant.red900,
                 decoration: InputDecoration(
                   prefixIcon: Icon(Icons.abc_rounded, color: ColorConstant.red900,),
                   helperStyle: AppStyle.txtPoppinsRegular12,
@@ -176,6 +177,10 @@ class _NewSalonState extends State<NewSalon> {
                   hintStyle: AppStyle.txtPoppinsMedium18GreyLight,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(16)
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: ColorConstant.red900),
+                      borderRadius: BorderRadius.circular(16)
                   ),
                   filled: true,
                   fillColor: ColorConstant.gray90001,
@@ -185,11 +190,16 @@ class _NewSalonState extends State<NewSalon> {
               ),
               Padding(padding: getPadding(all: 16)),
               TextField(
+                cursorColor: ColorConstant.red900,
                 decoration: InputDecoration(
                   prefixIcon: Icon(Icons.person_add_alt_rounded, color: ColorConstant.red900,),
                   hintText: 'Search a friend to add',
                   hintStyle: AppStyle.txtPoppinsMedium18GreyLight,
                   border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16)
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: ColorConstant.red900),
                       borderRadius: BorderRadius.circular(16)
                   ),
                   filled: true,
