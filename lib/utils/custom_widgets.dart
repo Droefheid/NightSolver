@@ -31,11 +31,7 @@ class VerticalMovieCard extends StatelessWidget {
             ClipRRect(
                 borderRadius: BorderRadius.circular(20),
                 child: Stack( children:[
-                  Container(
-                      height: getVerticalSize(273),
-                      width: getHorizontalSize(163),
-                      child:
-                      Image.network(item.urlImage, fit: BoxFit.fill, filterQuality: FilterQuality.high,)),
+                  Image.network(item.urlImage, fit: BoxFit.fill, filterQuality: FilterQuality.high,),
                   Positioned(
                     right: getHorizontalSize(-1),
                     child: Container(
@@ -96,8 +92,9 @@ class VerticalMovieCard extends StatelessWidget {
                         width: getHorizontalSize(161),
                         alignment: Alignment.centerLeft,
                         child: Text(
-                          "Action, Fantasy, Adventure",
+                          item.genres == [] ? "No genres found" : GetGenresNames(item.genres),
                           style: AppStyle.txtPoppinsRegular14,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                       Container(

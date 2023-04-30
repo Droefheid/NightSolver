@@ -115,13 +115,13 @@ class _MovieListState extends State<MovieList> {
             textAlign: TextAlign.left
         )
       ),
-      body: Padding(
-          padding: getPadding(left: 16, top: 16),
-          child: ListView.separated(
+      body: Column(children: [
+        Expanded(child:
+      ListView.separated(
           itemBuilder: (context, index) => VerticalMovieCard(item: new MovieInfo(movies[index])),
           separatorBuilder: (context, _) => SizedBox(height: getVerticalSize(16),),
           itemCount: movies.length
-      )),
+      ))]),
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: ColorConstant.gray900,
         selectedItemColor: ColorConstant.red900,
