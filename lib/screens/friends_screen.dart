@@ -370,7 +370,7 @@ class FriendCell extends StatelessWidget {
           )
         ])),
       content: Text(
-      'You are about to unfriend \'$friend\'\n'
+      'You are about to unfriend $friend\n'
       'Do you wish to proceed?', style: AppStyle.txtPoppinsMedium18GreyLight),
       actions: [
         cancelButton,
