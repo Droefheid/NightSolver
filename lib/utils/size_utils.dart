@@ -127,3 +127,11 @@ double CustomRound(double number) {
   return number.ceilToDouble();
 }
 
+String GetGenresNames(List<dynamic> genres) {
+  if(genres.length == 1) return genres[0]["name"];
+  var genresNames = "";
+  for (int i = 0; i < genres.length; i++) {
+    genresNames += genres[i]["name"] + ", ";
+  }
+  return genresNames.substring(0, genresNames.length-1);
+}
