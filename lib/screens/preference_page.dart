@@ -169,7 +169,7 @@ class _PreferencesState extends State<Preferences> {
               var setPreferences = snapshot.data()!['salons'][widget.salonName]['preferences'].keys;
               List result = widget.IdList.where((element) => !setPreferences.contains(element)).toList();
               if(result.length != 0){
-                CustomToast.showToast(context, 'your preferences have been updated');
+                CustomToast.showToast(context, 'Your preferences have been updated');
                 List names = [];
                 for (int i = 0; i < result.length; i++){
                   final DocumentReference friendDocRef =
@@ -179,7 +179,7 @@ class _PreferencesState extends State<Preferences> {
                   names.add(friendName);
                 }
                 String showNames = names.length > 2 ? '${names.sublist(0, names.length - 1).join(", ")} and ${names.last}' : names.join(' and ');
-                CustomToast.showToast(context, 'waiting for $showNames to set their preferences');
+                CustomToast.showToast(context, 'Waiting for $showNames to set their preferences');
               }
               else{
                 Navigator.of(context).push(MaterialPageRoute(
