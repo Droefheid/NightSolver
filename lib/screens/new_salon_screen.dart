@@ -187,7 +187,7 @@ class _NewSalonState extends State<NewSalon> {
               TextField(
                 decoration: InputDecoration(
                   prefixIcon: Icon(Icons.person_add_alt_rounded, color: ColorConstant.red900,),
-                  hintText: 'Add a friend',
+                  hintText: 'Search a friend to add',
                   hintStyle: AppStyle.txtPoppinsMedium18GreyLight,
                   border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(16)
