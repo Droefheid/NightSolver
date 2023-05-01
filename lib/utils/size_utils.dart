@@ -121,7 +121,7 @@ EdgeInsetsGeometry getMarginOrPadding({
 
 /// Round to the closest half number
 double CustomRound(double number) {
-  return double.parse(number.toStringAsFixed(1));;
+  return double.parse(number.toStringAsFixed(1));
 }
 
 String GetGenresNames(List<dynamic> genres) {
