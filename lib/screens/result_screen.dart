@@ -45,6 +45,7 @@ class ResultScreenSate extends State<ResultScreen> {
   Future<void> getData() async {
     var recommendedList = [];
     var seenMovies = [];
+    var RecmovieIds = [];
     var recommendedMoviesAlreadySavedInFirestore = [];
 
     for (String id in widget.IdList) {
@@ -53,9 +54,19 @@ class ResultScreenSate extends State<ResultScreen> {
       if (snapshot.data()!['movies_id'] != null) {
         seenMovies.addAll(snapshot.data()!['movies_id']);
       }
-      if (snapshot.data()!['recommended'] != null) {
-        for (var item in snapshot.data()!['recommended'].entries) {
-          recommendedList.addAll(item.value);
+
+      Map<String,dynamic>  Rec = snapshot.data()!['recommended'];
+      for( List<dynamic> Values in Rec.values){
+        //check of list not empty
+        if(Values.length !=0){
+          for(int i=0; i<Values.length;i++){
+            //Check if recommended list is unique
+            if(!(RecmovieIds.contains(Values[i]['id']))){
+              // add recommended movies
+              RecmovieIds.add(Values[i]['id']);
+              recommendedList.addAll(Values[i]);
+            }
+          }
         }
       }
 
@@ -124,15 +135,16 @@ class ResultScreenSate extends State<ResultScreen> {
             if (Genres.contains(recommendedList[i]["genre"])) {
               //check if the movie recommended is not in the seen movies list
               if (!seenMovies.contains(recommendedList[i]["id"])) {
-                RecList.add(recommendedList[i]["id"]);
+                RecList.add(recommendedList[i]);
               }
             }
           }
         }
         for (var Rec in RecList) {
+          var MovieId = Rec['id'];
           //get the providers list of the recommended movie
           final movieProvider = await http.get(Uri.parse(
-              'https://api.themoviedb.org/3/movie/$Rec/watch/providers?api_key=' +
+              'https://api.themoviedb.org/3/movie/$MovieId/watch/providers?api_key=' +
                   Constants.theMovieDb));
           if (movieProvider.statusCode == 200) {
             final Map<String, dynamic> ProviderData =
@@ -148,16 +160,9 @@ class ResultScreenSate extends State<ResultScreen> {
                         [y]["provider_name"]] ==
                     1) {
                   //check if movie added not in list of movie data
-                  if (!moviesDataTitles.contains(Rec)) {
-                    moviesDataTitles.add(Rec);
-                    final finalRec = await http.get(Uri.parse(
-                        'https://api.themoviedb.org/3/movie/$Rec?api_key=' +
-                            Constants.theMovieDb));
-                    if (finalRec.statusCode == 200) {
-                      final Map<String, dynamic> finalRecCard =
-                          json.decode(finalRec.body);
-                      moviesData.add(finalRecCard);
-                    }
+                  if (!moviesDataTitles.contains(MovieId)) {
+                    moviesDataTitles.add(MovieId);
+                    moviesData.add(Rec);
                   }
                   break;
                 }
