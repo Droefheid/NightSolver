@@ -230,7 +230,6 @@ class _NewSalonState extends State<NewSalon> {
                         else{
                           removePerson(persons[i]);
                         }
-                        print(persons[i]);
                       },
                     );
                   },
@@ -302,24 +301,22 @@ class _PersonCellState extends State<PersonCell> {
                                 snapshot.connectionState == ConnectionState.done) {
                               return widget.salonMembers.contains(widget.person)
                                   ? Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Expanded(
-                                        child: Text(
-                                          snapshot.data!,
-                                          style: AppStyle.txtPoppinsMedium18,
-                                        )
+                                      Text(
+                                        snapshot.data!,
+                                        style: AppStyle.txtPoppinsMedium18,
                                       ),
+                                      SizedBox(width: 0),
                                       Icon(
                                         Icons.done,
                                         color: ColorConstant.whiteA700,
                                       )
                                     ],
                                   )
-                                  : Expanded(
-                                    child: Text(
-                                      snapshot.data!,
-                                      style: AppStyle.txtPoppinsMedium18,
-                                    )
+                                  : Text(
+                                    snapshot.data!,
+                                    style: AppStyle.txtPoppinsMedium18,
                                   );
                             }
                             return CircularProgressIndicator(
