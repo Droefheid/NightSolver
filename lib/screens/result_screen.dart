@@ -49,34 +49,32 @@ class ResultScreenSate extends State<ResultScreen> {
     var recommendedMoviesAlreadySavedInFirestore = [];
 
     for (String id in widget.IdList) {
-      final snapshot =
-          await FirebaseFirestore.instance.collection('users').doc(id).get();
+      final snapshot = await FirebaseFirestore.instance.collection('users').doc(
+          id).get();
       if (snapshot.data()!['movies_id'] != null) {
         seenMovies.addAll(snapshot.data()!['movies_id']);
-
-        Map<String,dynamic> Res = snapshot.data()!['recommended'];
-        for( List<dynamic> Values in Res.values){
-          //check of list not empty
-          if(Values.length !=0){
-            for(int i=0; i<Values.length;i++){
-              //check if the movie recommended is not in the seen movies list
-              if(!(snapshot.data()!['movies_id'].contains(Values[i]['id'].toString()))){
-                //Check if recommended list is unique
-                if(!(RecmovieIds.contains(Values[i]['id']))){
-                  // add recommended movies
-                  RecmovieIds.add(Values[i]['id']);
-                  recommendedList.add(Values[i]);
-                }
+      }
+      Map<String, dynamic> Res = snapshot.data()!['recommended'];
+      for (List<dynamic> Values in Res.values) {
+        //check of list not empty
+        if (Values.length != 0) {
+          for (int i = 0; i < Values.length; i++) {
+            //check if the movie recommended is not in the seen movies list
+            if (!(snapshot.data()!['movies_id'].contains(
+                Values[i]['id'].toString()))) {
+              //Check if recommended list is unique
+              if (!(RecmovieIds.contains(Values[i]['id']))) {
+                // add recommended movies
+                RecmovieIds.add(Values[i]['id']);
+                recommendedList.add(Values[i]);
               }
             }
           }
         }
       }
 
-
-
       Map preferences =
-          snapshot.data()!['salons'][widget.salonName]['preferences'][id];
+      snapshot.data()!['salons'][widget.salonName]['preferences'][id];
       aventure += preferences['aventure'];
       action += preferences['action'];
       comedie += preferences['comedie'];
@@ -85,13 +83,12 @@ class ResultScreenSate extends State<ResultScreen> {
       fantasy += preferences['fantasy'];
       horror += preferences['horror'];
       scifi += preferences['scifi'];
-
       var data =
-          snapshot.data()!['salons'][widget.salonName]['recommended_movies'];
+      snapshot.data()!['salons'][widget.salonName]['recommended_movies'];
       if (data != null) {
         recommendedMoviesAlreadySavedInFirestore.addAll(data);
       }
-
+    }
       int numberOfMembers = widget.IdList.length;
       aventure = aventure / numberOfMembers;
       action = action / numberOfMembers;
@@ -131,7 +128,6 @@ class ResultScreenSate extends State<ResultScreen> {
       if (scifi >= 50) {
         Genres.add('878');
       }
-
       if (recommendedMoviesAlreadySavedInFirestore.isEmpty) {
         if (!recommendedList.isEmpty) {
           //get a list of recommend movies based on seen movies
@@ -145,24 +141,19 @@ class ResultScreenSate extends State<ResultScreen> {
             }
           }
         }
-        for (var Rec in RecList) {
-          var MovieId = Rec['id'];
+      }
+      for (var Rec in RecList) {
+        var MovieId = Rec['id'];
+        print(MovieId);
           //get the providers list of the recommended movie
-          final movieProvider = await http.get(Uri.parse(
-              'https://api.themoviedb.org/3/movie/$MovieId/watch/providers?api_key=' +
-                  Constants.theMovieDb));
+          final movieProvider = await http.get(Uri.parse('https://api.themoviedb.org/3/movie/$MovieId/watch/providers?api_key=' + Constants.theMovieDb));
           if (movieProvider.statusCode == 200) {
-            final Map<String, dynamic> ProviderData =
-                json.decode(movieProvider.body);
+            final Map<String, dynamic> ProviderData = json.decode(movieProvider.body);
             //check if the movie has any provider in Belgium
-            if (ProviderData["results"]["BE"] != null &&
-                ProviderData["results"]["BE"]["flatrate"] != null) {
-              for (int y = 0;
-                  y < ProviderData["results"]["BE"]["flatrate"].length;
-                  y++) {
+            if (ProviderData["results"]["BE"] != null && ProviderData["results"]["BE"]["flatrate"] != null) {
+              for (int y = 0; y < ProviderData["results"]["BE"]["flatrate"].length; y++) {
                 // check if the provider is in the providers list
-                if (widget.providers.containsKey(ProviderData["results"]["BE"]["flatrate"][y]["provider_name"])
-                    && widget.providers[ProviderData["results"]["BE"]["flatrate"][y]["provider_name"]]) {
+                if (widget.providers.containsKey(ProviderData["results"]["BE"]["flatrate"][y]["provider_name"]) && widget.providers[ProviderData["results"]["BE"]["flatrate"][y]["provider_name"]]) {
                   //check if movie added not in list of movie data
                   if (!moviesDataTitles.contains(MovieId)) {
                     moviesDataTitles.add(MovieId);
@@ -182,7 +173,6 @@ class ResultScreenSate extends State<ResultScreen> {
               }
             }, SetOptions(merge: true));
           }
-        }
       } else {
         moviesData = recommendedMoviesAlreadySavedInFirestore;
       }
@@ -197,7 +187,6 @@ class ResultScreenSate extends State<ResultScreen> {
         });
       }
     }
-  }
 
   @override
   void initState() {
