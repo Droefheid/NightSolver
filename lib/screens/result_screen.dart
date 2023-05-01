@@ -53,25 +53,27 @@ class ResultScreenSate extends State<ResultScreen> {
           await FirebaseFirestore.instance.collection('users').doc(id).get();
       if (snapshot.data()!['movies_id'] != null) {
         seenMovies.addAll(snapshot.data()!['movies_id']);
-      }
 
-      Map<String,dynamic> Res = snapshot.data()!['recommended'];
-      for( List<dynamic> Values in Res.values){
-        //check of list not empty
-        if(Values.length !=0){
-          for(int i=0; i<Values.length;i++){
-            //check if the movie recommended is not in the seen movies list
-            if(!(snapshot.data()!['movies_id'].contains(Values[i]['id'].toString()))){
-              //Check if recommended list is unique
-              if(!(RecmovieIds.contains(Values[i]['id']))){
-                // add recommended movies
-                RecmovieIds.add(Values[i]['id']);
-                recommendedList.add(Values[i]);
+        Map<String,dynamic> Res = snapshot.data()!['recommended'];
+        for( List<dynamic> Values in Res.values){
+          //check of list not empty
+          if(Values.length !=0){
+            for(int i=0; i<Values.length;i++){
+              //check if the movie recommended is not in the seen movies list
+              if(!(snapshot.data()!['movies_id'].contains(Values[i]['id'].toString()))){
+                //Check if recommended list is unique
+                if(!(RecmovieIds.contains(Values[i]['id']))){
+                  // add recommended movies
+                  RecmovieIds.add(Values[i]['id']);
+                  recommendedList.add(Values[i]);
+                }
               }
             }
           }
         }
       }
+
+
 
       Map preferences =
           snapshot.data()!['salons'][widget.salonName]['preferences'][id];
