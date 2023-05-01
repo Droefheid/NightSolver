@@ -59,7 +59,7 @@ class _NewSalonState extends State<NewSalon> {
         if(snapshot.data()!['friends'] != null) {
           for (String friendId in snapshot.data()!['friends']) {
             String friendName = await getFriendName(friendId);
-            if (letterCount < friendName.length && friendName.substring(0, letterCount).toLowerCase() ==
+            if (letterCount <= friendName.length && friendName.substring(0, letterCount).toLowerCase() ==
                 value.toLowerCase()) {
               searchPersons.add(friendId);
             }
