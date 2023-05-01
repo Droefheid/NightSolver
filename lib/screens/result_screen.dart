@@ -264,13 +264,7 @@ class ResultScreenSate extends State<ResultScreen> {
                                       IdList: widget.IdList),
                                   padding: const EdgeInsets.all(0.0),
                                   onPressed: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => MovieDetail(
-                                            item: new MovieInfo(movies[i])),
-                                      ),
-                                    );
+                                    Navigator.of(context).pop();
                                   },
                                 )
                             );

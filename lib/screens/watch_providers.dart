@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:night_solver/screens/preference_page.dart';
-import 'package:night_solver/utils/size_utils.dart';
 import '../theme/app_style.dart';
 import '../utils/color_constant.dart';
 class Providers extends StatefulWidget {

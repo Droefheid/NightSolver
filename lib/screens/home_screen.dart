@@ -56,7 +56,7 @@ class _HomeScreenState extends State<HomeScreen> {
         .get();
 
     List<dynamic>? moviesId = null;
-    if(snapshot.data() != null){
+    if (snapshot.data() != null) {
       moviesId = snapshot.data()!['movies_id'];
     }
 
@@ -94,12 +94,22 @@ class _HomeScreenState extends State<HomeScreen> {
       }
     }
 
+
+
+    for (var i = 0; i < trending_movies_responseData['results'].length; i++) {
+      final movie = trending_movies_responseData['results'][i];
+      final index = latest_movies_data.indexWhere((m) => m['id'] == movie['id']);
+      if (index != -1) {
+        trending_movies_responseData['results'][i]['can_delete'] = true;
+      } else {
+        trending_movies_responseData['results'][i]['can_delete'] = false;
+      }
+    }
     setState(() {
       trending_movies = trending_movies_responseData['results'];
       latest_movies = latest_movies_responseData['results'];
     });
   }
-
   @override
   void initState() {
     super.initState();

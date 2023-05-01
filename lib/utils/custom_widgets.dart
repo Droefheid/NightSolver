@@ -171,13 +171,11 @@ class VerticalMovieCardWithLikeButtonState extends State<VerticalMovieCardWithLi
     getData();
   }
 
-
     @override
   Widget build(BuildContext context) =>
       InkWell(
           onTap: () =>
-              Navigator.of(context).push(
-                  MaterialPageRoute(builder: (_) => MovieDetail(item: widget.item))),
+              Navigator.of(context).pop,
           child: Container(
             width: getHorizontalSize(379),
             height: getVerticalSize(273),
@@ -374,12 +372,19 @@ class ShortVerticalCard extends StatelessWidget {
                             filterQuality: FilterQuality.high)),
                     Positioned(
                         right: getHorizontalSize(-1),
-                        child: IconButton(
-                            onPressed: null,
-                            icon: ImageIcon(
-                              AssetImage("assets/icons/bookmark_empty.png"),
-                              color: ColorConstant.whiteA700,
-                            )))
+                        child: Container(
+                      child: IconButton(
+                      onPressed: null,
+                      icon: ImageIcon(
+                        AssetImage(
+                          item.canDelete
+                              ? 'assets/icons/bookmark_filled.png'
+                              : 'assets/icons/bookmark_empty.png',
+                        ),
+                        color: item.canDelete ? ColorConstant.red900 : ColorConstant.whiteA700,
+                      ),
+                    ),
+              ),)
                   ]))),
           SizedBox(
             height: getVerticalSize(16),
