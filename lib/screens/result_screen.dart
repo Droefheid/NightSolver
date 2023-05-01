@@ -55,16 +55,19 @@ class ResultScreenSate extends State<ResultScreen> {
         seenMovies.addAll(snapshot.data()!['movies_id']);
       }
 
-      Map<String,dynamic>  Rec = snapshot.data()!['recommended'];
-      for( List<dynamic> Values in Rec.values){
+      Map<String,dynamic> Res = snapshot.data()!['recommended'];
+      for( List<dynamic> Values in Res.values){
         //check of list not empty
         if(Values.length !=0){
           for(int i=0; i<Values.length;i++){
-            //Check if recommended list is unique
-            if(!(RecmovieIds.contains(Values[i]['id']))){
-              // add recommended movies
-              RecmovieIds.add(Values[i]['id']);
-              recommendedList.addAll(Values[i]);
+            //check if the movie recommended is not in the seen movies list
+            if(!(snapshot.data()!['movies_id'].contains(Values[i]['id'].toString()))){
+              //Check if recommended list is unique
+              if(!(RecmovieIds.contains(Values[i]['id']))){
+                // add recommended movies
+                RecmovieIds.add(Values[i]['id']);
+                recommendedList.add(Values[i]);
+              }
             }
           }
         }
@@ -132,9 +135,9 @@ class ResultScreenSate extends State<ResultScreen> {
           //get a list of recommend movies based on seen movies
           for (int i = 0; i < recommendedList.length; i++) {
             //check if the movie recommended has the same genre as set in the preferences
-            if (Genres.contains(recommendedList[i]["genre"])) {
+            if (Genres.contains(recommendedList[i]["genre_ids"][0].toString())) {
               //check if the movie recommended is not in the seen movies list
-              if (!seenMovies.contains(recommendedList[i]["id"])) {
+              if (!seenMovies.contains(recommendedList[i]["id"].toString())) {
                 RecList.add(recommendedList[i]);
               }
             }
@@ -156,9 +159,8 @@ class ResultScreenSate extends State<ResultScreen> {
                   y < ProviderData["results"]["BE"]["flatrate"].length;
                   y++) {
                 // check if the provider is in the providers list
-                if (widget.providers[ProviderData["results"]["BE"]["flatrate"]
-                        [y]["provider_name"]] ==
-                    1) {
+                if (widget.providers.containsKey(ProviderData["results"]["BE"]["flatrate"][y]["provider_name"])
+                    && widget.providers[ProviderData["results"]["BE"]["flatrate"][y]["provider_name"]]) {
                   //check if movie added not in list of movie data
                   if (!moviesDataTitles.contains(MovieId)) {
                     moviesDataTitles.add(MovieId);
