@@ -63,28 +63,27 @@ class RecommendationState extends State<Recommendation> {
   }
 
   Future<void> getData() async {
-    List<dynamic> Recmovie = [];
     List<dynamic> moviesData = [];
     List<dynamic> RecmovieIds = [];
     final snapshot = await FirebaseFirestore.instance
         .collection("users")
         .doc(user.uid)
         .get();
-    if (snapshot.data()!['recommended'] != null && !snapshot.data()!['recommended'].isEmpty) {
-      for (var item in snapshot.data()!['recommended'].entries) {
-        Recmovie.addAll(item.value);
-      }
-    }
-    for (int i = 0; i < Recmovie.length; i++) {
-      RecmovieIds.add(Recmovie[i]["id"]);
-    }
-    for (var movieId in RecmovieIds) {
-      final response = await http.get(Uri.parse(
-          'https://api.themoviedb.org/3/movie/$movieId?api_key=' +
-              Constants.theMovieDb));
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> finalCard = json.decode(response.body);
-        moviesData.add(finalCard);
+    Map<String,dynamic> Res = snapshot.data()!['recommended'];
+    for( List<dynamic> Values in Res.values){
+      //check of list not empty
+      if(Values.length !=0){
+        for(int i=0; i<Values.length;i++){
+          //check if the movie recommended is not in the seen movies list
+          if(!(snapshot.data()!['movies_id'].contains(Values[i]['id'].toString()))){
+            //Check if recommended list is unique
+            if(!(RecmovieIds.contains(Values[i]['id']))){
+              // add recommended movies
+              RecmovieIds.add(Values[i]['id']);
+              moviesData.add(Values[i]);
+            }
+          }
+        }
       }
     }
 

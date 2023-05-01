@@ -47,23 +47,10 @@ class _MovieDetailState extends State<MovieDetail> {
         'https://api.themoviedb.org/3/movie/$id/recommendations?api_key=$apiKey&language=en-US&page=1'));
     if (result.statusCode == 200) {
       final Map<String, dynamic> resultData = json.decode(result.body);
-      ////check if the movie recommended is not in the seen movies list
-      final snapshot = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(user.uid)
-          .get();
       for (int i = 0; i < resultData['results'].length; i++) {
-        if (snapshot.data()!['movies_id'] != null) {
-          if (!(snapshot
-              .data()!['movies_id']
-              .contains(resultData["results"][i]["id"]))) {
-            if (resultData['results'][i]['genre_ids'].length != 0) {
-              final recommended = {
-                'id': resultData["results"][i]["id"].toString(),
-                'genre': resultData['results'][i]['genre_ids'][0].toString()
-              };
-              RecList.add(recommended);
-            }
+        if (resultData['results'][i]['genre_ids'].length != 0) {
+          if(resultData['results'][i]['vote_average']/2 >=3 && resultData['results'][i]['vote_count']>=250){
+            RecList.add(resultData['results'][i]);
           }
         }
       }
