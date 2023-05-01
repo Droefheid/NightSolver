@@ -42,6 +42,12 @@ class _NewSalonState extends State<NewSalon> {
     super.initState();
     getData();
   }
+  Future<String> getFriendName(String friendId) async{
+    final DocumentReference friendDocRef =
+    FirebaseFirestore.instance.collection('users').doc(friendId);
+    DocumentSnapshot snapshot = await friendDocRef.get();
+    return snapshot['displayName'];
+  }
 
   void _onSearchChanged(String value) async {
     try {
@@ -51,10 +57,11 @@ class _NewSalonState extends State<NewSalon> {
             .get();
         List<dynamic> searchPersons = [];
         if(snapshot.data()!['friends'] != null) {
-          for (String friend in snapshot.data()!['friends']) {
-            if (friend.substring(0, letterCount).toLowerCase() ==
+          for (String friendId in snapshot.data()!['friends']) {
+            String friendName = await getFriendName(friendId);
+            if (letterCount < friendName.length && friendName.substring(0, letterCount).toLowerCase() ==
                 value.toLowerCase()) {
-              searchPersons.add(friend);
+              searchPersons.add(friendId);
             }
           }
         }
