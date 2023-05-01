@@ -91,10 +91,16 @@ class _MovieDetailState extends State<MovieDetail> {
     final user = FirebaseAuth.instance.currentUser!;
     final DocumentReference docRef =
     FirebaseFirestore.instance.collection('users').doc(user.uid);
-    await docRef.update({
+
+    docRef.update({
       'movies_id': FieldValue.arrayRemove([movieId]),
-      'recommended': FieldValue.arrayRemove([movieId]),
     });
+
+    docRef.set({ 'recommended' : {
+      movieId: FieldValue.delete()
+    }
+    },SetOptions(merge: true));
+
 
     CustomToast.showToast(context, 'Movie removed from watched list');
     widget.item.canDelete = false;

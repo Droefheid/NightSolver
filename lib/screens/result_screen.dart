@@ -144,7 +144,6 @@ class ResultScreenSate extends State<ResultScreen> {
       }
       for (var Rec in RecList) {
         var MovieId = Rec['id'];
-        print(MovieId);
           //get the providers list of the recommended movie
           final movieProvider = await http.get(Uri.parse('https://api.themoviedb.org/3/movie/$MovieId/watch/providers?api_key=' + Constants.theMovieDb));
           if (movieProvider.statusCode == 200) {
