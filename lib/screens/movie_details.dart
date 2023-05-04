@@ -28,8 +28,6 @@ class _MovieDetailState extends State<MovieDetail> {
   final apiKey = '9478d83ca04bd6ee25b942dd7a0ad777';
   Color mainColor = const Color(0xffffffff);
   final user = FirebaseAuth.instance.currentUser!;
-  final FirebaseFirestore _db = FirebaseFirestore.instance;
-  final CollectionReference _moviesCollection = FirebaseFirestore.instance.collection('movies');
 
 
   void onTabTapped(int index) {
@@ -64,10 +62,6 @@ class _MovieDetailState extends State<MovieDetail> {
     FirebaseFirestore.instance.collection('users').doc(user.uid);
     List<dynamic> recommendedMovies =
     await recommended(widget.item.id.toString());
-    final snapshot = await FirebaseFirestore.instance
-        .collection('users')
-        .doc(user.uid)
-        .get();
     await docRef.set({
       'recommended': {
         widget.item.id.toString(): recommendedMovies,
@@ -76,14 +70,10 @@ class _MovieDetailState extends State<MovieDetail> {
     }, SetOptions(merge: true));
 
     CustomToast.showToast(context, 'Movie added to watched list');
-    setState(() {});
     FocusScope.of(context).unfocus();
-    setState(() {});
     Navigator.pop(context);  // pop current page
-    setState(() {});
     widget.item.canDelete = true;
     Navigator.of(context).push(MaterialPageRoute(builder: (_) => MovieDetail(item: widget.item)));
-    setState(() {});
   }
 
 
@@ -104,13 +94,9 @@ class _MovieDetailState extends State<MovieDetail> {
 
     CustomToast.showToast(context, 'Movie removed from watched list');
     widget.item.canDelete = false;
-    setState(() {});
     FocusScope.of(context).unfocus();
-    setState(() {});
     Navigator.pop(context);  // pop current page
-    setState(() {});
     Navigator.of(context).push(MaterialPageRoute(builder: (_) => MovieDetail(item: widget.item)));
-    setState(() {});
   }
 
   Future<void> getWatchProviders() async {
