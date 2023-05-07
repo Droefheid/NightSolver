@@ -50,8 +50,8 @@ class RecommendationState extends State<Recommendation> {
 
     if (!selectedGenreIds.isEmpty && !movies.isEmpty && !movies_to_filter.isEmpty) {
       List<dynamic> filteredMovies = movies_to_filter.where((movie) {
-        List<dynamic> genres = movie['genres'];
-        return selectedGenreIds.every((id) => genres.any((genre) => genre['id'] == id));
+        List<dynamic> genres = movie['genre_ids'];
+        return selectedGenreIds.every((id) => genres.any((genre) => genre == id));
       }).toList();
       setState(() {
         movies = filteredMovies;

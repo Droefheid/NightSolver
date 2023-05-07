@@ -73,7 +73,7 @@ class _MovieDetailState extends State<MovieDetail> {
     FocusScope.of(context).unfocus();
     Navigator.pop(context);  // pop current page
     widget.item.canDelete = true;
-    Navigator.of(context).push(MaterialPageRoute(builder: (_) => MovieDetail(item: widget.item)));
+    //Navigator.of(context).push(MaterialPageRoute(builder: (_) => MovieDetail(item: widget.item)));
   }
 
 
@@ -96,7 +96,7 @@ class _MovieDetailState extends State<MovieDetail> {
     widget.item.canDelete = false;
     FocusScope.of(context).unfocus();
     Navigator.pop(context);  // pop current page
-    Navigator.of(context).push(MaterialPageRoute(builder: (_) => MovieDetail(item: widget.item)));
+    //Navigator.of(context).push(MaterialPageRoute(builder: (_) => MovieDetail(item: widget.item)));
   }
 
   Future<void> getWatchProviders() async {
