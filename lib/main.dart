@@ -1,11 +1,33 @@
+import 'dart:ui';
+
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:night_solver/auth/main_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:night_solver/theme/theme.dart';
+import 'package:night_solver/screens/friends_screen.dart';
+import 'package:night_solver/screens/movie_list.dart';
+import 'package:night_solver/screens/recommendation_screen.dart';
+import 'package:night_solver/screens/salons.dart';
+import 'package:night_solver/screens/search_screen.dart';
+import 'package:night_solver/screens/settings_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
   await Firebase.initializeApp();
+ 
+  FlutterError.onError = (errorDetails) {
+    FirebaseCrashlytics.instance.recordFlutterFatalError(errorDetails);
+  };
+  // Pass all uncaught asynchronous errors that aren't handled by the Flutter framework to Crashlytics
+  PlatformDispatcher.instance.onError = (error, stack) {
+    FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+    return true;
+  };
 
   runApp(const MyApp());
 }
@@ -17,9 +39,19 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      initialRoute: '/',
+      routes: {
+        '/' : (context) => MainScreen(),
+        '/search' : (context) => SearchScreen(),
+        '/movieList' : (context) => MovieList(),
+        '/recommendation' : (context) => Recommendation(),
+        '/friends' : (context) => Friends(),
+        '/settings' : (context) => SettingScreen(),
+        '/salons' : (context) => Salons()
+      },
       title: 'Night Solver',
-      theme: lightTheme,
-      home: MainScreen(),
+      theme: ThemeData.light(),
     );
   }
 }

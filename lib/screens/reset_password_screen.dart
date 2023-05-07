@@ -1,5 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:night_solver/utils/color_constant.dart';
+import '../theme/app_style.dart';
+import '../utils/size_utils.dart';
 import 'custom_toast.dart';
 
 class ResetPasswordScreen extends StatefulWidget {
@@ -26,9 +29,9 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
       await FirebaseAuth.instance.sendPasswordResetEmail(
         email: _emailController.text.trim(),
       );
-      CustomToast.showToast(context, "Password reset email sent.");//Please check your email to reset your password.
+      CustomToast.showToast(context, "Password reset email sent. Please check your email to reset your password.");
     } catch (e) {
-      CustomToast.showToast(context, "Failed to send password reset email.");// Please try again.
+      CustomToast.showToast(context, "Failed to send password reset email. Please try again.");
     }
     FocusManager.instance.primaryFocus?.unfocus();
     Navigator.pop(context);
@@ -38,76 +41,102 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: Colors.grey[200],
+        backgroundColor: ColorConstant.gray900,
         body: SafeArea(
             child: Center(
           child: SingleChildScrollView(
             child:
                 Column(mainAxisAlignment: MainAxisAlignment.center, children: [
 
-              ImageIcon(
-                AssetImage("assets/logo_foreground.png"),
-                size: 80,
+              Padding(
+                  padding: getPadding(bottom: 50),
+                  child: Align(
+                      alignment: Alignment.topLeft,
+                      child: IconButton(
+                          onPressed: (){Navigator.pop(context);},
+                          icon: ImageIcon(AssetImage("assets/icons/back_arrow_red.png"), color: ColorConstant.red900,)
+                      )
+                  )
               ),
 
-              SizedBox(height: 10),
+              ImageIcon(
+                AssetImage("assets/logo_foreground.png"),
+                size: 100,
+                color: ColorConstant.red900,
+              ),
+              //Text("NightSolver", style: AppStyle.txtPoppinsBold30),
 
-              Text('Forgot your password ?',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30)),
-              SizedBox(height: 50),
+              SizedBox(height: getVerticalSize(70),),
+
+              Padding(
+                  padding: getPadding(left: 18, top: 16),
+                  child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text.rich(
+                          TextSpan( children: [
+                            TextSpan(text: "Forgot\npassword", style: AppStyle.txtPoppinsBold36),
+                            TextSpan(text: "?", style: AppStyle.txtPoppinsBold36Red)
+                          ])
+                      )
+                  )
+              ),
 
               //email input
               Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 25.0),
+                  padding: getPadding(all: 16),
                   child: TextField(
                       controller: _emailController,
+                      cursorColor: ColorConstant.red900,
                       decoration: InputDecoration(
-                        enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.white),
-                          borderRadius: BorderRadius.circular(12),
+                        prefixIcon: Icon(Icons.email_rounded, color: ColorConstant.red900),
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(16)
                         ),
                         focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.red.shade900),
-                          borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(color: ColorConstant.red900),
+                            borderRadius: BorderRadius.circular(16)
                         ),
-                        hintText: 'Email',
-                        fillColor: Colors.grey[100],
+                        hintText: 'Enter your email address',
+                        hintStyle: AppStyle.txtPoppinsMedium18GreyLight,
+                        fillColor: ColorConstant.gray90001,
                         filled: true,
                       ))),
 
-              SizedBox(height: 30),
+              Padding(
+                  padding: getPadding(left: 20),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text.rich(
+                        TextSpan( children: [
+                          TextSpan(
+                              text: "*",
+                              style: AppStyle.txtPoppinsRegular12
+                          ),
+                          TextSpan(
+                              text: " We will send you an email to reset your password",
+                              style: AppStyle.txtPoppinsRegular13
+                          )
+                        ])
+                    )
+                  )
+              ),
 
               //sign in button
               GestureDetector(
                 onTap: resetPassword,
                 child: Container(
-                  padding: EdgeInsets.all(20),
-                  margin: EdgeInsets.symmetric(horizontal: 25.0),
+                  padding: getPadding(all: 16),
+                  margin: getMargin(all: 16),
                   decoration: BoxDecoration(
-                      color: Colors.red[900],
-                      borderRadius: BorderRadius.circular(12)),
+                      color: ColorConstant.red900,
+                      borderRadius: BorderRadius.circular(16)),
                   child: Center(
                       child: Text('Reset Password',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 20,
-                          ))),
+                          style: AppStyle.txtPoppinsMedium18Grey)),
                 ),
               ),
 
-                SizedBox(height: 25),
-                //register now
 
-                GestureDetector(
-                  onTap: (){Navigator.pop(context);},
-                  child: Text('Login now',
-                      style: TextStyle(
-                        color: Colors.red[900],
-                        fontWeight: FontWeight.bold,
-                        fontSize: 15,
-                      )),
-                ),
 
             ]),
           ),

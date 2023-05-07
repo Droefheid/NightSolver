@@ -2,6 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import '../theme/app_style.dart';
+import '../utils/color_constant.dart';
 import 'custom_toast.dart';
 
 class Friends extends StatefulWidget {
@@ -95,19 +97,35 @@ class _FriendsState extends State<Friends> {
 
   showHelpDialog(BuildContext context) {
     Widget okButton = MaterialButton(
-      child: Text("Ok"),
+      child: Text("Ok", style: AppStyle.txtPoppinsMedium18Red,),
       onPressed:  () {
         Navigator.pop(context, true);
       },
     );
     AlertDialog alert = AlertDialog(
-      title: Text("Help"),
+      title: Text.rich(
+          TextSpan(children: [
+            TextSpan(
+              text:"Help",
+              style: AppStyle.txtPoppinsMedium18,
+            ),
+            TextSpan(
+                text: " .",
+                style: AppStyle.txtPoppinsMedium18Red
+            )
+          ])
+      ),
       content: Text(
-          "To add a friend, type his username in this field, then click the + icon."
+          "To add a friend, type his username in this field, then click the + icon.",
+          style: AppStyle.txtPoppinsMedium18GreyLight,
       ),
       actions: [
         okButton,
       ],
+      backgroundColor: ColorConstant.gray90001,
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16)
+      ),
     );
     showDialog(
       context: context,
@@ -118,30 +136,50 @@ class _FriendsState extends State<Friends> {
   }
 
   Future getFriendName(String friendId) async {
-      final DocumentReference friendDocRef =
-      FirebaseFirestore.instance.collection('users').doc(friendId);
-      DocumentSnapshot snapshot = await friendDocRef.get();
-      final String friendName = snapshot['displayName'];
+    final snapshot = await FirebaseFirestore.instance.collection('users')
+        .doc(friendId)
+        .get();
+    if (snapshot.data()!['displayName'] == null) return '';
+    final String friendName = snapshot['displayName'];
     return friendName;
   }
 
 
+  void onTabTapped(int index) {
+    if (index==0) Navigator.pushNamed(context, '/');
+    if (index==1) Navigator.pushNamed(context, '/search');
+    if (index==2) Navigator.pushNamed(context, '/salons');
+    if (index==4) Navigator.pushNamed(context, '/movieList');
+    if (index==5) Navigator.pushNamed(context, '/settings');
+  }
+
 
   @override
   Widget build(BuildContext context) {
+    int currentIndex = 3;
     return GestureDetector(
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: Scaffold(
+        backgroundColor: ColorConstant.gray900,
         appBar: AppBar(
-          elevation: 0.3,
-          centerTitle: true,
-          leading: IconButton(
-            icon: Icon(Icons.arrow_back),
-            onPressed: () => Navigator.pop(context, true)
-          ),
-          title: Text(
-            'Friends',
-          ),
+            backgroundColor: ColorConstant.gray900,
+            leading: IconButton(
+              icon: ImageIcon(AssetImage("assets/icons/back_arrow_red.png"), color: ColorConstant.red900,),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+            title: RichText(
+                text: TextSpan(children: [
+                  TextSpan(
+                      text: "Friends",
+                      style: AppStyle.txtPoppinsBold30
+                  ),
+                  TextSpan(
+                      text: ".",
+                      style: AppStyle.txtPoppinsBold30Red
+                  ),
+                ]),
+                textAlign: TextAlign.left
+            )
         ),
         body: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -150,9 +188,10 @@ class _FriendsState extends State<Friends> {
             children: [
               TextFormField(
                 controller: _addControler,
+                cursorColor: ColorConstant.red900,
                 decoration: InputDecoration(
                   prefixIcon: new IconButton(
-                      icon: Icon(Icons.add_circle_outline),
+                      icon: Icon(Icons.add_circle_outline, color: ColorConstant.red900,),
                       onPressed: () async {
                         if (_addControler.text == user.displayName){
                           CustomToast.showToast(context, "You can't add yourself");
@@ -160,34 +199,60 @@ class _FriendsState extends State<Friends> {
                         else{
                           QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection("users").get();
                           final allUsers = querySnapshot.docs.map((doc) => doc.id).toList();
+                          bool foundUser = false;
                           for(String friendId in allUsers){
                             String friendName = await getFriendName(friendId);
-                            if (_addControler.text == friendName){
-                              addFriend(friendId);
-                              CustomToast.showToast(context, '$friendName added as a friend');
+                            if (friendName != ''){
+                              if (_addControler.text == friendName) {
+                                addFriend(friendId);
+                                foundUser = true;
+                                CustomToast.showToast(
+                                    context, '$friendName added as a friend');
+                                break;
+                              }
                             }
                           }
-                          CustomToast.showToast(context, 'No user found');
+                          if (!foundUser) CustomToast.showToast(context, 'No user found');
                         }
                       },
                   ),
                   suffixIcon: new IconButton(
-                    icon: Icon(Icons.help),
+                    icon: Icon(Icons.help, color: ColorConstant.gray700,),
                     onPressed: () {showHelpDialog(context);}
                   ),
                   hintText: "Add a friend",
+                  hintStyle: AppStyle.txtPoppinsMedium18GreyLight,
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(15)
-                  )
+                    borderRadius: BorderRadius.circular(16)
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: ColorConstant.red900),
+                      borderRadius: BorderRadius.circular(16)
+                  ),
+                  filled: true,
+                  fillColor: ColorConstant.gray90001
                 ),
+                style: AppStyle.txtPoppinsMedium18,
                 onChanged: null
               ),
               Padding(padding: EdgeInsets.all(10.0)),
               TextField(
-                textAlign: TextAlign.center,
+                cursorColor: ColorConstant.red900,
                 decoration: InputDecoration(
+                  prefixIcon: Icon(Icons.person_search_rounded, color: ColorConstant.red900),
                   hintText: 'Search a friend',
+                  hintStyle: AppStyle.txtPoppinsMedium18GreyLight,
+                  filled: true,
+                  fillColor: ColorConstant.gray90001,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(16)
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: ColorConstant.red900),
+                      borderRadius: BorderRadius.circular(16)
+                  ),
                 ),
+                style: AppStyle.txtPoppinsMedium18,
                 controller: _SearchController,
                 onChanged: _onSearchChanged,
               ),
@@ -199,7 +264,6 @@ class _FriendsState extends State<Friends> {
                       child: FriendCell(friends[i]),
                       padding: const EdgeInsets.all(0.0),
                       onPressed: null,
-                      color: Colors.white,
                     );
                   },
                 ),
@@ -207,6 +271,45 @@ class _FriendsState extends State<Friends> {
             ],
           ),
         ),
+          bottomNavigationBar: BottomNavigationBar(
+            backgroundColor: ColorConstant.gray900,
+            selectedItemColor: ColorConstant.red900,
+            unselectedItemColor: ColorConstant.whiteA700,
+            showSelectedLabels: false,
+            showUnselectedLabels: false,
+            type: BottomNavigationBarType.fixed,
+            currentIndex: currentIndex,
+            onTap: (index) => setState(() {
+              currentIndex = index;
+              onTabTapped(index);
+            }),
+            items: [
+              BottomNavigationBarItem(
+                  icon: ImageIcon(AssetImage("assets/icons/home_filled.png")),
+                  label: "Home"
+              ),
+              BottomNavigationBarItem(
+                  icon: ImageIcon(AssetImage("assets/icons/search_empty.png")),
+                  label: "Search"
+              ),
+              BottomNavigationBarItem(
+                  icon: ImageIcon(AssetImage("assets/icons/recomandation_empty.png")),
+                  label: "Recommendation"
+              ),
+              BottomNavigationBarItem(
+                  icon: ImageIcon(AssetImage("assets/icons/friends_filled.png")),
+                  label: "Friends"
+              ),
+              BottomNavigationBarItem(
+                  icon: ImageIcon(AssetImage("assets/icons/bookmark_empty.png")),
+                  label: "bookmark"
+              ),
+              BottomNavigationBarItem(
+                  icon: ImageIcon(AssetImage("assets/icons/settings_empty.png")),
+                  label: "Settings"
+              ),
+            ],
+          )
       ),
     );
   }
@@ -220,8 +323,6 @@ class FriendCell extends StatelessWidget {
 
   Future<String> getFriendName(String friendId) async{
 
-
-    print(friendId);
     final DocumentReference friendDocRef =
     FirebaseFirestore.instance.collection('users').doc(friendId);
     DocumentSnapshot snapshot = await friendDocRef.get();
@@ -252,13 +353,13 @@ class FriendCell extends StatelessWidget {
   showWarningDialog(BuildContext context, String friend) {
 
     Widget cancelButton = MaterialButton(
-      child: Text("Cancel"),
+      child: Text("Cancel", style: AppStyle.txtPoppinsMedium18),
       onPressed:  () {
         Navigator.pop(context, true);
       },
     );
     Widget proceedButton = MaterialButton(
-      child: Text("Proceed"),
+      child: Text("Proceed", style: AppStyle.txtPoppinsMedium18Red),
       onPressed: () async {
         await removeFriend(friend);
         await Navigator.of(context).push(MaterialPageRoute(builder: (_) => Friends()));
@@ -267,14 +368,28 @@ class FriendCell extends StatelessWidget {
         },
     );
     AlertDialog alert = AlertDialog(
-      title: Text("Warning"),
+      title: Text.rich(
+        TextSpan(children: [
+          TextSpan(
+            text:"Warning",
+            style: AppStyle.txtPoppinsMedium18,
+          ),
+          TextSpan(
+              text: " !",
+              style: AppStyle.txtPoppinsMedium18Red
+          )
+        ])),
       content: Text(
-      'You are about to unfriend \'$friend\'\n'
-      'Do you wish to proceed?'),
+      'You are about to unfriend $friend\n'
+      'Do you wish to proceed?', style: AppStyle.txtPoppinsMedium18GreyLight),
       actions: [
         cancelButton,
         proceedButton,
       ],
+      backgroundColor: ColorConstant.gray90001,
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16)
+      ),
     );
 
 
@@ -303,7 +418,6 @@ class FriendCell extends StatelessWidget {
                 ),
                 decoration: new BoxDecoration(
                   borderRadius: new BorderRadius.circular(10.0),
-                  color: Colors.grey,
                   image: new DecorationImage(
                       image: new NetworkImage(
                           "https://eitrawmaterials.eu/wp-content/uploads/2016/09/person-icon.png"),
@@ -324,10 +438,7 @@ class FriendCell extends StatelessWidget {
                     children: [
                             Text(
                               friend,
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 20
-                              ),
+                              style: AppStyle.txtPoppinsBold20
                             )
                     ],
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -338,7 +449,7 @@ class FriendCell extends StatelessWidget {
               highlightColor: Colors.red,
               icon: Icon(
                 Icons.heart_broken,
-                color: Colors.black,
+                color: ColorConstant.red900,
               ),
               onPressed: () {showWarningDialog(context, friend);}
             ),
@@ -347,7 +458,7 @@ class FriendCell extends StatelessWidget {
         new Container(
           width: 300.0,
           height: 0.5,
-          color: const Color(0xD2D2E1ff),
+          color: ColorConstant.redA700,
           margin: const EdgeInsets.all(16.0),
         )
       ],

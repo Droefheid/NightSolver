@@ -4,7 +4,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
-import 'movie_details.dart';
+import 'package:night_solver/theme/app_style.dart';
+import 'package:night_solver/utils/custom_widgets.dart';
+import '../utils/color_constant.dart';
+import '../utils/constants.dart';
+import '../utils/movie_info.dart';
+import '../utils/size_utils.dart';
 
 class MovieList extends StatefulWidget {
   @override
@@ -12,7 +17,6 @@ class MovieList extends StatefulWidget {
 }
 
 class _MovieListState extends State<MovieList> {
-  final apiKey = '9478d83ca04bd6ee25b942dd7a0ad777';
   List<dynamic> movies = [];
   final TextEditingController _controller = TextEditingController();
   final ScrollController _scrollController = ScrollController();
@@ -30,7 +34,7 @@ class _MovieListState extends State<MovieList> {
     if (moviesId != null) {
       for (String movieId in moviesId) {
         final response = await http.get(Uri.parse(
-            'https://api.themoviedb.org/3/movie/$movieId?api_key=$apiKey'));
+            'https://api.themoviedb.org/3/movie/$movieId?api_key='+Constants.theMovieDb));
 
         if (response.statusCode == 200) {
           final Map<String, dynamic> responseData = json.decode(response.body);
@@ -49,7 +53,7 @@ class _MovieListState extends State<MovieList> {
     try {
       if (value != '') {
         final url =
-            'https://api.themoviedb.org/3/search/movie?api_key=$apiKey&query=$value';
+            'https://api.themoviedb.org/3/search/movie?api_key='+Constants.theMovieDb+'&query=$value';
         final response = await http.get(Uri.parse(url));
         final responseData = json.decode(response.body);
         resetScrollPosition();
@@ -78,73 +82,84 @@ class _MovieListState extends State<MovieList> {
     _scrollController.jumpTo(0.0);
   }
 
+  void onTabTapped(int index) {
+    if (index==0) Navigator.pushNamed(context, '/');
+    if (index==1) Navigator.pushNamed(context, '/search');
+    if (index==2) Navigator.pushNamed(context, '/salons');
+    if (index==3) Navigator.pushNamed(context, '/friends');
+    if (index==5) Navigator.pushNamed(context, '/settings');
+  }
+
   @override
   Widget build(BuildContext context) {
+    int currentIndex = 4;
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: ColorConstant.gray900,
       appBar: AppBar(
-        elevation: 0.3,
-        centerTitle: true,
+        backgroundColor: ColorConstant.gray900,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () => Navigator.of(context).pop(),
+          icon: ImageIcon(AssetImage("assets/icons/back_arrow_red.png"), color: ColorConstant.red900,),
+            onPressed: () => Navigator.of(context).pop()
         ),
-        title: Text(
-          'Movies',
-          style: TextStyle(
-            fontFamily: 'Arvo',
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            TextFormField(
-                controller: _controller,
-                decoration: InputDecoration(
-                    prefixIcon: new IconButton(
-                      icon: Icon(Icons.add_circle_outline),
-                      onPressed: null
-                    ),
-                    hintText: "Add movies",
-                    border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(15)
-                    )
-                ),
-                onChanged: _onSearchChanged
-            ),
-
-
-            Expanded(
-              child: ListView.builder(
-                controller: _scrollController,
-                itemCount: movies.isEmpty ? 0 : movies.length,
-                itemBuilder: (context, i) {
-                  return MaterialButton(
-                    child: MovieCell(movies[i]),
-                    padding: const EdgeInsets.all(0.0),
-                    onPressed: () async {
-                      final addedMovie = await Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => MovieDetail(movies[i]),
-                        ),
-                      );
-                      if (addedMovie != null && addedMovie) {
-                        _controller.clear();
-                        await getData();
-                      }
-                    },
-                    color: Colors.white,
-                  );
-                },
+        title: RichText(
+            text: TextSpan(children: [
+              TextSpan(
+                  text: "Bookmarks",
+                  style: AppStyle.txtPoppinsBold30
               ),
-            )
-          ],
-        ),
+              TextSpan(
+                  text: ".",
+                  style: AppStyle.txtPoppinsBold30Red
+              ),
+            ]),
+            textAlign: TextAlign.left
+        )
+      ),
+      body: Column(children: [
+        Expanded(child:
+      ListView.separated(
+          itemBuilder: (context, index) => VerticalMovieCard(item: new MovieInfo(movies[index])),
+          separatorBuilder: (context, _) => SizedBox(height: getVerticalSize(16),),
+          itemCount: movies.length
+      ))]),
+      bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: ColorConstant.gray900,
+        selectedItemColor: ColorConstant.red900,
+        unselectedItemColor: ColorConstant.whiteA700,
+        showSelectedLabels: false,
+        showUnselectedLabels: false,
+        type: BottomNavigationBarType.fixed,
+        currentIndex: currentIndex,
+        onTap: (index) => setState(() {
+          currentIndex = index;
+          onTabTapped(index);
+        }),
+        items: [
+          BottomNavigationBarItem(
+              icon: ImageIcon(AssetImage("assets/icons/home_filled.png")),
+              label: "Home"
+          ),
+          BottomNavigationBarItem(
+              icon: ImageIcon(AssetImage("assets/icons/search_empty.png")),
+              label: "Search"
+          ),
+          BottomNavigationBarItem(
+              icon: ImageIcon(AssetImage("assets/icons/recomandation_empty.png")),
+              label: "Recommendation"
+          ),
+          BottomNavigationBarItem(
+              icon: ImageIcon(AssetImage("assets/icons/friends_filled.png")),
+              label: "Friends"
+          ),
+          BottomNavigationBarItem(
+              icon: ImageIcon(AssetImage("assets/icons/bookmark_filled.png")),
+              label: "bookmark"
+          ),
+          BottomNavigationBarItem(
+              icon: ImageIcon(AssetImage("assets/icons/settings_empty.png")),
+              label: "Settings"
+          ),
+        ],
       ),
     );
   }
@@ -261,7 +276,7 @@ class _SearchBarState extends State<SearchBar> {
         controller: searchController,
         decoration: InputDecoration(
           hintText: "Search movies...",
-          suffixIcon: Icon(Icons.search),
+          suffixIcon: ImageIcon(AssetImage("assets/icons/search_empty.png"), color: ColorConstant.whiteA700,),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.all(Radius.circular(25.0)),
             borderSide: BorderSide.none,
